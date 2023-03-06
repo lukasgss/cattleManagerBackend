@@ -15,7 +15,6 @@ public class UserServiceTests
 {
     private readonly IUserService _sut;
     private readonly IUserRepository _userRepositoryMock;
-    private readonly IMapper _mapperMock;
     private readonly IPasswordService _passwordServiceMock;
     private readonly IJwtTokenGenerator _jwtTokenGeneratorMock;
     private readonly RegisterUserRequest _validUserRequest = new(
@@ -37,11 +36,10 @@ public class UserServiceTests
     };
     public UserServiceTests()
     {
-        _mapperMock = A.Fake<IMapper>();
         _userRepositoryMock = A.Fake<IUserRepository>();
         _passwordServiceMock = A.Fake<IPasswordService>();
         _jwtTokenGeneratorMock = A.Fake<IJwtTokenGenerator>();
-        _sut = new UserService(_userRepositoryMock, _mapperMock, _passwordServiceMock, _jwtTokenGeneratorMock);
+        _sut = new UserService(_userRepositoryMock, _passwordServiceMock, _jwtTokenGeneratorMock);
     }
 
     [Fact]

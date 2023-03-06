@@ -1,5 +1,5 @@
 appsettings.json
 appsettings.Development.json
-/bin
-/obj
+/CattleManager.Application/bin
+/CattleManager.Application/obj
 .vscode
