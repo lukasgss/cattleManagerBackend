@@ -1,4 +1,5 @@
 using AutoMapper;
+using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
 using CattleManager.Application.Domain.Entities;
 

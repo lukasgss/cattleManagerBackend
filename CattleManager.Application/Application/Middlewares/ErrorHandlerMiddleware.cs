@@ -42,6 +42,10 @@ public class ErrorHandlerMiddleware
                 statusCode = HttpStatusCode.Conflict;
                 message = exception.Message;
                 break;
+            case NotFoundException:
+                statusCode = HttpStatusCode.NotFound;
+                message = exception.Message;
+                break;
             default:
                 statusCode = HttpStatusCode.InternalServerError;
                 message = "Erro interno no sistema, tente novamente mais tarde.";

@@ -43,7 +43,7 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task ShouldNotRegisterUserWhenPasswordAndConfirmPasswordDontMatch()
+    public async Task Does_Not_Register_User_When_Password_And_Confirm_Password_Dont_Match()
     {
         var userToRegister = new RegisterUserRequest(
             FirstName: "firstName",
@@ -61,7 +61,7 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task ShouldNotRegisterUserWhenUsernameAlreadyExists()
+    public async Task Does_Not_Register_User_When_Username_Already_Exists()
     {
         A.CallTo(() => _userRepositoryMock.GetUserByUsernameAsync("username")).Returns(_userMock);
 
@@ -71,7 +71,7 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task ShouldNotRegisterUserWhenEmailAlreadyExists()
+    public async Task Does_Not_Register_User_When_Email_Already_Exists()
     {
         User? nullUser = null;
 
@@ -84,7 +84,7 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task ShouldRegisterUserWhenDataIsValid()
+    public async Task Registers_User_When_Data_Is_Valid()
     {
         User? nullUser = null;
         A.CallTo(() => _userRepositoryMock.GetUserByUsernameAsync(_validUserRequest.Username)).Returns(nullUser);
@@ -104,7 +104,7 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task ShouldNotLoginWithIncorrectUsername()
+    public async Task Does_Not_Login_With_Incorrect_Username()
     {
         User? nullUser = null;
         A.CallTo(() => _userRepositoryMock.GetUserByUsernameAsync("wrongUsername")).Returns(nullUser);
@@ -116,7 +116,7 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task ShouldNotLoginWithIncorrectPassword()
+    public async Task Does_Not_Login_With_Incorrect_Password()
     {
         A.CallTo(() => _userRepositoryMock.GetUserByUsernameAsync(_validLoginRequest.Username)).Returns(_userMock);
         A.CallTo(() => _passwordServiceMock.ComparePassword(_validLoginRequest.Password, "hashedPassword")).Returns(false);
@@ -128,7 +128,7 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task ShouldLoginWithCorrectCredentials()
+    public async Task Logs_in_With_Correct_Credentials()
     {
         A.CallTo(() => _userRepositoryMock.GetUserByUsernameAsync(_validLoginRequest.Username)).Returns(_userMock);
         A.CallTo(() => _passwordServiceMock.ComparePassword(_validLoginRequest.Password, _validLoginRequest.Password)).Returns(true);

@@ -1,15 +1,23 @@
 global using Microsoft.EntityFrameworkCore;
 using System.Text;
+using System.Text.Json.Serialization;
 using AutoMapper;
 using CattleManager.Application.Application.Common.Interfaces.Authentication;
+using CattleManager.Application.Application.Common.Interfaces.Authorization;
+using CattleManager.Application.Application.Common.Interfaces.Entities.CattleBreeds;
+using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
+using CattleManager.Application.Application.Common.Interfaces.Entities.Owners;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
+using CattleManager.Application.Application.Common.Interfaces.GuidProvider;
 using CattleManager.Application.Application.Common.Marker;
 using CattleManager.Application.Application.Middlewares;
 using CattleManager.Application.Application.Services.Authentication;
+using CattleManager.Application.Application.Services.Authorization;
 using CattleManager.Application.Application.Services.Entities;
 using CattleManager.Application.Infrastructure.Persistence;
 using CattleManager.Application.Infrastructure.Persistence.DataContext;
 using CattleManager.Application.Infrastructure.Persistence.Mappings;
+using CattleManager.Application.Infrastructure.Providers;
 using FluentValidation;
 using Microsoft.IdentityModel.Tokens;
 
@@ -18,6 +26,9 @@ IMapper mapper = mappingConfig.CreateMapper();
 
 var builder = WebApplication.CreateBuilder(args);
 {
+    builder.Services.AddControllers().AddJsonOptions(x =>
+                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
     builder.Services.AddControllers();
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
@@ -30,6 +41,10 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddScoped<IUserService, UserService>();
     builder.Services.AddScoped<IUserRepository, UserRepository>();
     builder.Services.AddScoped<IPasswordService, PasswordService>();
+    builder.Services.AddScoped<ICattleService, CattleService>();
+    builder.Services.AddScoped<ICattleRepository, CattleRepository>();
+    builder.Services.AddScoped<IUserAuthorizationService, UserAuthorizationService>();
+    builder.Services.AddScoped<IGuidProvider, GuidProvider>();
     builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>(_ => new JwtTokenGenerator(
         builder.Configuration["AppSettings:Issuer"],
         builder.Configuration["AppSettings:Audience"],

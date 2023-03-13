@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CattleManager.Application.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230302213526_FixTableUsers")]
-    partial class FixTableUsers
+    [Migration("20230309191059_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,122 @@ namespace CattleManager.Application.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("CatetleManager.Application.Domain.Entities.Conception", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<Guid>("FatherId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("MotherId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FatherId");
+
+                    b.HasIndex("MotherId");
+
+                    b.ToTable("Conceptions", (string)null);
+                });
+
+            modelBuilder.Entity("CattleBreed", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("BreedId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CattleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("QuantityInPercentage")
+                        .HasColumnType("decimal(6, 5)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BreedId");
+
+                    b.HasIndex("CattleId");
+
+                    b.ToTable("CattleBreed", t =>
+                        {
+                            t.HasCheckConstraint("QuantityBetween0And1", "\"CattleBreed\".\"QuantityInPercentage\" >= 0 AND \"CattleBreed\".\"QuantityInPercentage\" <= 1");
+                        });
+                });
+
+            modelBuilder.Entity("CattleManager.Application.Domain.Entities.Breed", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasAlternateKey("Name");
+
+                    b.ToTable("Breeds", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("84dda583-e177-4798-a4a8-efd2eb2bec33"),
+                            Name = "Gir"
+                        },
+                        new
+                        {
+                            Id = new Guid("1d66c840-f7bf-414c-bd62-e83af12bc417"),
+                            Name = "Holandês"
+                        },
+                        new
+                        {
+                            Id = new Guid("b09c73a3-02b4-4218-af87-ca0018e2e87c"),
+                            Name = "Jersey"
+                        },
+                        new
+                        {
+                            Id = new Guid("c6289763-4929-4110-920e-edeec109e50b"),
+                            Name = "Pardo Suíço"
+                        },
+                        new
+                        {
+                            Id = new Guid("5f2a7d6c-bbd8-4029-9615-c9eba93b162d"),
+                            Name = "Guzerá"
+                        },
+                        new
+                        {
+                            Id = new Guid("db455b05-bf98-4f03-8cdd-3ce5151fbd0b"),
+                            Name = "Nelore"
+                        },
+                        new
+                        {
+                            Id = new Guid("1807cd67-f6ff-4473-ac52-cc5ca9570268"),
+                            Name = "Simental"
+                        },
+                        new
+                        {
+                            Id = new Guid("0347e873-0fb0-47a4-a183-00da20af683c"),
+                            Name = "Sindi"
+                        },
+                        new
+                        {
+                            Id = new Guid("faf9ffd7-db74-4587-af60-1301ac46b450"),
+                            Name = "Brahman"
+                        });
+                });
 
             modelBuilder.Entity("CattleManager.Application.Domain.Entities.Cattle", b =>
                 {
@@ -51,6 +167,7 @@ namespace CattleManager.Application.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Image")
+                        .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
@@ -61,6 +178,9 @@ namespace CattleManager.Application.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
+
+                    b.Property<int?>("PriceInCentsInReais")
+                        .HasColumnType("integer");
 
                     b.Property<DateOnly?>("PurchaseDate")
                         .HasColumnType("date");
@@ -80,6 +200,27 @@ namespace CattleManager.Application.Migrations
                     b.HasIndex("SexId");
 
                     b.ToTable("Cattle", (string)null);
+                });
+
+            modelBuilder.Entity("CattleManager.Application.Domain.Entities.CattleOwner", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CattleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CattleId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CattleOwners");
                 });
 
             modelBuilder.Entity("CattleManager.Application.Domain.Entities.MilkProduction", b =>
@@ -104,27 +245,6 @@ namespace CattleManager.Application.Migrations
                     b.ToTable("MilkProductions", (string)null);
                 });
 
-            modelBuilder.Entity("CattleManager.Application.Domain.Entities.Owner", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CattleId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CattleId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Owners", (string)null);
-                });
-
             modelBuilder.Entity("CattleManager.Application.Domain.Entities.Sex", b =>
                 {
                     b.Property<byte>("Id")
@@ -137,9 +257,23 @@ namespace CattleManager.Application.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasAlternateKey("Gender");
+
                     b.ToTable("Sex", null, t =>
                         {
                             t.HasCheckConstraint("IdIs0Or1", "\"Sex\".\"Id\" >= 0 AND \"Sex\".\"Id\" <= 1");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            Id = (byte)0,
+                            Gender = "Fêmea"
+                        },
+                        new
+                        {
+                            Id = (byte)1,
+                            Gender = "Macho"
                         });
                 });
 
@@ -179,33 +313,6 @@ namespace CattleManager.Application.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("CattleManager.Application.Domain.Entities.Vaccination", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CattleId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date");
-
-                    b.Property<decimal>("DosageInMl")
-                        .HasColumnType("decimal(9, 4)");
-
-                    b.Property<Guid>("VaccineId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CattleId");
-
-                    b.HasIndex("VaccineId");
-
-                    b.ToTable("Vaccinations", (string)null);
-                });
-
             modelBuilder.Entity("CattleManager.Application.Domain.Entities.Vaccine", b =>
                 {
                     b.Property<Guid>("Id")
@@ -219,7 +326,76 @@ namespace CattleManager.Application.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasAlternateKey("Name");
+
                     b.ToTable("Vaccines", (string)null);
+                });
+
+            modelBuilder.Entity("Vaccinations", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CattleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly>("Date")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("date")
+                        .HasDefaultValue(new DateOnly(2023, 3, 9));
+
+                    b.Property<decimal>("DosageInMl")
+                        .HasColumnType("decimal(9, 4)");
+
+                    b.Property<Guid>("VaccineId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CattleId");
+
+                    b.HasIndex("VaccineId");
+
+                    b.ToTable("Vaccinations");
+                });
+
+            modelBuilder.Entity("CatetleManager.Application.Domain.Entities.Conception", b =>
+                {
+                    b.HasOne("CattleManager.Application.Domain.Entities.Cattle", "Father")
+                        .WithMany("Conceptions")
+                        .HasForeignKey("FatherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CattleManager.Application.Domain.Entities.Cattle", "Mother")
+                        .WithMany()
+                        .HasForeignKey("MotherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Father");
+
+                    b.Navigation("Mother");
+                });
+
+            modelBuilder.Entity("CattleBreed", b =>
+                {
+                    b.HasOne("CattleManager.Application.Domain.Entities.Breed", "Breed")
+                        .WithMany("CattleBreeds")
+                        .HasForeignKey("BreedId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CattleManager.Application.Domain.Entities.Cattle", "Cattle")
+                        .WithMany("CattleBreeds")
+                        .HasForeignKey("CattleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Breed");
+
+                    b.Navigation("Cattle");
                 });
 
             modelBuilder.Entity("CattleManager.Application.Domain.Entities.Cattle", b =>
@@ -247,18 +423,7 @@ namespace CattleManager.Application.Migrations
                     b.Navigation("Sex");
                 });
 
-            modelBuilder.Entity("CattleManager.Application.Domain.Entities.MilkProduction", b =>
-                {
-                    b.HasOne("CattleManager.Application.Domain.Entities.Cattle", "Cattle")
-                        .WithMany()
-                        .HasForeignKey("CattleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Cattle");
-                });
-
-            modelBuilder.Entity("CattleManager.Application.Domain.Entities.Owner", b =>
+            modelBuilder.Entity("CattleManager.Application.Domain.Entities.CattleOwner", b =>
                 {
                     b.HasOne("CattleManager.Application.Domain.Entities.Cattle", "Cattle")
                         .WithMany()
@@ -277,7 +442,18 @@ namespace CattleManager.Application.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("CattleManager.Application.Domain.Entities.Vaccination", b =>
+            modelBuilder.Entity("CattleManager.Application.Domain.Entities.MilkProduction", b =>
+                {
+                    b.HasOne("CattleManager.Application.Domain.Entities.Cattle", "Cattle")
+                        .WithMany("MilkProductions")
+                        .HasForeignKey("CattleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cattle");
+                });
+
+            modelBuilder.Entity("Vaccinations", b =>
                 {
                     b.HasOne("CattleManager.Application.Domain.Entities.Cattle", "Cattle")
                         .WithMany()
@@ -296,9 +472,20 @@ namespace CattleManager.Application.Migrations
                     b.Navigation("Vaccine");
                 });
 
+            modelBuilder.Entity("CattleManager.Application.Domain.Entities.Breed", b =>
+                {
+                    b.Navigation("CattleBreeds");
+                });
+
             modelBuilder.Entity("CattleManager.Application.Domain.Entities.Cattle", b =>
                 {
+                    b.Navigation("CattleBreeds");
+
+                    b.Navigation("Conceptions");
+
                     b.Navigation("FatherChildren");
+
+                    b.Navigation("MilkProductions");
 
                     b.Navigation("MotherChildren");
                 });

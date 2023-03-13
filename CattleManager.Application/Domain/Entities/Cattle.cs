@@ -1,3 +1,5 @@
+using CatetleManager.Application.Domain.Entities;
+
 namespace CattleManager.Application.Domain.Entities;
 
 public class Cattle
@@ -14,7 +16,10 @@ public class Cattle
     public DateOnly? DateOfDeath { get; set; }
     public string? CauseOfDeath { get; set; }
     public DateOnly? DateOfSale { get; set; }
+    public int? PriceInCentsInReais { get; set; }
 
+    public ICollection<User> Users { get; set; } = null!;
+    public ICollection<CattleOwner> CattleOwners { get; set; } = null!;
     public ICollection<Cattle> MotherChildren { get; set; } = null!;
     public ICollection<Cattle> FatherChildren { get; set; } = null!;
     public Cattle? Father { get; set; }
@@ -23,4 +28,9 @@ public class Cattle
     public Guid? MotherId { get; set; }
     public Sex Sex { get; set; } = null!;
     public byte SexId { get; set; }
+    public ICollection<Breed> Breeds { get; set; } = null!;
+    public ICollection<CattleBreed> CattleBreeds { get; set; } = null!;
+    public ICollection<Vaccine> Vaccines { get; set; } = null!;
+    public ICollection<MilkProduction> MilkProductions { get; set; } = null!;
+    public ICollection<Conception> Conceptions { get; set; } = null!;
 }

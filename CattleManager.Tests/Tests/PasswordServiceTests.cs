@@ -1,7 +1,5 @@
-using System;
 using CattleManager.Application.Application.Common.Interfaces.Authentication;
 using CattleManager.Application.Application.Services.Authentication;
-using FakeItEasy;
 using Xunit;
 
 namespace CattleManager.Tests;
@@ -9,16 +7,14 @@ namespace CattleManager.Tests;
 public class PasswordServiceTests
 {
     private readonly IPasswordService _sut;
-    private readonly IPasswordService _passwordServiceMock;
 
     public PasswordServiceTests()
     {
         _sut = new PasswordService();
-        _passwordServiceMock = A.Fake<IPasswordService>();
     }
 
     [Fact]
-    public void ShouldReturnFalseIfPasswordsToCompareAreDifferent()
+    public void Returns_False_If_Passwords_To_Compare_Are_Different()
     {
         var passwordHash = BCrypt.Net.BCrypt.HashPassword("differentPassword");
         bool comparePassword = _sut.ComparePassword("plainTextPassword", passwordHash);
@@ -27,7 +23,7 @@ public class PasswordServiceTests
     }
 
     [Fact]
-    public void ShouldReturnTrueIfPasswordsToCompareAreEqual()
+    public void Returns_True_If_Passwords_To_Compare_Are_Equal()
     {
         const string password = "password";
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
@@ -38,7 +34,7 @@ public class PasswordServiceTests
     }
 
     [Fact]
-    public void ShouldHashPassword()
+    public void Hashes_Password()
     {
         const int bcryptPasswordHashLength = 60;
 

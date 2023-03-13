@@ -1,11 +1,12 @@
 namespace CattleManager.Application.Domain.Entities;
 
-public class Owner
+public class CattleBreed
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+    public decimal QuantityInPercentage { get; set; }
 
-    public User User { get; set; } = null!;
-    public Guid UserId { get; set; }
     public Cattle Cattle { get; set; } = null!;
     public Guid CattleId { get; set; }
+    public Breed Breed { get; set; } = null!;
+    public Guid BreedId { get; set; }
 }

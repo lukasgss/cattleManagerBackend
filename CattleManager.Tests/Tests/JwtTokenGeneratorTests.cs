@@ -9,7 +9,7 @@ namespace CattleManager.Tests;
 public class JwtTokenGeneratorTests
 {
     [Fact]
-    public void ShouldGenerateJwtTokenAndHaveCorrectClaims()
+    public void Generates_Jwt_Token_And_Has_Correct_Claims()
     {
         var jwtTokenGeneratorMock = new JwtTokenGenerator("issuer", "audience", "superSecretKeyVeryLong");
 
