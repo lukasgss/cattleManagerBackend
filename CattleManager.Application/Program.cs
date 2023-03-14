@@ -4,9 +4,8 @@ using System.Text.Json.Serialization;
 using AutoMapper;
 using CattleManager.Application.Application.Common.Interfaces.Authentication;
 using CattleManager.Application.Application.Common.Interfaces.Authorization;
-using CattleManager.Application.Application.Common.Interfaces.Entities.CattleBreeds;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
-using CattleManager.Application.Application.Common.Interfaces.Entities.Owners;
+using CattleManager.Application.Application.Common.Interfaces.Entities.MilkProductions;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
 using CattleManager.Application.Application.Common.Interfaces.GuidProvider;
 using CattleManager.Application.Application.Common.Marker;
@@ -45,6 +44,8 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddScoped<ICattleRepository, CattleRepository>();
     builder.Services.AddScoped<IUserAuthorizationService, UserAuthorizationService>();
     builder.Services.AddScoped<IGuidProvider, GuidProvider>();
+    builder.Services.AddScoped<IMilkProductionService, MilkProductionService>();
+    builder.Services.AddScoped<IMilkProductionRepository, MilkProductionRepository>();
     builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>(_ => new JwtTokenGenerator(
         builder.Configuration["AppSettings:Issuer"],
         builder.Configuration["AppSettings:Audience"],

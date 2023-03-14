@@ -1,5 +1,6 @@
 using AutoMapper;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
+using CattleManager.Application.Application.Common.Interfaces.Entities.MilkProductions;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
 using CattleManager.Application.Domain.Entities;
 
@@ -11,5 +12,9 @@ public class MappingProfile : Profile
     {
         CreateMap<User, UserResponse>().ReverseMap();
         CreateMap<User, RegisterUserRequest>().ReverseMap();
+
+        CreateMap<MilkProduction, MilkProductionRequest>().ReverseMap();
+        CreateMap<MilkProduction, MilkProductionResponse>().ReverseMap();
+        CreateMap<EditMilkProductionRequest, MilkProduction>().ReverseMap();
     }
 }

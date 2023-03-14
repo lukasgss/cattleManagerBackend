@@ -4,6 +4,7 @@ namespace CattleManager.Application.Application.Common.Interfaces.Entities.Cattl
 
 public record CattleRequest : ICattleRequest
 {
+#pragma warning disable 8618
     public CattleRequest() { }
 
     public Guid? Id { get; init; }

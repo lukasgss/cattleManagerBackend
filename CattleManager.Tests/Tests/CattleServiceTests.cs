@@ -469,7 +469,7 @@ public class CattleServiceTests
         };
     }
 
-    private EditCattleRequest GenerateEditCattleRequest(Guid cattleId, Guid userId, Guid? fatherId = null, Guid? motherId = null)
+    private static EditCattleRequest GenerateEditCattleRequest(Guid cattleId, Guid userId, Guid? fatherId = null, Guid? motherId = null)
     {
         return new EditCattleRequest()
         {
