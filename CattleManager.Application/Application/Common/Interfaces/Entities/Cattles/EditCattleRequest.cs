@@ -2,9 +2,9 @@ using CattleManager.Application.Application.Common.Interfaces.Entities.CattleBre
 
 namespace CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
 
-public record CattleRequest : ICattleRequest
+public record EditCattleRequest : ICattleRequest
 {
-    public CattleRequest() { }
+    public EditCattleRequest() { }
 
     public Guid? Id { get; init; }
     public string Name { get; init; }

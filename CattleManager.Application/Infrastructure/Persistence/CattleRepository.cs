@@ -25,7 +25,6 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
         .Where(cattle =>
             cattle.Name.ToLower().Contains(cattleName.ToLowerInvariant())
             && cattle.Users.Any(user => user.Id == userId))
-        .AsNoTracking()
         .ToListAsync();
     }
 
@@ -40,13 +39,22 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
             .ThenInclude(x => x.Breed)
         .Include(x => x.Sex)
         .Where(x => x.Users.Any(x => x.Id == ownerId))
-        .AsNoTracking()
         .ToListAsync();
     }
 
-    public async Task<Cattle?> GetCattleById(Guid cattleId, Guid userId)
+    public async Task<Cattle?> GetCattleById(Guid cattleId, Guid userId, bool trackChanges = false)
     {
-        return await _dbContext.Cattle
+        return !trackChanges ? (await _dbContext.Cattle
+            .Include(x => x.Users)
+            .Include(x => x.CattleOwners)
+                .ThenInclude(x => x.User)
+            .Include(x => x.Breeds)
+            .Include(x => x.CattleBreeds)
+                .ThenInclude(x => x.Breed)
+            .Include(x => x.Sex)
+            .SingleOrDefaultAsync(x => x.Id == cattleId && x.Users.Any(x => x.Id == userId)))
+            :
+            (await _dbContext.Cattle
             .Include(x => x.Users)
             .Include(x => x.CattleOwners)
                 .ThenInclude(x => x.User)
@@ -55,6 +63,6 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
                 .ThenInclude(x => x.Breed)
             .Include(x => x.Sex)
             .AsNoTracking()
-            .SingleOrDefaultAsync(x => x.Id == cattleId && x.Users.Any(x => x.Id == userId));
+            .SingleOrDefaultAsync(x => x.Id == cattleId && x.Users.Any(x => x.Id == userId)));
     }
 }

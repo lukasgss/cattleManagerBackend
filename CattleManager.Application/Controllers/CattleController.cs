@@ -30,7 +30,7 @@ public class CattleController : ControllerBase
         return Ok(cattle);
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:guid}", Name = "GetCattleById")]
     public async Task<ActionResult<CattleResponse>> GetCattleById(Guid id)
     {
         string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
@@ -61,6 +61,32 @@ public class CattleController : ControllerBase
         string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
         var cattle = await _cattleService.CreateCattle(cattleRequest, new Guid(userId));
+        return new CreatedAtRouteResult(nameof(GetCattleById), new { id = cattle.Id }, cattle);
+    }
+
+    [HttpPut("{cattleId:guid}")]
+    public async Task<ActionResult<CattleResponse>> EditCattle(EditCattleRequest cattleRequest, Guid cattleId)
+    {
+        EditCattleValidator validator = new();
+        var validationResult = validator.Validate(cattleRequest);
+        if (!validationResult.IsValid)
+        {
+            var modelStateDictionary = ValidationErrors.GenerateModelStateDictionary(validationResult);
+            return ValidationProblem(modelStateDictionary);
+        }
+
+        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        var cattle = await _cattleService.EditCattle(cattleRequest, new Guid(userId), cattleId);
         return Ok(cattle);
+    }
+
+    [HttpDelete("{cattleId:guid}")]
+    public async Task<ActionResult> DeleteCattle(Guid cattleId)
+    {
+        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        await _cattleService.DeleteCattle(cattleId, new Guid(userId));
+        return Ok();
     }
 }

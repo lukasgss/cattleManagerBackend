@@ -77,7 +77,7 @@ public class CattleServiceTests
         Guid cattleIdToBeSearched = Guid.NewGuid();
         Guid userId = Guid.NewGuid();
         Cattle? nullCattle = null;
-        A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleIdToBeSearched, userId)).Returns(nullCattle);
+        A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleIdToBeSearched, userId, true)).Returns(nullCattle);
 
         async Task result() => await _sut.GetCattleById(cattleIdToBeSearched, userId);
 
@@ -92,7 +92,7 @@ public class CattleServiceTests
         Guid userId = Guid.NewGuid();
         Cattle cattleFromOwner = GenerateCattle(cattleId, userId);
         CattleResponse cattleFromOwnerResponse = GenerateCattleResponseDto(cattleFromOwner);
-        A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleId, userId)).Returns(cattleFromOwner);
+        A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleId, userId, true)).Returns(cattleFromOwner);
 
         var cattle = await _sut.GetCattleById(cattleId, userId);
 
@@ -223,7 +223,7 @@ public class CattleServiceTests
         A.CallTo(() => _cattleRepositoryMock.GetByIdAsync(motherId)).Returns(mother);
         Cattle cattleFromCattleRequest = GenerateCattleFromCattleRequest(cattleRequest);
         A.CallTo(() => _guidProviderMock.NewGuid()).Returns(cattleFromCattleRequest.Id);
-        A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleFromCattleRequest.Id, userId)).Returns(cattleFromCattleRequest);
+        A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleFromCattleRequest.Id, userId, true)).Returns(cattleFromCattleRequest);
         CattleResponse cattleResponse = GenerateCattleResponseDto(cattleFromCattleRequest);
 
         // Act
@@ -231,6 +231,75 @@ public class CattleServiceTests
 
         // Assert
         Assert.Equivalent(cattleResponse, cattle);
+    }
+
+    [Fact]
+    public async Task Edit_Cattle_With_Unregistered_Id_Throws_NotFoundException()
+    {
+        Guid cattleId = _guidProvider.NewGuid();
+        Guid userId = Guid.NewGuid();
+        EditCattleRequest editCattleRequest = GenerateEditCattleRequest(cattleId, userId, Guid.NewGuid(), Guid.NewGuid());
+        Cattle? nullCattle = null;
+        A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleId, userId, true)).Returns(nullCattle);
+
+        async Task result() => await _sut.EditCattle(editCattleRequest, userId, editCattleRequest.Id!.Value);
+
+        var exception = await Assert.ThrowsAsync<NotFoundException>(result);
+        Assert.Equal("Gado com o id especificado não existe.", exception.Message);
+    }
+
+    [Fact]
+    public async Task Edit_Cattle_With_Itself_As_Parent_Throws_BadRequestException()
+    {
+        Guid userId = Guid.NewGuid();
+        Guid cattleId = Guid.NewGuid();
+        EditCattleRequest cattleRequest = GenerateEditCattleRequest(cattleId, userId, fatherId: cattleId, null);
+        Cattle cattleFromCattleRequest = GenerateCattleFromCattleRequest(cattleRequest, cattleId);
+        A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleFromCattleRequest.Id, userId, true)).Returns(cattleFromCattleRequest);
+
+        async Task result() => await _sut.EditCattle(cattleRequest, userId, cattleId);
+
+        var exception = await Assert.ThrowsAsync<BadRequestException>(result);
+        Assert.Equal("Animal não pode ser pai ou mãe dele próprio.", exception.Message);
+    }
+
+    [Fact]
+    public async Task Edit_Cattle_With_Valid_Data_Returns_Edited_Cattle()
+    {
+        Guid userId = Guid.NewGuid();
+        Guid fatherId = Guid.NewGuid();
+        Guid motherId = Guid.NewGuid();
+        Guid cattleId = Guid.NewGuid();
+        EditCattleRequest cattleRequest = GenerateEditCattleRequest(cattleId, userId, fatherId, motherId);
+
+        Cattle cattle = GenerateCattleFromCattleRequest(cattleRequest, cattleId);
+        A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleId, userId, true)).Returns(cattle);
+        Cattle father = GenerateCattle(fatherId, userId, true);
+        A.CallTo(() => _cattleRepositoryMock.GetByIdAsync(fatherId)).Returns(father);
+        Cattle mother = GenerateCattle(fatherId, userId, false);
+        A.CallTo(() => _cattleRepositoryMock.GetByIdAsync(motherId)).Returns(mother);
+        Cattle cattleFromCattleRequest = GenerateCattleFromCattleRequest(cattleRequest, cattleId);
+        A.CallTo(() => _guidProviderMock.NewGuid()).Returns(cattleFromCattleRequest.Id);
+        A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleFromCattleRequest.Id, userId, true)).Returns(cattleFromCattleRequest);
+        CattleResponse cattleResponse = GenerateCattleResponseDto(cattleFromCattleRequest);
+
+        var cattleResult = await _sut.EditCattle(cattleRequest, userId, cattleId);
+
+        Assert.Equivalent(cattleResponse, cattleResult);
+    }
+
+    [Fact]
+    public async Task Delete_Cattle_With_Non_Existent_Id_Throws_NotFoundException()
+    {
+        Guid cattleId = Guid.NewGuid();
+        Guid userId = Guid.NewGuid();
+        Cattle? nullCattle = null;
+        A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleId, userId, false)).Returns(nullCattle);
+
+        async Task result() => await _sut.DeleteCattle(cattleId, userId);
+
+        var exception = await Assert.ThrowsAsync<NotFoundException>(result);
+        Assert.Equal("Animal com o id especificado não foi encontrado.", exception.Message);
     }
 
     private static Cattle GenerateCattle(Guid? cattleId = null, Guid? userId = null, bool isMale = false)
@@ -323,35 +392,36 @@ public class CattleServiceTests
 
     private static CattleRequest GenerateCattleRequest(Guid userId, Guid? fatherId, Guid? motherId)
     {
-        return new CattleRequest(
-            Name: "Jupiter",
-            FatherId: fatherId,
-            MotherId: motherId,
-            SexId: 0,
-            Breeds: new List<CattleBreedRequest>()
+        return new CattleRequest()
+        {
+            Name = "Jupiter",
+            FatherId = fatherId,
+            MotherId = motherId,
+            SexId = 0,
+            Breeds = new List<CattleBreedRequest>()
             {
                 new CattleBreedRequest(BreedId: _girId, QuantityInPercentage: .625m),
                 new CattleBreedRequest(BreedId: _holandesId, QuantityInPercentage: .375m)
             },
-            PurchaseDate: null,
-            ConceptionDate: DateOnly.FromDateTime(new DateTime(2020, 01, 01)),
-            DateOfBirth: DateOnly.FromDateTime(new DateTime(2020, 09, 01)),
-            YearOfBirth: 2020,
-            Image: null,
-            DateOfDeath: null,
-            CauseOfDeath: null,
-            DateOfSale: null,
-            PriceInCentsInReais: null,
-            OwnersIds: new Guid[] { userId }
-        );
+            PurchaseDate = null,
+            ConceptionDate = DateOnly.FromDateTime(new DateTime(2020, 01, 01)),
+            DateOfBirth = DateOnly.FromDateTime(new DateTime(2020, 09, 01)),
+            YearOfBirth = 2020,
+            Image = null,
+            DateOfDeath = null,
+            CauseOfDeath = null,
+            DateOfSale = null,
+            PriceInCentsInReais = null,
+            OwnersIds = new Guid[] { userId }
+        };
     }
 
-    private Cattle GenerateCattleFromCattleRequest(CattleRequest cattleRequest)
+    private Cattle GenerateCattleFromCattleRequest(ICattleRequest cattleRequest, Guid? id = null)
     {
         Guid cattleId = _guidProvider.NewGuid();
         return new()
         {
-            Id = cattleId,
+            Id = id ?? cattleId,
             Name = cattleRequest.Name,
             FatherId = cattleRequest.FatherId,
             Father = new Cattle() { Id = Guid.NewGuid(), Name = "Father", SexId = 1 },
@@ -396,6 +466,33 @@ public class CattleServiceTests
                     }
                 }
             },
+        };
+    }
+
+    private EditCattleRequest GenerateEditCattleRequest(Guid cattleId, Guid userId, Guid? fatherId = null, Guid? motherId = null)
+    {
+        return new EditCattleRequest()
+        {
+            Id = cattleId,
+            Name = "Jupiter",
+            FatherId = fatherId,
+            MotherId = motherId,
+            SexId = 0,
+            Breeds = new List<CattleBreedRequest>()
+            {
+                new CattleBreedRequest(BreedId: _girId, QuantityInPercentage: .625m),
+                new CattleBreedRequest(BreedId: _holandesId, QuantityInPercentage: .375m)
+            },
+            PurchaseDate = null,
+            ConceptionDate = DateOnly.FromDateTime(new DateTime(2020, 01, 01)),
+            DateOfBirth = DateOnly.FromDateTime(new DateTime(2020, 09, 01)),
+            YearOfBirth = 2020,
+            Image = null,
+            DateOfDeath = null,
+            CauseOfDeath = null,
+            DateOfSale = null,
+            PriceInCentsInReais = null,
+            OwnersIds = new Guid[] { userId }
         };
     }
 }

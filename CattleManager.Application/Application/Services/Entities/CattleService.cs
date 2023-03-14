@@ -35,7 +35,7 @@ public class CattleService : ICattleService
 
     public async Task<CattleResponse> GetCattleById(Guid cattleId, Guid userId)
     {
-        var cattle = await _cattleRepository.GetCattleById(cattleId, userId);
+        var cattle = await _cattleRepository.GetCattleById(cattleId, userId, true);
         if (cattle is null)
             throw new NotFoundException("Animal com o ID especificado não foi encontrado.");
 
@@ -57,28 +57,10 @@ public class CattleService : ICattleService
 
     public async Task<CattleResponse> CreateCattle(CattleRequest cattleRequest, Guid userId)
     {
-        var cattleByName = await _cattleRepository.GetCattleByName(cattleRequest.Name, userId);
-        if (cattleByName.Any())
-            throw new ConflictException("Gado com esse nome já existe.");
+        await ValidateCattleName(cattleRequest.Name, userId);
+        await ValidateCattleParents(cattleRequest.FatherId, cattleRequest.MotherId);
 
-        if (cattleRequest.FatherId is not null)
-        {
-            var cattleFather = await _cattleRepository.GetByIdAsync(cattleRequest.FatherId.Value);
-            if (cattleFather is null)
-                throw new NotFoundException("Pai especificado não foi encontrado.");
-            if (cattleFather.SexId == (byte)Gender.Female)
-                throw new BadRequestException("Pai do animal não pode ser do sexo feminino.");
-        }
-        if (cattleRequest.MotherId is not null)
-        {
-            var cattleMother = await _cattleRepository.GetByIdAsync(cattleRequest.MotherId.Value);
-            if (cattleMother is null)
-                throw new NotFoundException("Mãe especificada não foi encontrada.");
-            if (cattleMother.SexId == (byte)Gender.Male)
-                throw new BadRequestException("Mãe do animal não pode ser do sexo masculino.");
-        }
-
-        Cattle cattleToRegister = GenerateCattleToBeRegistered(cattleRequest);
+        Cattle cattleToRegister = GenerateCattleFromRequest(cattleRequest);
 
         GenerateListOfCattleBreedRequest(cattleRequest, cattleToRegister);
         GenerateListOfOwnerRequest(cattleRequest, cattleToRegister);
@@ -93,12 +75,53 @@ public class CattleService : ICattleService
         return createdCattle;
     }
 
-    private Cattle GenerateCattleToBeRegistered(CattleRequest cattleRequest)
+    public async Task<CattleResponse> EditCattle(EditCattleRequest cattleRequest, Guid userId, Guid routeId)
+    {
+        if (routeId != cattleRequest.Id)
+            throw new BadRequestException("Id da rota não coincide com o id do gado especificado.");
+
+        var cattle = await _cattleRepository.GetCattleById(cattleRequest.Id.Value, userId, true);
+        if (cattle is null)
+            throw new NotFoundException("Gado com o id especificado não existe.");
+
+        await ValidateCattleName(cattleRequest.Name, userId);
+        await ValidateCattleParents(cattleRequest.FatherId, cattleRequest.MotherId, cattleRequest.Id);
+
+        Cattle cattleToEdit = GenerateCattleFromRequest(cattleRequest);
+
+        _cattleRepository.Update(cattleToEdit);
+        await _cattleRepository.CommitAsync();
+
+        var updatedCattle = await GetCattleById(cattleToEdit.Id, userId);
+        if (updatedCattle is null)
+            throw new Exception("Não foi possível retornar os dados do gado.");
+
+        return updatedCattle;
+    }
+
+    public async Task DeleteCattle(Guid cattleId, Guid userId)
+    {
+        var cattle = await _cattleRepository.GetCattleById(cattleId, userId, false);
+        if (cattle is null)
+            throw new NotFoundException("Animal com o id especificado não foi encontrado.");
+
+        _cattleRepository.Delete(cattle);
+        await _cattleRepository.CommitAsync();
+    }
+
+    private async Task ValidateCattleName(string cattleName, Guid userId)
+    {
+        var cattleByName = await _cattleRepository.GetCattleByName(cattleName, userId);
+        if (cattleByName.Any())
+            throw new ConflictException("Gado com esse nome já existe.");
+    }
+
+    private Cattle GenerateCattleFromRequest(ICattleRequest cattleRequest)
     {
         Guid cattleId = _guidProvider.NewGuid();
         return new()
         {
-            Id = cattleId,
+            Id = cattleRequest.Id ?? cattleId,
             Name = cattleRequest.Name,
             PurchaseDate = cattleRequest.PurchaseDate,
             ConceptionDate = cattleRequest.ConceptionDate,
@@ -115,6 +138,29 @@ public class CattleService : ICattleService
             SexId = cattleRequest.SexId,
             CattleBreeds = new List<CattleBreed>()
         };
+    }
+
+    private async Task ValidateCattleParents(Guid? fatherId, Guid? motherId, Guid? cattleId = null)
+    {
+        if (cattleId is not null && (cattleId == fatherId || cattleId == motherId))
+            throw new BadRequestException("Animal não pode ser pai ou mãe dele próprio.");
+
+        if (fatherId is not null)
+        {
+            var cattleFather = await _cattleRepository.GetByIdAsync(fatherId.Value);
+            if (cattleFather is null)
+                throw new NotFoundException("Pai especificado não foi encontrado.");
+            if (cattleFather.SexId == (byte)Gender.Female)
+                throw new BadRequestException("Pai do animal não pode ser do sexo feminino.");
+        }
+        if (motherId is not null)
+        {
+            var cattleMother = await _cattleRepository.GetByIdAsync(motherId.Value);
+            if (cattleMother is null)
+                throw new NotFoundException("Mãe especificada não foi encontrada.");
+            if (cattleMother.SexId == (byte)Gender.Male)
+                throw new BadRequestException("Mãe do animal não pode ser do sexo masculino.");
+        }
     }
 
     private static void GenerateListOfOwnerRequest(CattleRequest cattleRequest, Cattle cattleToRegister)
