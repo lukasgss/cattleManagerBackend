@@ -30,7 +30,7 @@ public class Cattle
     public byte SexId { get; set; }
     public ICollection<Breed> Breeds { get; set; } = null!;
     public ICollection<CattleBreed> CattleBreeds { get; set; } = null!;
-    public ICollection<Vaccine> Vaccines { get; set; } = null!;
+    public virtual ICollection<Vaccination> Vaccinations { get; set; } = null!;
     public ICollection<MilkProduction> MilkProductions { get; set; } = null!;
     public ICollection<Conception> Conceptions { get; set; } = null!;
 }

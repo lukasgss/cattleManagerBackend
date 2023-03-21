@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace CattleManager.Application.Domain.Entities;
 
 public class Vaccination
@@ -6,8 +8,12 @@ public class Vaccination
     public decimal DosageInMl { get; set; }
     public DateOnly Date { get; set; }
 
-    public Cattle Cattle { get; set; } = null!;
+    [ForeignKey("CattleId")]
+    public virtual Cattle Cattle { get; set; } = null!;
+
     public Guid CattleId { get; set; }
-    public Vaccine Vaccine { get; set; } = null!;
+
+    [ForeignKey("VaccineId")]
+    public virtual Vaccine Vaccine { get; set; } = null!;
     public Guid VaccineId { get; set; }
 }

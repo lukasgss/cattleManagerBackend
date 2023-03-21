@@ -317,7 +317,6 @@ public class CattleServiceTests
             YearOfBirth = 2020,
             FatherId = Guid.NewGuid(),
             MotherId = Guid.NewGuid(),
-            Vaccines = new List<Vaccine>(),
             Breeds = new List<Breed>()
             {
                 new Breed() { Id = _girId, Name = "Gir" },

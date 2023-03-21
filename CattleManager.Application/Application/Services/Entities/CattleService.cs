@@ -14,7 +14,9 @@ public class CattleService : ICattleService
     private readonly ICattleRepository _cattleRepository;
     private readonly IGuidProvider _guidProvider;
 
-    public CattleService(ICattleRepository cattleRepository, IGuidProvider guidProvider)
+    public CattleService(
+        ICattleRepository cattleRepository,
+        IGuidProvider guidProvider)
     {
         _cattleRepository = cattleRepository;
         _guidProvider = guidProvider;
@@ -136,7 +138,7 @@ public class CattleService : ICattleService
             FatherId = cattleRequest.FatherId,
             MotherId = cattleRequest.MotherId,
             SexId = cattleRequest.SexId,
-            CattleBreeds = new List<CattleBreed>()
+            CattleBreeds = new List<CattleBreed>(),
         };
     }
 

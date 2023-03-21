@@ -38,17 +38,6 @@ public class AppDbContext : DbContext
                 .HasForeignKey(x => x.MotherId).OnDelete(DeleteBehavior.SetNull);
             entity.HasMany(x => x.Users).WithMany(x => x.Cattle).UsingEntity<CattleOwner>();
 
-            entity.HasMany(x => x.Vaccines).WithMany(x => x.Cattle).UsingEntity<Vaccination>(
-                "Vaccinations",
-                vac => vac.HasOne(prop => prop.Vaccine).WithMany().HasForeignKey(prop => prop.VaccineId),
-                vac => vac.HasOne(prop => prop.Cattle).WithMany().HasForeignKey(prop => prop.CattleId),
-                vac =>
-                {
-                    vac.Property(prop => prop.DosageInMl).IsRequired().HasColumnType("decimal(9, 4)");
-                    vac.Property(prop => prop.Date).IsRequired().HasDefaultValue(DateOnly.FromDateTime(DateTime.Now));
-                }
-            );
-
             entity.HasMany(x => x.Conceptions).WithOne(x => x.Father);
         });
 
@@ -60,13 +49,6 @@ public class AppDbContext : DbContext
             entity.Property(x => x.Username).IsRequired().HasMaxLength(255);
             entity.Property(x => x.Email).IsRequired().HasMaxLength(255);
             entity.Property(x => x.Password).IsRequired().HasMaxLength(255);
-        });
-
-        modelBuilder.Entity<Vaccine>(entity =>
-        {
-            entity.ToTable("Vaccines");
-            entity.HasAlternateKey(x => x.Name);
-            entity.Property(x => x.Name).HasMaxLength(255);
         });
 
         modelBuilder.Entity<MilkProduction>(entity =>
@@ -113,18 +95,6 @@ public class AppDbContext : DbContext
                     cb.Property(prop => prop.QuantityInPercentage).IsRequired()
                     .HasColumnType("decimal(6, 5)");
                 }
-            );
-
-            entity.HasData(
-                new Breed { Id = Guid.NewGuid(), Name = "Gir" },
-                new Breed { Id = Guid.NewGuid(), Name = "Holandês" },
-                new Breed { Id = Guid.NewGuid(), Name = "Jersey" },
-                new Breed { Id = Guid.NewGuid(), Name = "Pardo Suíço" },
-                new Breed { Id = Guid.NewGuid(), Name = "Guzerá" },
-                new Breed { Id = Guid.NewGuid(), Name = "Nelore" },
-                new Breed { Id = Guid.NewGuid(), Name = "Simental" },
-                new Breed { Id = Guid.NewGuid(), Name = "Sindi" },
-                new Breed { Id = Guid.NewGuid(), Name = "Brahman" }
             );
         });
 

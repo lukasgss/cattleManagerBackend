@@ -42,9 +42,16 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
         .ToListAsync();
     }
 
+    public async Task<Cattle?> GetCattleDataOnlyById(Guid cattleId, Guid userId)
+    {
+        return await _dbContext.Cattle
+            .Include(x => x.Vaccinations)
+            .SingleOrDefaultAsync(x => x.Id == cattleId && x.Users.Any(x => x.Id == userId));
+    }
+
     public async Task<Cattle?> GetCattleById(Guid cattleId, Guid userId, bool trackChanges = false)
     {
-        return !trackChanges ? (await _dbContext.Cattle
+        return trackChanges ? (await _dbContext.Cattle
             .Include(x => x.Users)
             .Include(x => x.CattleOwners)
                 .ThenInclude(x => x.User)
@@ -52,6 +59,7 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
             .Include(x => x.CattleBreeds)
                 .ThenInclude(x => x.Breed)
             .Include(x => x.Sex)
+            .Include(x => x.Vaccinations)
             .SingleOrDefaultAsync(x => x.Id == cattleId && x.Users.Any(x => x.Id == userId)))
             :
             (await _dbContext.Cattle
@@ -62,6 +70,7 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
             .Include(x => x.CattleBreeds)
                 .ThenInclude(x => x.Breed)
             .Include(x => x.Sex)
+            .Include(x => x.Vaccinations)
             .AsNoTracking()
             .SingleOrDefaultAsync(x => x.Id == cattleId && x.Users.Any(x => x.Id == userId)));
     }
