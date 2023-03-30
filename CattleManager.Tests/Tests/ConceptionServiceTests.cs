@@ -5,6 +5,7 @@ using AutoMapper;
 using CatetleManager.Application.Domain.Entities;
 using CattleManager.Application.Application.Common.Enums;
 using CattleManager.Application.Application.Common.Exceptions;
+using CattleManager.Application.Application.Common.Interfaces.CattleParents;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Conceptions;
 using CattleManager.Application.Application.Services.Entities;
@@ -78,12 +79,15 @@ public class ConceptionServiceTests
         Guid userId = Guid.NewGuid();
         A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleId, userId, false)).Returns(new Cattle());
         List<Conception> emptyList = new();
+        List<ConceptionResponse> emptyResponseList = new();
         A.CallTo(() => _conceptionRepositoryMock.GetAllConceptionsFromCattle(cattleId, userId, 1)).Returns(emptyList);
+        A.CallTo(() => _conceptionRepositoryMock.GetAmountOfPages()).Returns(1);
         A.CallTo(() => _mapperMock.Map<List<ConceptionResponse>>(emptyList)).Returns(new List<ConceptionResponse>());
+        PaginatedConceptionResponse expectedResponse = new(emptyResponseList, 1, 1);
 
-        IEnumerable<ConceptionResponse> conceptions = await _sut.GetAllConceptionsFromCattleAsync(cattleId, userId, 1);
+        PaginatedConceptionResponse conceptions = await _sut.GetAllConceptionsFromCattleAsync(cattleId, userId, 1);
 
-        Assert.Empty(conceptions);
+        Assert.Equivalent(expectedResponse, conceptions);
     }
 
     [Fact]
@@ -101,10 +105,12 @@ public class ConceptionServiceTests
         }
         A.CallTo(() => _conceptionRepositoryMock.GetAllConceptionsFromCattle(cattleId, userId, 1)).Returns(conceptionsList);
         A.CallTo(() => _mapperMock.Map<List<ConceptionResponse>>(conceptionsList)).Returns(conceptionResponsesList);
+        A.CallTo(() => _conceptionRepositoryMock.GetAmountOfPages()).Returns(1);
+        PaginatedConceptionResponse expectedResponse = new(conceptionResponsesList, 1, 1);
 
         var conceptions = await _sut.GetAllConceptionsFromCattleAsync(cattleId, userId, 1);
 
-        Assert.Equivalent(conceptionResponsesList, conceptions);
+        Assert.Equivalent(expectedResponse, conceptions);
     }
 
     [Fact]
@@ -414,11 +420,9 @@ public class ConceptionServiceTests
 
     private static ConceptionResponse GenerateConceptionResponseFromConception(Conception conception)
     {
-        return new ConceptionResponse(
-            conception.Id,
-            conception.Date,
-            conception.FatherId,
-            conception.MotherId);
+        CattleParentsResponse father = new(conception.FatherId, "fatherName");
+        CattleParentsResponse mother = new(conception.MotherId, "motherName");
+        return new ConceptionResponse(conception.Id, conception.Date, father, mother);
     }
 
     private static CreateConceptionRequest GenerateCreateConceptionRequest(Guid fatherId, Guid motherId)

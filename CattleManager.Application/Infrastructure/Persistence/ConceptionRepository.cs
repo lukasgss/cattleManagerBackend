@@ -14,9 +14,16 @@ public class ConceptionRepository : GenericRepository<Conception>, IConceptionRe
         _dbContext = dbContext;
     }
 
+    public double GetAmountOfPages()
+    {
+        return Math.Ceiling(_dbContext.Conceptions.Count() / (double)GlobalConstants.ResultsPerPage);
+    }
+
     public async Task<IEnumerable<Conception>> GetAllConceptionsFromCattle(Guid cattleId, Guid userId, int page)
     {
         return await _dbContext.Conceptions
+        .Include(x => x.Mother)
+        .Include(x => x.Father)
         .Where(x => (x.MotherId == cattleId && x.Mother.Users.Any(x => x.Id == userId)) ||
             (x.FatherId == cattleId && x.Father.Users.Any(x => x.Id == userId)))
         .OrderByDescending(x => x.Date)

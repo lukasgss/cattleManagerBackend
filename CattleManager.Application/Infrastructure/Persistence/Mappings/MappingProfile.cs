@@ -1,5 +1,6 @@
 using AutoMapper;
 using CatetleManager.Application.Domain.Entities;
+using CattleManager.Application.Application.Common.Interfaces.CattleParents;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Conceptions;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkProductions;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
@@ -26,5 +27,6 @@ public class MappingProfile : Profile
         CreateMap<Conception, CreateConceptionRequest>().ReverseMap();
         CreateMap<Conception, ConceptionResponse>().ReverseMap();
         CreateMap<EditConceptionRequest, Conception>().ReverseMap();
+        CreateMap<CattleParentsResponse, Cattle>().ReverseMap();
     }
 }

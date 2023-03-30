@@ -30,14 +30,18 @@ public class ConceptionService : IConceptionService
         return _mapper.Map<ConceptionResponse>(conception);
     }
 
-    public async Task<IEnumerable<ConceptionResponse>> GetAllConceptionsFromCattleAsync(Guid cattleId, Guid userId, int page)
+    public async Task<PaginatedConceptionResponse> GetAllConceptionsFromCattleAsync(Guid cattleId, Guid userId, int page)
     {
         Cattle? cattleToQuery = await _cattleRepository.GetCattleById(cattleId, userId, false);
         if (cattleToQuery is null)
             throw new NotFoundException("Animal com o id especificado não existe.");
+        var amountOfPages = _conceptionRepository.GetAmountOfPages();
+        if (page > amountOfPages || page < 1)
+            throw new BadRequestException($"Resultado possui {amountOfPages} página(s), insira um valor entre 1 e o número de páginas.");
 
         var conceptions = await _conceptionRepository.GetAllConceptionsFromCattle(cattleId, userId, page);
-        return _mapper.Map<List<ConceptionResponse>>(conceptions);
+        List<ConceptionResponse> conceptionResponses = _mapper.Map<List<ConceptionResponse>>(conceptions);
+        return new PaginatedConceptionResponse(conceptionResponses, page, amountOfPages);
     }
 
     public async Task<ConceptionResponse> CreateConceptionAsync(CreateConceptionRequest conceptionRequest, Guid userId)

@@ -3,7 +3,7 @@ namespace CattleManager.Application.Application.Common.Interfaces.Entities.Conce
 public interface IConceptionService
 {
     Task<ConceptionResponse> GetConceptionByIdAsync(Guid conceptionId);
-    Task<IEnumerable<ConceptionResponse>> GetAllConceptionsFromCattleAsync(Guid cattleId, Guid userId, int page);
+    Task<PaginatedConceptionResponse> GetAllConceptionsFromCattleAsync(Guid cattleId, Guid userId, int page);
     Task<ConceptionResponse> CreateConceptionAsync(CreateConceptionRequest conceptionRequest, Guid userId);
     Task<ConceptionResponse> EditConceptionAsync(EditConceptionRequest conceptionRequest, Guid userId, Guid routeId);
     Task DeleteConceptionAsync(Guid conceptionId, Guid userId);
