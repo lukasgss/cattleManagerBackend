@@ -80,15 +80,17 @@ public class MilkProductionServiceTests
     {
         Guid cattleId = Guid.NewGuid();
         Guid userId = Guid.NewGuid();
+        A.CallTo(() => _milkProductionRepositoryMock.GetAmountOfPages(cattleId, userId)).Returns(1);
         A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleId, userId, false)).Returns(new Cattle());
         List<MilkProduction> milkProductions = GenerateListOfMilkProductions(cattleId);
         A.CallTo(() => _milkProductionRepositoryMock.GetMilkProductionsFromCattleAsync(cattleId, userId, 1)).Returns(milkProductions);
         List<MilkProductionResponse> expectedMilkProductionResponse = GenerateListOfMilkProductionResponseFromListOfMilkProductions(milkProductions);
         A.CallTo(() => _mapperMock.Map<List<MilkProductionResponse>>(milkProductions)).Returns(expectedMilkProductionResponse);
+        PaginatedMilkProductionResponse expectedResponse = new(expectedMilkProductionResponse, 1, 1);
 
         var milkProductionResponse = await _sut.GetAllMilkProductionsFromCattleAsync(cattleId, userId, 1);
 
-        Assert.Equivalent(expectedMilkProductionResponse, milkProductionResponse);
+        Assert.Equivalent(expectedResponse, milkProductionResponse);
     }
 
     [Fact]

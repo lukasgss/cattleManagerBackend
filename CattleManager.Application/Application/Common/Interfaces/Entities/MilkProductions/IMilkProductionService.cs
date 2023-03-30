@@ -5,7 +5,7 @@ namespace CattleManager.Application.Application.Common.Interfaces.Entities.MilkP
 public interface IMilkProductionService
 {
     Task<MilkProductionResponse> GetMilkProductionByIdAsync(Guid id, Guid userId);
-    Task<IEnumerable<MilkProductionResponse>> GetAllMilkProductionsFromCattleAsync(Guid cattleId, Guid userId, int page);
+    Task<PaginatedMilkProductionResponse> GetAllMilkProductionsFromCattleAsync(Guid cattleId, Guid userId, int page);
     Task<MilkProductionResponse> CreateMilkProductionAsync(MilkProductionRequest milkProductionRequest, Guid userId);
     Task<MilkProductionResponse> EditMilkProductionByIdAsync(
         EditMilkProductionRequest editedMilkProduction,

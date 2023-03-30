@@ -5,6 +5,7 @@ namespace CattleManager.Application.Application.Common.Interfaces.Entities.MilkP
 
 public interface IMilkProductionRepository : IGenericRepository<MilkProduction>
 {
+    double GetAmountOfPages(Guid cattleId, Guid userId);
     Task<MilkProduction?> GetMilkProductionByIdAsync(Guid milkProductionId, Guid userId, bool trackChanges = true);
     Task<IEnumerable<MilkProduction>> GetMilkProductionsFromCattleAsync(Guid cattleId, Guid userid, int page);
 }

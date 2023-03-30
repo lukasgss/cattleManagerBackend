@@ -14,6 +14,12 @@ public class MilkProductionRepository : GenericRepository<MilkProduction>, IMilk
         _dbContext = dbContext;
     }
 
+    public double GetAmountOfPages(Guid cattleId, Guid userId)
+    {
+        return Math.Ceiling(_dbContext.MilkProductions.Where(x => x.CattleId == cattleId
+            && x.Cattle.Users.Any(x => x.Id == userId)).Count() / (double)GlobalConstants.ResultsPerPage);
+    }
+
     public async Task<MilkProduction?> GetMilkProductionByIdAsync(Guid milkProductionId, Guid userId, bool trackChanges = true)
     {
         return trackChanges ? (await _dbContext.MilkProductions
