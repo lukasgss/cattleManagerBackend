@@ -36,7 +36,7 @@ public class ConceptionService : IConceptionService
         if (cattleToQuery is null)
             throw new NotFoundException("Animal com o id especificado não existe.");
         var amountOfPages = _conceptionRepository.GetAmountOfPages();
-        if (page > amountOfPages || page < 1)
+        if ((page > amountOfPages && amountOfPages > 0) || page < 1)
             throw new BadRequestException($"Resultado possui {amountOfPages} página(s), insira um valor entre 1 e o número de páginas.");
 
         var conceptions = await _conceptionRepository.GetAllConceptionsFromCattle(cattleId, userId, page);

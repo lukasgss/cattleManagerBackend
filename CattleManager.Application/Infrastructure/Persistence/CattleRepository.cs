@@ -13,6 +13,11 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
         _dbContext = dbContext;
     }
 
+    public double GetAmountOfPages(Guid userId)
+    {
+        return Math.Ceiling(_dbContext.Cattle.Where(x => x.Users.Any(x => x.Id == userId)).Count() / (double)GlobalConstants.ResultsPerPage);
+    }
+
     public async Task<IEnumerable<Cattle>> GetCattleByName(string cattleName, Guid userId)
     {
         return await _dbContext.Cattle

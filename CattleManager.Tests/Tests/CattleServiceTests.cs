@@ -42,11 +42,13 @@ public class CattleServiceTests
             cattleFromDifferentOwner.Add(GenerateCattle());
         Guid userId = Guid.NewGuid();
         Guid differentUserId = Guid.NewGuid();
+        A.CallTo(() => _cattleRepositoryMock.GetAmountOfPages(differentUserId)).Returns(1);
         A.CallTo(() => _cattleRepositoryMock.GetAllCattleFromOwner(userId, 1)).Returns(cattleFromDifferentOwner);
+        PaginatedCattleResponse expectedCattleResponse = new(new List<CattleResponse>(), 1, 1);
 
-        IEnumerable<CattleResponse> cattle = await _sut.GetAllCattleFromOwner(differentUserId, 1);
+        PaginatedCattleResponse cattleResponse = await _sut.GetAllCattleFromOwner(differentUserId, 1);
 
-        Assert.Empty(cattle);
+        Assert.Equivalent(expectedCattleResponse, cattleResponse);
     }
 
     [Fact]
@@ -56,19 +58,18 @@ public class CattleServiceTests
         for (int i = 0; i < 5; i++)
             ownedCattle.Add(GenerateCattle());
         Guid userId = Guid.NewGuid();
+        A.CallTo(() => _cattleRepositoryMock.GetAmountOfPages(userId)).Returns(1);
         A.CallTo(() => _cattleRepositoryMock.GetAllCattleFromOwner(userId, 1)).Returns(ownedCattle);
         List<CattleResponse> ownedCattleByUser = new();
-        List<CattleResponse> ownedCattleResponse = new();
-
-        var cattle = await _sut.GetAllCattleFromOwner(userId, 1);
-        ownedCattleResponse.AddRange(cattle);
         foreach (Cattle animal in ownedCattle)
         {
             ownedCattleByUser.Add(GenerateCattleResponseDto(animal));
         }
+        PaginatedCattleResponse expectedOwnedCattleResponse = new(ownedCattleByUser, 1, 1);
 
-        Assert.NotEmpty(cattle);
-        ownedCattleByUser.Should().BeEquivalentTo(ownedCattleResponse);
+        var cattleResponse = await _sut.GetAllCattleFromOwner(userId, 1);
+
+        Assert.Equivalent(expectedOwnedCattleResponse, cattleResponse);
     }
 
     [Fact]

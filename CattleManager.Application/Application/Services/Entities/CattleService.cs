@@ -22,17 +22,21 @@ public class CattleService : ICattleService
         _guidProvider = guidProvider;
     }
 
-    public async Task<IEnumerable<CattleResponse>> GetAllCattleFromOwner(Guid ownerId, int page)
+    public async Task<PaginatedCattleResponse> GetAllCattleFromOwner(Guid ownerId, int page)
     {
-        IEnumerable<Cattle> cattlesFromOwner = await _cattleRepository.GetAllCattleFromOwner(ownerId, page);
-        List<CattleResponse> cattlesFromOwnerResponse = new();
-        foreach (var ownedCattle in cattlesFromOwner)
+        double amountOfPages = _cattleRepository.GetAmountOfPages(ownerId);
+        if ((page > amountOfPages && amountOfPages > 0) || page < 1)
+            throw new BadRequestException($"Resultado possui {amountOfPages} página(s), insira um valor entre 1 e o número de páginas.");
+
+        IEnumerable<Cattle> cattleFromOwner = await _cattleRepository.GetAllCattleFromOwner(ownerId, page);
+        List<CattleResponse> cattleFromOwnerResponse = new();
+        foreach (var ownedCattle in cattleFromOwner)
         {
             var cattleResponse = GenerateCattleResponseDto(ownedCattle);
-            cattlesFromOwnerResponse.Add(cattleResponse);
+            cattleFromOwnerResponse.Add(cattleResponse);
         }
 
-        return cattlesFromOwnerResponse;
+        return new PaginatedCattleResponse(cattleFromOwnerResponse, page, amountOfPages);
     }
 
     public async Task<CattleResponse> GetCattleById(Guid cattleId, Guid userId)
