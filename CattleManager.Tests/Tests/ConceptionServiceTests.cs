@@ -257,7 +257,7 @@ public class ConceptionServiceTests
         EditConceptionRequest editConceptionRequest = GenerateEditConceptionRequest(conceptionId, fatherId, motherId);
         Guid userId = Guid.NewGuid();
         Conception? nullConception = null;
-        A.CallTo(() => _conceptionRepositoryMock.GetByIdAsync(conceptionId)).Returns(nullConception);
+        A.CallTo(() => _conceptionRepositoryMock.GetConceptionByIdAsync(conceptionId, false)).Returns(nullConception);
 
         async Task result() => await _sut.EditConceptionAsync(editConceptionRequest, userId, conceptionId);
 
