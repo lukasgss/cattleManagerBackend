@@ -45,7 +45,7 @@ public class VaccinationServiceTests
         Vaccination? nullVaccination = null;
         A.CallTo(() => _vaccinationRepositoryMock.GetVaccinationByIdAsync(vaccinationId)).Returns(nullVaccination);
 
-        async Task result() => await _sut.GetVaccinationById(vaccinationId);
+        async Task result() => await _sut.GetVaccinationByIdAsync(vaccinationId);
 
         var exception = await Assert.ThrowsAsync<NotFoundException>(result);
         Assert.Equal("Vacinação com o id especificado não existe.", exception.Message);
@@ -65,7 +65,7 @@ public class VaccinationServiceTests
         A.CallTo(() => _mapperMock.Map<VaccinationResponse>(vaccination)).Returns(expectedVaccinationResponse);
         A.CallTo(() => _vaccinationRepositoryMock.GetVaccinationByIdAsync(vaccinationId)).Returns(vaccination);
 
-        VaccinationResponse vaccinationResponse = await _sut.GetVaccinationById(vaccinationId);
+        VaccinationResponse vaccinationResponse = await _sut.GetVaccinationByIdAsync(vaccinationId);
 
         Assert.Equivalent(expectedVaccinationResponse, vaccinationResponse);
     }
@@ -114,7 +114,7 @@ public class VaccinationServiceTests
         CreateVaccinationRequest vaccinationRequest = GenerateVaccinationRequest(cattleId, vaccineId, 10, DateOnly.FromDateTime(DateTime.Now));
         A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleId, userId, true)).Returns(nullCattle);
 
-        async Task result() => await _sut.CreateVaccination(vaccinationRequest, userId);
+        async Task result() => await _sut.CreateVaccinationAsync(vaccinationRequest, userId);
 
         var exception = await Assert.ThrowsAsync<NotFoundException>(result);
         Assert.Equal("Animal com o id especificado não existe.", exception.Message);
@@ -131,7 +131,7 @@ public class VaccinationServiceTests
         Vaccine? nullVaccine = null;
         A.CallTo(() => _vaccineRepositoryMock.GetVaccineByIdAsync(vaccineId)).Returns(nullVaccine);
 
-        async Task result() => await _sut.CreateVaccination(vaccinationRequest, userId);
+        async Task result() => await _sut.CreateVaccinationAsync(vaccinationRequest, userId);
 
         var exception = await Assert.ThrowsAsync<NotFoundException>(result);
         Assert.Equal("Vacina com o id especificado não existe.", exception.Message);
@@ -154,7 +154,7 @@ public class VaccinationServiceTests
         A.CallTo(() => _mapperMock.Map<Vaccination>(vaccinationRequest)).Returns(vaccination);
         A.CallTo(() => _mapperMock.Map<VaccinationResponse>(vaccination)).Returns(expectedVaccinationResponse);
 
-        VaccinationResponse vaccinationResponse = await _sut.CreateVaccination(vaccinationRequest, userId);
+        VaccinationResponse vaccinationResponse = await _sut.CreateVaccinationAsync(vaccinationRequest, userId);
 
         Assert.Equivalent(expectedVaccinationResponse, vaccinationResponse);
     }
@@ -171,7 +171,7 @@ public class VaccinationServiceTests
         DateOnly date = DateOnly.FromDateTime(DateTime.Now);
         EditVaccinationRequest vaccinationRequest = GenerateEditVaccinationRequest(vaccinationId, cattleId, vaccineId, dosageInMl, date);
 
-        async Task result() => await _sut.EditVaccination(vaccinationRequest, routeId, userId);
+        async Task result() => await _sut.EditVaccinationAsync(vaccinationRequest, routeId, userId);
 
         var exception = await Assert.ThrowsAsync<BadRequestException>(result);
         Assert.Equal("Rota não coincide com o id da vacinação.", exception.Message);
@@ -190,7 +190,7 @@ public class VaccinationServiceTests
         Vaccination? nullVaccination = null;
         A.CallTo(() => _vaccinationRepositoryMock.GetVaccinationByIdAsync(vaccinationId)).Returns(nullVaccination);
 
-        async Task result() => await _sut.EditVaccination(vaccinationRequest, vaccinationId, userId);
+        async Task result() => await _sut.EditVaccinationAsync(vaccinationRequest, vaccinationId, userId);
 
         var exception = await Assert.ThrowsAsync<NotFoundException>(result);
         Assert.Equal("Vacinação com o id especificado não existe.", exception.Message);
@@ -210,7 +210,7 @@ public class VaccinationServiceTests
         Cattle? nullCattle = null;
         A.CallTo(() => _cattleRepositoryMock.GetByIdAsync(cattleId)).Returns(nullCattle);
 
-        async Task result() => await _sut.EditVaccination(vaccinationRequest, vaccinationId, userId);
+        async Task result() => await _sut.EditVaccinationAsync(vaccinationRequest, vaccinationId, userId);
 
         var exception = await Assert.ThrowsAsync<NotFoundException>(result);
         Assert.Equal("Animal com o id especificado não existe.", exception.Message);
@@ -231,7 +231,7 @@ public class VaccinationServiceTests
         Vaccine? nullAppliedVaccine = null;
         A.CallTo(() => _vaccineRepositoryMock.GetVaccineByIdAsync(vaccineId)).Returns(nullAppliedVaccine);
 
-        async Task result() => await _sut.EditVaccination(vaccinationRequest, vaccinationId, userId);
+        async Task result() => await _sut.EditVaccinationAsync(vaccinationRequest, vaccinationId, userId);
 
         var exception = await Assert.ThrowsAsync<NotFoundException>(result);
         Assert.Equal("Vacina com o id especificado não existe.", exception.Message);
@@ -255,7 +255,7 @@ public class VaccinationServiceTests
         VaccinationResponse expectedVaccinationResponse = GenerateVaccinationResponse(cattleId, vaccineId, dosageInMl, date, vaccinationId);
         A.CallTo(() => _mapperMock.Map<VaccinationResponse>(vaccination)).Returns(expectedVaccinationResponse);
 
-        VaccinationResponse vaccinationResponse = await _sut.EditVaccination(vaccinationRequest, vaccinationId, userId);
+        VaccinationResponse vaccinationResponse = await _sut.EditVaccinationAsync(vaccinationRequest, vaccinationId, userId);
 
         Assert.Equivalent(expectedVaccinationResponse, vaccinationResponse);
     }
