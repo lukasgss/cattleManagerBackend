@@ -12,6 +12,7 @@ public class AppDbContext : DbContext
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<Vaccine> Vaccines { get; set; } = null!;
     public DbSet<Vaccination> Vaccinations { get; set; } = null!;
+    public DbSet<Conception> Conceptions { get; set; } = null!;
     public DbSet<MilkProduction> MilkProductions { get; set; } = null!;
     public DbSet<Sex> Sex { get; set; } = null!;
     public DbSet<Breed> Breeds { get; set; } = null!;

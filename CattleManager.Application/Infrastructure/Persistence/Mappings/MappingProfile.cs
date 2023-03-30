@@ -1,4 +1,6 @@
 using AutoMapper;
+using CatetleManager.Application.Domain.Entities;
+using CattleManager.Application.Application.Common.Interfaces.Entities.Conceptions;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkProductions;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Vaccinations;
@@ -21,5 +23,8 @@ public class MappingProfile : Profile
         CreateMap<EditVaccinationRequest, Vaccination>().ReverseMap();
         CreateMap<Vaccination, VaccinationResponse>().ReverseMap();
 
+        CreateMap<Conception, CreateConceptionRequest>().ReverseMap();
+        CreateMap<Conception, ConceptionResponse>().ReverseMap();
+        CreateMap<EditConceptionRequest, Conception>().ReverseMap();
     }
 }

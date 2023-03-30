@@ -25,7 +25,7 @@ public class VaccinationService : IVaccinationService
         _mapper = mapper;
     }
 
-    public async Task<VaccinationResponse> GetVaccinationById(Guid vaccinationId)
+    public async Task<VaccinationResponse> GetVaccinationByIdAsync(Guid vaccinationId)
     {
         Vaccination? vaccination = await _vaccinationRepository.GetVaccinationByIdAsync(vaccinationId);
         if (vaccination is null)
@@ -40,7 +40,7 @@ public class VaccinationService : IVaccinationService
         return _mapper.Map<List<VaccinationResponse>>(cattleVaccinations);
     }
 
-    public async Task<VaccinationResponse> CreateVaccination(CreateVaccinationRequest vaccinationRequest, Guid userId)
+    public async Task<VaccinationResponse> CreateVaccinationAsync(CreateVaccinationRequest vaccinationRequest, Guid userId)
     {
         Cattle? vaccinatedCattle = await _cattleRepository.GetCattleById(vaccinationRequest.CattleId, userId, true);
         if (vaccinatedCattle is null)
@@ -58,7 +58,7 @@ public class VaccinationService : IVaccinationService
         return _mapper.Map<VaccinationResponse>(vaccination);
     }
 
-    public async Task<VaccinationResponse> EditVaccination(EditVaccinationRequest vaccinationRequest, Guid routeId, Guid userId)
+    public async Task<VaccinationResponse> EditVaccinationAsync(EditVaccinationRequest vaccinationRequest, Guid routeId, Guid userId)
     {
         if (routeId != vaccinationRequest.Id)
             throw new BadRequestException("Rota não coincide com o id da vacinação.");
@@ -82,11 +82,15 @@ public class VaccinationService : IVaccinationService
         return _mapper.Map<VaccinationResponse>(editedVaccination);
     }
 
-    public async Task DeleteVaccination(Guid vaccinationId)
+    public async Task DeleteVaccinationAsync(Guid vaccinationId, Guid userId)
     {
         Vaccination? vaccinationToDelete = await _vaccinationRepository.GetByIdAsync(vaccinationId);
         if (vaccinationToDelete is null)
             throw new NotFoundException("Vacinação com o id especificado não existe.");
+
+        Cattle? cattleToBeVaccinated = await _cattleRepository.GetCattleById(vaccinationToDelete.CattleId, userId, false);
+        if (cattleToBeVaccinated is null)
+            throw new NotFoundException("Animal com o id especificado não existe.");
 
         _vaccinationRepository.Delete(vaccinationToDelete);
         await _vaccinationRepository.CommitAsync();

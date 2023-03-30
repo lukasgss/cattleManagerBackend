@@ -1,3 +1,3 @@
 namespace CattleManager.Application.Application.Common.Interfaces.Entities.Conceptions;
 
-public record ConceptionsResponse(Guid Id, DateOnly Date, string CattleName);
+public record ConceptionResponse(Guid Id, DateOnly Date, Guid FatherId, Guid MotherId);

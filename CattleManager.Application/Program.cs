@@ -5,6 +5,7 @@ using AutoMapper;
 using CattleManager.Application.Application.Common.Interfaces.Authentication;
 using CattleManager.Application.Application.Common.Interfaces.Authorization;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
+using CattleManager.Application.Application.Common.Interfaces.Entities.Conceptions;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkProductions;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Vaccinations;
@@ -51,6 +52,8 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddScoped<IVaccinationRepository, VaccinationRepository>();
     builder.Services.AddScoped<IVaccineRepository, VaccineRepository>();
     builder.Services.AddScoped<IVaccinationService, VaccinationService>();
+    builder.Services.AddScoped<IConceptionService, ConceptionService>();
+    builder.Services.AddScoped<IConceptionRepository, ConceptionRepository>();
     builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>(_ => new JwtTokenGenerator(
         builder.Configuration["AppSettings:Issuer"],
         builder.Configuration["AppSettings:Audience"],

@@ -19,12 +19,21 @@ public class VaccinationController : ControllerBase
         _userAuthorizationService = userAuthorizationService;
     }
 
+    [HttpGet("{cattleId:guid}")]
+    public async Task<ActionResult<IEnumerable<VaccinationResponse>>> GetAllVaccinationsFromCattle(Guid cattleId)
+    {
+        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        var vaccinationsFromCattle = await _vaccinationService.GetAllVaccinationsFromCattle(cattleId, new Guid(userId));
+        return Ok(vaccinationsFromCattle);
+    }
+
     [HttpPost]
     public async Task<ActionResult<VaccinationResponse>> CreateVacination(CreateVaccinationRequest vaccinationRequest)
     {
         string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var vaccination = await _vaccinationService.CreateVaccination(vaccinationRequest, new Guid(userId));
+        var vaccination = await _vaccinationService.CreateVaccinationAsync(vaccinationRequest, new Guid(userId));
         return Ok(vaccination);
     }
 
@@ -33,7 +42,16 @@ public class VaccinationController : ControllerBase
     {
         string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var editedVaccination = await _vaccinationService.EditVaccination(vaccinationRequest, vaccinationId, new Guid(userId));
+        var editedVaccination = await _vaccinationService.EditVaccinationAsync(vaccinationRequest, vaccinationId, new Guid(userId));
         return Ok(editedVaccination);
+    }
+
+    [HttpDelete("{vaccinationId:guid}")]
+    public async Task<ActionResult> DeleteVaccination(Guid vaccinationId)
+    {
+        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        await _vaccinationService.DeleteVaccinationAsync(vaccinationId, new Guid(userId));
+        return Ok();
     }
 }

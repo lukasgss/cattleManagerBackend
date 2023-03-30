@@ -8,7 +8,7 @@ public class Conception
     public DateOnly Date { get; set; }
 
     public Guid FatherId { get; set; }
-    public Cattle Father { get; set; } = null!;
+    public virtual Cattle Father { get; set; } = null!;
     public Guid MotherId { get; set; }
-    public Cattle Mother { get; set; } = null!;
+    public virtual Cattle Mother { get; set; } = null!;
 }
