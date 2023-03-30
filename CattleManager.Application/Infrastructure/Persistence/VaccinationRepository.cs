@@ -13,6 +13,12 @@ public class VaccinationRepository : GenericRepository<Vaccination>, IVaccinatio
         _dbContext = dbContext2;
     }
 
+    public double GetAmountOfPages(Guid cattleId, Guid userId)
+    {
+        return Math.Ceiling(_dbContext.Vaccinations.Where(x => x.CattleId == cattleId
+        && x.Cattle.Users.Any(x => x.Id == userId)).Count() / (double)GlobalConstants.ResultsPerPage);
+    }
+
     public async Task<IEnumerable<Vaccination>> GetAllVaccinationsFromCattle(Guid cattleId, Guid userId, int page)
     {
         return await _dbContext.Vaccinations

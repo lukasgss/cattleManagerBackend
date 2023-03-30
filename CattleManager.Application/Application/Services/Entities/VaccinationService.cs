@@ -34,10 +34,16 @@ public class VaccinationService : IVaccinationService
         return _mapper.Map<VaccinationResponse>(vaccination);
     }
 
-    public async Task<IEnumerable<VaccinationResponse>> GetAllVaccinationsFromCattle(Guid cattleId, Guid userId, int page)
+    public async Task<PaginatedVaccinationResponse> GetAllVaccinationsFromCattle(Guid cattleId, Guid userId, int page)
     {
+        double amountOfPages = _vaccinationRepository.GetAmountOfPages(cattleId, userId);
+        if ((page > amountOfPages && amountOfPages > 1) || page < 1)
+            throw new BadRequestException($"Resultado possui {amountOfPages} página(s), insira um valor entre 1 e o número de páginas.");
+
         IEnumerable<Vaccination> cattleVaccinations = await _vaccinationRepository.GetAllVaccinationsFromCattle(cattleId, userId, page);
-        return _mapper.Map<List<VaccinationResponse>>(cattleVaccinations);
+        List<VaccinationResponse> vaccinationResponse = _mapper.Map<List<VaccinationResponse>>(cattleVaccinations);
+
+        return new PaginatedVaccinationResponse(vaccinationResponse, page, amountOfPages);
     }
 
     public async Task<VaccinationResponse> CreateVaccinationAsync(CreateVaccinationRequest vaccinationRequest, Guid userId)

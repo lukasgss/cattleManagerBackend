@@ -75,12 +75,14 @@ public class VaccinationServiceTests
     {
         Guid cattleId = Guid.NewGuid();
         Guid userId = Guid.NewGuid();
+        A.CallTo(() => _vaccinationRepositoryMock.GetAmountOfPages(cattleId, userId)).Returns(1);
         A.CallTo(() => _vaccinationRepositoryMock.GetAllVaccinationsFromCattle(cattleId, userId, 1)).Returns(new List<Vaccination>());
         A.CallTo(() => _mapperMock.Map<List<VaccinationResponse>>(new List<Vaccination>())).Returns(new List<VaccinationResponse>());
+        PaginatedVaccinationResponse expectedVaccinationResponse = new(new List<VaccinationResponse>(), 1, 1);
 
         var vaccinationsFromCattle = await _sut.GetAllVaccinationsFromCattle(cattleId, userId, 1);
 
-        Assert.Empty(vaccinationsFromCattle);
+        Assert.Equivalent(expectedVaccinationResponse, vaccinationsFromCattle);
     }
 
     [Fact]
@@ -96,12 +98,14 @@ public class VaccinationServiceTests
             new Vaccination() {Id = Guid.NewGuid(), VaccineId = Guid.NewGuid(), CattleId = Guid.NewGuid(), DosageInMl = 4},
         };
         List<VaccinationResponse> expectedVaccinationResponses = GenerateListOfVaccinationResponse(vaccinations);
+        A.CallTo(() => _vaccinationRepositoryMock.GetAmountOfPages(cattleId, userId)).Returns(1);
         A.CallTo(() => _vaccinationRepositoryMock.GetAllVaccinationsFromCattle(cattleId, userId, 1)).Returns(vaccinations);
         A.CallTo(() => _mapperMock.Map<List<VaccinationResponse>>(vaccinations)).Returns(expectedVaccinationResponses);
+        PaginatedVaccinationResponse expectedResponse = new(expectedVaccinationResponses, 1, 1);
 
-        IEnumerable<VaccinationResponse> vaccinationResponses = await _sut.GetAllVaccinationsFromCattle(cattleId, userId, 1);
+        PaginatedVaccinationResponse vaccinationResponses = await _sut.GetAllVaccinationsFromCattle(cattleId, userId, 1);
 
-        Assert.Equivalent(expectedVaccinationResponses, vaccinationResponses);
+        Assert.Equivalent(expectedResponse, vaccinationResponses);
     }
 
     [Fact]
