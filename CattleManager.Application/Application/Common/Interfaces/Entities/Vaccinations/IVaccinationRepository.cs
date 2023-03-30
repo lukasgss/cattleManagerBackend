@@ -5,6 +5,6 @@ namespace CattleManager.Application.Application.Common.Interfaces.Entities.Vacci
 
 public interface IVaccinationRepository : IGenericRepository<Vaccination>
 {
-    public Task<IEnumerable<Vaccination>> GetAllVaccinationsFromCattle(Guid cattleId, Guid userId);
+    public Task<IEnumerable<Vaccination>> GetAllVaccinationsFromCattle(Guid cattleId, Guid userId, int page);
     public Task<Vaccination?> GetVaccinationByIdAsync(Guid vaccinationId);
 }

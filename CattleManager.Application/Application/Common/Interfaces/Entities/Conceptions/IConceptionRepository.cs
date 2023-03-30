@@ -5,6 +5,6 @@ namespace CattleManager.Application.Application.Common.Interfaces.Entities.Conce
 
 public interface IConceptionRepository : IGenericRepository<Conception>
 {
-    Task<IEnumerable<Conception>> GetAllConceptionsFromCattle(Guid cattleId, Guid userId);
+    Task<IEnumerable<Conception>> GetAllConceptionsFromCattle(Guid cattleId, Guid userId, int page);
     Task<Conception?> GetConceptionByIdAsync(Guid id, bool trackChanges = true);
 }

@@ -1,3 +1,4 @@
+using CattleManager.Application.Application.Common.Constants;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
 using CattleManager.Application.Domain.Entities;
 using CattleManager.Application.Infrastructure.Persistence.DataContext;
@@ -28,10 +29,9 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
         .ToListAsync();
     }
 
-    public async Task<IEnumerable<Cattle>> GetAllCattlesFromOwner(Guid ownerId)
+    public async Task<IEnumerable<Cattle>> GetAllCattleFromOwner(Guid ownerId, int page)
     {
         return await _dbContext.Cattle
-        .Include(x => x.Users)
         .Include(x => x.CattleOwners)
             .ThenInclude(x => x.User)
         .Include(x => x.Breeds)
@@ -39,6 +39,9 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
             .ThenInclude(x => x.Breed)
         .Include(x => x.Sex)
         .Where(x => x.Users.Any(x => x.Id == ownerId))
+        .OrderBy(x => x.Name)
+        .Skip((page - 1) * GlobalConstants.ResultsPerPage)
+        .Take(GlobalConstants.ResultsPerPage)
         .ToListAsync();
     }
 
@@ -52,10 +55,8 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
     public async Task<Cattle?> GetCattleById(Guid cattleId, Guid userId, bool trackChanges = false)
     {
         return trackChanges ? (await _dbContext.Cattle
-            .Include(x => x.Users)
             .Include(x => x.CattleOwners)
                 .ThenInclude(x => x.User)
-            .Include(x => x.Breeds)
             .Include(x => x.CattleBreeds)
                 .ThenInclude(x => x.Breed)
             .Include(x => x.Sex)
@@ -63,10 +64,8 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
             .SingleOrDefaultAsync(x => x.Id == cattleId && x.Users.Any(x => x.Id == userId)))
             :
             (await _dbContext.Cattle
-            .Include(x => x.Users)
             .Include(x => x.CattleOwners)
                 .ThenInclude(x => x.User)
-            .Include(x => x.Breeds)
             .Include(x => x.CattleBreeds)
                 .ThenInclude(x => x.Breed)
             .Include(x => x.Sex)

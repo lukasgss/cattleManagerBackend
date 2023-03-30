@@ -30,13 +30,13 @@ public class ConceptionService : IConceptionService
         return _mapper.Map<ConceptionResponse>(conception);
     }
 
-    public async Task<IEnumerable<ConceptionResponse>> GetAllConceptionsFromCattleAsync(Guid cattleId, Guid userId)
+    public async Task<IEnumerable<ConceptionResponse>> GetAllConceptionsFromCattleAsync(Guid cattleId, Guid userId, int page)
     {
         Cattle? cattleToQuery = await _cattleRepository.GetCattleById(cattleId, userId, false);
         if (cattleToQuery is null)
             throw new NotFoundException("Animal com o id especificado não existe.");
 
-        var conceptions = await _conceptionRepository.GetAllConceptionsFromCattle(cattleId, userId);
+        var conceptions = await _conceptionRepository.GetAllConceptionsFromCattle(cattleId, userId, page);
         return _mapper.Map<List<ConceptionResponse>>(conceptions);
     }
 

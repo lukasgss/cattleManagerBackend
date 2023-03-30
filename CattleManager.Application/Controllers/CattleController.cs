@@ -22,11 +22,11 @@ public class CattleController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<CattleResponse>>> GetAllCattlesFromOwner()
+    public async Task<ActionResult<IEnumerable<CattleResponse>>> GetAllCattlesFromOwner(int page = 1)
     {
         string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var cattle = await _cattleService.GetAllCattlesFromOwner(new Guid(userId));
+        var cattle = await _cattleService.GetAllCattleFromOwner(new Guid(userId), page);
         return Ok(cattle);
     }
 

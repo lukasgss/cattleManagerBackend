@@ -27,11 +27,11 @@ public class ConceptionController : ControllerBase
     }
 
     [HttpGet("cattle/{id:guid}")]
-    public async Task<ActionResult<ICollection<ConceptionResponse>>> GetAllConceptionsFromCattleByCattleId(Guid id)
+    public async Task<ActionResult<ICollection<ConceptionResponse>>> GetAllConceptionsFromCattleByCattleId(Guid id, int page = 1)
     {
         string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var conceptionsFromCattle = await _conceptionService.GetAllConceptionsFromCattleAsync(id, new Guid(userId));
+        var conceptionsFromCattle = await _conceptionService.GetAllConceptionsFromCattleAsync(id, new Guid(userId), page);
         return Ok(conceptionsFromCattle);
     }
 

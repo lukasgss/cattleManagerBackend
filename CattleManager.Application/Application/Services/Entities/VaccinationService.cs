@@ -34,9 +34,9 @@ public class VaccinationService : IVaccinationService
         return _mapper.Map<VaccinationResponse>(vaccination);
     }
 
-    public async Task<IEnumerable<VaccinationResponse>> GetAllVaccinationsFromCattle(Guid cattleId, Guid userId)
+    public async Task<IEnumerable<VaccinationResponse>> GetAllVaccinationsFromCattle(Guid cattleId, Guid userId, int page)
     {
-        IEnumerable<Vaccination> cattleVaccinations = await _vaccinationRepository.GetAllVaccinationsFromCattle(cattleId, userId);
+        IEnumerable<Vaccination> cattleVaccinations = await _vaccinationRepository.GetAllVaccinationsFromCattle(cattleId, userId, page);
         return _mapper.Map<List<VaccinationResponse>>(cattleVaccinations);
     }
 

@@ -1,4 +1,5 @@
 using CatetleManager.Application.Domain.Entities;
+using CattleManager.Application.Application.Common.Constants;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Conceptions;
 using CattleManager.Application.Infrastructure.Persistence.DataContext;
 
@@ -13,11 +14,14 @@ public class ConceptionRepository : GenericRepository<Conception>, IConceptionRe
         _dbContext = dbContext;
     }
 
-    public async Task<IEnumerable<Conception>> GetAllConceptionsFromCattle(Guid cattleId, Guid userId)
+    public async Task<IEnumerable<Conception>> GetAllConceptionsFromCattle(Guid cattleId, Guid userId, int page)
     {
         return await _dbContext.Conceptions
         .Where(x => (x.MotherId == cattleId && x.Mother.Users.Any(x => x.Id == userId)) ||
             (x.FatherId == cattleId && x.Father.Users.Any(x => x.Id == userId)))
+        .OrderByDescending(x => x.Date)
+        .Skip((page - 1) * GlobalConstants.ResultsPerPage)
+        .Take(GlobalConstants.ResultsPerPage)
         .ToListAsync();
     }
 

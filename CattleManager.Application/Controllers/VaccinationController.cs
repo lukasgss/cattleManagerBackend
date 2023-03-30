@@ -20,11 +20,11 @@ public class VaccinationController : ControllerBase
     }
 
     [HttpGet("{cattleId:guid}")]
-    public async Task<ActionResult<IEnumerable<VaccinationResponse>>> GetAllVaccinationsFromCattle(Guid cattleId)
+    public async Task<ActionResult<IEnumerable<VaccinationResponse>>> GetAllVaccinationsFromCattle(Guid cattleId, int page = 1)
     {
         string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var vaccinationsFromCattle = await _vaccinationService.GetAllVaccinationsFromCattle(cattleId, new Guid(userId));
+        var vaccinationsFromCattle = await _vaccinationService.GetAllVaccinationsFromCattle(cattleId, new Guid(userId), page);
         return Ok(vaccinationsFromCattle);
     }
 

@@ -65,7 +65,7 @@ public class ConceptionServiceTests
         Cattle? nullCattle = null;
         A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleId, userId, false)).Returns(nullCattle);
 
-        async Task result() => await _sut.GetAllConceptionsFromCattleAsync(cattleId, userId);
+        async Task result() => await _sut.GetAllConceptionsFromCattleAsync(cattleId, userId, 1);
 
         var exception = await Assert.ThrowsAsync<NotFoundException>(result);
         Assert.Equal("Animal com o id especificado não existe.", exception.Message);
@@ -78,10 +78,10 @@ public class ConceptionServiceTests
         Guid userId = Guid.NewGuid();
         A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleId, userId, false)).Returns(new Cattle());
         List<Conception> emptyList = new();
-        A.CallTo(() => _conceptionRepositoryMock.GetAllConceptionsFromCattle(cattleId, userId)).Returns(emptyList);
+        A.CallTo(() => _conceptionRepositoryMock.GetAllConceptionsFromCattle(cattleId, userId, 1)).Returns(emptyList);
         A.CallTo(() => _mapperMock.Map<List<ConceptionResponse>>(emptyList)).Returns(new List<ConceptionResponse>());
 
-        IEnumerable<ConceptionResponse> conceptions = await _sut.GetAllConceptionsFromCattleAsync(cattleId, userId);
+        IEnumerable<ConceptionResponse> conceptions = await _sut.GetAllConceptionsFromCattleAsync(cattleId, userId, 1);
 
         Assert.Empty(conceptions);
     }
@@ -99,10 +99,10 @@ public class ConceptionServiceTests
             conceptionsList.Add(conception);
             conceptionResponsesList.Add(GenerateConceptionResponseFromConception(conception));
         }
-        A.CallTo(() => _conceptionRepositoryMock.GetAllConceptionsFromCattle(cattleId, userId)).Returns(conceptionsList);
+        A.CallTo(() => _conceptionRepositoryMock.GetAllConceptionsFromCattle(cattleId, userId, 1)).Returns(conceptionsList);
         A.CallTo(() => _mapperMock.Map<List<ConceptionResponse>>(conceptionsList)).Returns(conceptionResponsesList);
 
-        var conceptions = await _sut.GetAllConceptionsFromCattleAsync(cattleId, userId);
+        var conceptions = await _sut.GetAllConceptionsFromCattleAsync(cattleId, userId, 1);
 
         Assert.Equivalent(conceptionResponsesList, conceptions);
     }

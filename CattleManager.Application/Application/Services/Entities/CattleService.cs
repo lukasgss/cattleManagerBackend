@@ -22,9 +22,9 @@ public class CattleService : ICattleService
         _guidProvider = guidProvider;
     }
 
-    public async Task<IEnumerable<CattleResponse>> GetAllCattlesFromOwner(Guid ownerId)
+    public async Task<IEnumerable<CattleResponse>> GetAllCattleFromOwner(Guid ownerId, int page)
     {
-        IEnumerable<Cattle> cattlesFromOwner = await _cattleRepository.GetAllCattlesFromOwner(ownerId);
+        IEnumerable<Cattle> cattlesFromOwner = await _cattleRepository.GetAllCattleFromOwner(ownerId, page);
         List<CattleResponse> cattlesFromOwnerResponse = new();
         foreach (var ownedCattle in cattlesFromOwner)
         {

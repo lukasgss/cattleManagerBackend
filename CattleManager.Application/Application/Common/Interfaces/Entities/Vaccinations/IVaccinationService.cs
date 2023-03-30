@@ -3,7 +3,7 @@ namespace CattleManager.Application.Application.Common.Interfaces.Entities.Vacci
 public interface IVaccinationService
 {
     Task<VaccinationResponse> GetVaccinationByIdAsync(Guid vaccinationId);
-    Task<IEnumerable<VaccinationResponse>> GetAllVaccinationsFromCattle(Guid cattleId, Guid userId);
+    Task<IEnumerable<VaccinationResponse>> GetAllVaccinationsFromCattle(Guid cattleId, Guid userId, int page);
     Task<VaccinationResponse> CreateVaccinationAsync(CreateVaccinationRequest vaccinationRequest, Guid userId);
     Task<VaccinationResponse> EditVaccinationAsync(EditVaccinationRequest vaccinationRequest, Guid routeId, Guid userId);
     Task DeleteVaccinationAsync(Guid vaccinationId, Guid userId);

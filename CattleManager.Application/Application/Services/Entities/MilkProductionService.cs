@@ -31,13 +31,13 @@ public class MilkProductionService : IMilkProductionService
         return _mapper.Map<MilkProductionResponse>(milkProduction);
     }
 
-    public async Task<IEnumerable<MilkProductionResponse>> GetAllMilkProductionsFromCattleAsync(Guid cattleId, Guid userId)
+    public async Task<IEnumerable<MilkProductionResponse>> GetAllMilkProductionsFromCattleAsync(Guid cattleId, Guid userId, int page)
     {
         var cattle = await _cattleRepository.GetCattleById(cattleId, userId, false);
         if (cattle is null)
             throw new NotFoundException("Animal com o id especificado não foi encontrado.");
 
-        var milkProductions = await _milkProductionRepository.GetMilkProductionsFromCattleAsync(cattleId, userId);
+        var milkProductions = await _milkProductionRepository.GetMilkProductionsFromCattleAsync(cattleId, userId, page);
 
         return _mapper.Map<List<MilkProductionResponse>>(milkProductions);
     }

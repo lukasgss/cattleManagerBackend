@@ -1,3 +1,4 @@
+using CattleManager.Application.Application.Common.Constants;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Vaccinations;
 using CattleManager.Application.Domain.Entities;
 using CattleManager.Application.Infrastructure.Persistence.DataContext;
@@ -12,11 +13,14 @@ public class VaccinationRepository : GenericRepository<Vaccination>, IVaccinatio
         _dbContext = dbContext2;
     }
 
-    public async Task<IEnumerable<Vaccination>> GetAllVaccinationsFromCattle(Guid cattleId, Guid userId)
+    public async Task<IEnumerable<Vaccination>> GetAllVaccinationsFromCattle(Guid cattleId, Guid userId, int page)
     {
         return await _dbContext.Vaccinations
         .Include(x => x.Cattle.Users)
         .Where(x => x.CattleId == cattleId && x.Cattle.Users.Any(x => x.Id == userId))
+        .OrderByDescending(x => x.Date)
+        .Skip((page - 1) * GlobalConstants.ResultsPerPage)
+        .Take(GlobalConstants.ResultsPerPage)
         .ToListAsync();
     }
 

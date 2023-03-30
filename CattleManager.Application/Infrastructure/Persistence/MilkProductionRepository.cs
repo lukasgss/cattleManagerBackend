@@ -1,3 +1,4 @@
+using CattleManager.Application.Application.Common.Constants;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkProductions;
 using CattleManager.Application.Domain.Entities;
 using CattleManager.Application.Infrastructure.Persistence.DataContext;
@@ -23,10 +24,13 @@ public class MilkProductionRepository : GenericRepository<MilkProduction>, IMilk
         .SingleOrDefaultAsync(x => x.Id == milkProductionId && x.Cattle.Users.Any(x => x.Id == userId)));
     }
 
-    public async Task<IEnumerable<MilkProduction>> GetMilkProductionsFromCattleAsync(Guid cattleId, Guid userId)
+    public async Task<IEnumerable<MilkProduction>> GetMilkProductionsFromCattleAsync(Guid cattleId, Guid userId, int page)
     {
         return await _dbContext.MilkProductions
         .Where(x => x.CattleId == cattleId && x.Cattle.Users.Any(x => x.Id == userId))
+        .OrderByDescending(x => x.Date)
+        .Skip((page - 1) * GlobalConstants.ResultsPerPage)
+        .Take(GlobalConstants.ResultsPerPage)
         .ToListAsync();
     }
 }

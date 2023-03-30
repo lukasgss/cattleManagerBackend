@@ -69,7 +69,7 @@ public class MilkProductionServiceTests
         Cattle? nullCattle = null;
         A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleId, userId, false)).Returns(nullCattle);
 
-        async Task result() => await _sut.GetAllMilkProductionsFromCattleAsync(cattleId, userId);
+        async Task result() => await _sut.GetAllMilkProductionsFromCattleAsync(cattleId, userId, 1);
 
         var exception = await Assert.ThrowsAsync<NotFoundException>(result);
         Assert.Equal("Animal com o id especificado não foi encontrado.", exception.Message);
@@ -82,11 +82,11 @@ public class MilkProductionServiceTests
         Guid userId = Guid.NewGuid();
         A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleId, userId, false)).Returns(new Cattle());
         List<MilkProduction> milkProductions = GenerateListOfMilkProductions(cattleId);
-        A.CallTo(() => _milkProductionRepositoryMock.GetMilkProductionsFromCattleAsync(cattleId, userId)).Returns(milkProductions);
+        A.CallTo(() => _milkProductionRepositoryMock.GetMilkProductionsFromCattleAsync(cattleId, userId, 1)).Returns(milkProductions);
         List<MilkProductionResponse> expectedMilkProductionResponse = GenerateListOfMilkProductionResponseFromListOfMilkProductions(milkProductions);
         A.CallTo(() => _mapperMock.Map<List<MilkProductionResponse>>(milkProductions)).Returns(expectedMilkProductionResponse);
 
-        var milkProductionResponse = await _sut.GetAllMilkProductionsFromCattleAsync(cattleId, userId);
+        var milkProductionResponse = await _sut.GetAllMilkProductionsFromCattleAsync(cattleId, userId, 1);
 
         Assert.Equivalent(expectedMilkProductionResponse, milkProductionResponse);
     }

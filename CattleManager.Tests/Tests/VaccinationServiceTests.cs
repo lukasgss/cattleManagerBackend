@@ -75,10 +75,10 @@ public class VaccinationServiceTests
     {
         Guid cattleId = Guid.NewGuid();
         Guid userId = Guid.NewGuid();
-        A.CallTo(() => _vaccinationRepositoryMock.GetAllVaccinationsFromCattle(cattleId, userId)).Returns(new List<Vaccination>());
+        A.CallTo(() => _vaccinationRepositoryMock.GetAllVaccinationsFromCattle(cattleId, userId, 1)).Returns(new List<Vaccination>());
         A.CallTo(() => _mapperMock.Map<List<VaccinationResponse>>(new List<Vaccination>())).Returns(new List<VaccinationResponse>());
 
-        var vaccinationsFromCattle = await _sut.GetAllVaccinationsFromCattle(cattleId, userId);
+        var vaccinationsFromCattle = await _sut.GetAllVaccinationsFromCattle(cattleId, userId, 1);
 
         Assert.Empty(vaccinationsFromCattle);
     }
@@ -96,10 +96,10 @@ public class VaccinationServiceTests
             new Vaccination() {Id = Guid.NewGuid(), VaccineId = Guid.NewGuid(), CattleId = Guid.NewGuid(), DosageInMl = 4},
         };
         List<VaccinationResponse> expectedVaccinationResponses = GenerateListOfVaccinationResponse(vaccinations);
-        A.CallTo(() => _vaccinationRepositoryMock.GetAllVaccinationsFromCattle(cattleId, userId)).Returns(vaccinations);
+        A.CallTo(() => _vaccinationRepositoryMock.GetAllVaccinationsFromCattle(cattleId, userId, 1)).Returns(vaccinations);
         A.CallTo(() => _mapperMock.Map<List<VaccinationResponse>>(vaccinations)).Returns(expectedVaccinationResponses);
 
-        IEnumerable<VaccinationResponse> vaccinationResponses = await _sut.GetAllVaccinationsFromCattle(cattleId, userId);
+        IEnumerable<VaccinationResponse> vaccinationResponses = await _sut.GetAllVaccinationsFromCattle(cattleId, userId, 1);
 
         Assert.Equivalent(expectedVaccinationResponses, vaccinationResponses);
     }

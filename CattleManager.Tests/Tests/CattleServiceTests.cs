@@ -42,9 +42,9 @@ public class CattleServiceTests
             cattleFromDifferentOwner.Add(GenerateCattle());
         Guid userId = Guid.NewGuid();
         Guid differentUserId = Guid.NewGuid();
-        A.CallTo(() => _cattleRepositoryMock.GetAllCattlesFromOwner(userId)).Returns(cattleFromDifferentOwner);
+        A.CallTo(() => _cattleRepositoryMock.GetAllCattleFromOwner(userId, 1)).Returns(cattleFromDifferentOwner);
 
-        IEnumerable<CattleResponse> cattle = await _sut.GetAllCattlesFromOwner(differentUserId);
+        IEnumerable<CattleResponse> cattle = await _sut.GetAllCattleFromOwner(differentUserId, 1);
 
         Assert.Empty(cattle);
     }
@@ -56,11 +56,11 @@ public class CattleServiceTests
         for (int i = 0; i < 5; i++)
             ownedCattle.Add(GenerateCattle());
         Guid userId = Guid.NewGuid();
-        A.CallTo(() => _cattleRepositoryMock.GetAllCattlesFromOwner(userId)).Returns(ownedCattle);
+        A.CallTo(() => _cattleRepositoryMock.GetAllCattleFromOwner(userId, 1)).Returns(ownedCattle);
         List<CattleResponse> ownedCattleByUser = new();
         List<CattleResponse> ownedCattleResponse = new();
 
-        var cattle = await _sut.GetAllCattlesFromOwner(userId);
+        var cattle = await _sut.GetAllCattleFromOwner(userId, 1);
         ownedCattleResponse.AddRange(cattle);
         foreach (Cattle animal in ownedCattle)
         {
