@@ -44,6 +44,55 @@ public class UserServiceTests
     }
 
     [Fact]
+    public async Task Does_Not_Allow_To_Get_User_Data_From_Different_User()
+    {
+        Guid userId = Guid.NewGuid();
+        Guid differentUserId = Guid.NewGuid();
+
+        async Task result() => await _sut.GetUserDataByIdAsync(userId, differentUserId);
+
+        var exception = await Assert.ThrowsAsync<NotFoundException>(result);
+        Assert.Equal("Usuário com o id especificado não existe.", exception.Message);
+    }
+
+    [Fact]
+    public async Task Get_User_Data_From_Non_Existent_User_Throws_NotFoundException()
+    {
+        Guid userId = Guid.NewGuid();
+        User? nullUser = null;
+        A.CallTo(() => _userRepositoryMock.GetByIdAsync(userId)).Returns(nullUser);
+
+        async Task result() => await _sut.GetUserDataByIdAsync(userId, userId);
+
+        var exception = await Assert.ThrowsAsync<NotFoundException>(result);
+        Assert.Equal("Usuário com o id especificado não existe.", exception.Message);
+    }
+
+    [Fact]
+    public async Task Get_User_Data_From_User_Returns_User_Data()
+    {
+        Guid userId = Guid.NewGuid();
+        User user = new()
+        {
+            Id = Guid.NewGuid(),
+            FirstName = "firstName",
+            LastName = "lastName",
+            Email = "email@email.com",
+            Password = "password"
+        };
+        UserDataResponse expectedUserDataResponse = new UserDataResponse(
+            user.Id,
+            user.FirstName,
+            user.LastName,
+            user.Email);
+        A.CallTo(() => _userRepositoryMock.GetByIdAsync(userId)).Returns(user);
+
+        UserDataResponse userDataResponse = await _sut.GetUserDataByIdAsync(userId, userId);
+
+        Assert.Equivalent(expectedUserDataResponse, userDataResponse);
+    }
+
+    [Fact]
     public async Task Does_Not_Register_User_When_Password_And_Confirm_Password_Dont_Match()
     {
         var userToRegister = new RegisterUserRequest(

@@ -25,6 +25,23 @@ public class UserService : IUserService
         _guidProvider = guidProvider;
     }
 
+    public async Task<UserDataResponse> GetUserDataByIdAsync(Guid userIdToGet, Guid userId)
+    {
+        if (userId != userIdToGet)
+            throw new NotFoundException("Usuário com o id especificado não existe.");
+
+        User? user = await _userRepository.GetByIdAsync(userId);
+        if (user is null)
+            throw new NotFoundException("Usuário com o id especificado não existe.");
+
+        return new UserDataResponse(
+            Id: user.Id,
+            FirstName: user.FirstName,
+            LastName: user.LastName,
+            Email: user.Email
+        );
+    }
+
     public async Task<UserResponse> LoginUserAsync(LoginUserRequest userRequest)
     {
         var user = await _userRepository.GetUserByEmailAsync(userRequest.Email);

@@ -1,3 +1,4 @@
+using CattleManager.Application.Application.Common.Interfaces.Authorization;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
 using CattleManager.Application.Application.Validation;
 using CattleManager.Application.Application.Validation.User;
@@ -10,10 +11,21 @@ namespace CattleManager.Application.Controllers;
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
+    private readonly IUserAuthorizationService _userAuthorizationService;
 
-    public UserController(IUserService userService)
+    public UserController(IUserService userService, IUserAuthorizationService userAuthorizationService)
     {
         _userService = userService;
+        _userAuthorizationService = userAuthorizationService;
+    }
+
+    [Route("data/{id:guid}")]
+    public async Task<ActionResult<UserResponse>> GetUserDataById(Guid id)
+    {
+        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        UserDataResponse userData = await _userService.GetUserDataByIdAsync(id, new Guid(userId));
+        return Ok(userData);
     }
 
     [Route("register")]
