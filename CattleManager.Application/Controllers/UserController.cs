@@ -20,6 +20,7 @@ public class UserController : ControllerBase
     }
 
     [Route("data/{id:guid}")]
+    [HttpGet]
     public async Task<ActionResult<UserResponse>> GetUserDataById(Guid id)
     {
         string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
