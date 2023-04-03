@@ -4,6 +4,7 @@ using AutoMapper;
 using CattleManager.Application.Application.Common.Exceptions;
 using CattleManager.Application.Application.Common.Interfaces.Authentication;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
+using CattleManager.Application.Application.Common.Interfaces.GuidProvider;
 using CattleManager.Application.Application.Services.Entities;
 using CattleManager.Application.Domain.Entities;
 using FakeItEasy;
@@ -17,21 +18,20 @@ public class UserServiceTests
     private readonly IUserRepository _userRepositoryMock;
     private readonly IPasswordService _passwordServiceMock;
     private readonly IJwtTokenGenerator _jwtTokenGeneratorMock;
+    private readonly IGuidProvider _guidProviderMock;
     private readonly RegisterUserRequest _validUserRequest = new(
         FirstName: "firstName",
         LastName: "lastName",
-        Username: "username",
         Email: "email@email.com",
         Password: "password",
         ConfirmPassword: "password");
-    private readonly LoginUserRequest _validLoginRequest = new("username", "password");
+    private readonly LoginUserRequest _validLoginRequest = new("email@email.com", "password");
     private readonly User _userMock = new()
     {
         Id = Guid.NewGuid(),
         FirstName = "firstName",
         LastName = "lastName",
         Email = "email@email.com",
-        Username = "username",
         Password = "password"
     };
     public UserServiceTests()
@@ -39,7 +39,8 @@ public class UserServiceTests
         _userRepositoryMock = A.Fake<IUserRepository>();
         _passwordServiceMock = A.Fake<IPasswordService>();
         _jwtTokenGeneratorMock = A.Fake<IJwtTokenGenerator>();
-        _sut = new UserService(_userRepositoryMock, _passwordServiceMock, _jwtTokenGeneratorMock);
+        _guidProviderMock = A.Fake<IGuidProvider>();
+        _sut = new UserService(_userRepositoryMock, _passwordServiceMock, _jwtTokenGeneratorMock, _guidProviderMock);
     }
 
     [Fact]
@@ -48,7 +49,6 @@ public class UserServiceTests
         var userToRegister = new RegisterUserRequest(
             FirstName: "firstName",
             LastName: "lastName",
-            Username: "username",
             Email: "email",
             Password: "password",
             ConfirmPassword: "differentThanPassword"
@@ -61,24 +61,12 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task Does_Not_Register_User_When_Username_Already_Exists()
+    public async Task Register_User_With_Existent_Email_Throws_ConflictException()
     {
-        A.CallTo(() => _userRepositoryMock.GetUserByUsernameAsync("username")).Returns(_userMock);
+        A.CallTo(() => _userRepositoryMock.GetUserByEmailAsync("email@email.com")).Returns(_userMock);
 
         async Task result() => await _sut.RegisterUserAsync(_validUserRequest);
-        var exception = await Assert.ThrowsAsync<ConflictException>(result);
-        Assert.Equal("Usuário com esse nome de usuário já existe.", exception.Message);
-    }
 
-    [Fact]
-    public async Task Does_Not_Register_User_When_Email_Already_Exists()
-    {
-        User? nullUser = null;
-
-        A.CallTo(() => _userRepositoryMock.GetUserByUsernameAsync(_validUserRequest.Username)).Returns(nullUser);
-        A.CallTo(() => _userRepositoryMock.GetUserByEmailAsync(_validUserRequest.Email)).Returns(_userMock);
-
-        async Task result() => await _sut.RegisterUserAsync(_validUserRequest);
         var exception = await Assert.ThrowsAsync<ConflictException>(result);
         Assert.Equal("Usuário com esse endereço de e-mail já existe.", exception.Message);
     }
@@ -87,27 +75,22 @@ public class UserServiceTests
     public async Task Registers_User_When_Data_Is_Valid()
     {
         User? nullUser = null;
-        A.CallTo(() => _userRepositoryMock.GetUserByUsernameAsync(_validUserRequest.Username)).Returns(nullUser);
         A.CallTo(() => _userRepositoryMock.GetUserByEmailAsync(_validUserRequest.Email)).Returns(nullUser);
         Guid userId = Guid.NewGuid();
         A.CallTo(() => _jwtTokenGeneratorMock.GenerateToken(userId, _validUserRequest.FirstName, _validUserRequest.LastName)).Returns("jwtToken");
-        var user = await _sut.RegisterUserAsync(_validUserRequest);
+        A.CallTo(() => _guidProviderMock.NewGuid()).Returns(userId);
+        UserResponse expectedUserResponse = GenerateUserResponseFromUserRequest(userId, _validUserRequest);
 
-        Assert.NotNull(user);
-        Assert.NotNull(user.Id.ToString());
-        Assert.NotEqual(Guid.Empty.ToString(), user.Id.ToString());
-        Assert.Equal(_validUserRequest.FirstName, user.FirstName);
-        Assert.Equal(_validUserRequest.LastName, user.LastName);
-        Assert.Equal(_validUserRequest.Email, user.Email);
-        Assert.Equal(_validUserRequest.Username, user.Username);
-        Assert.NotNull(user.Token);
+        var userResponse = await _sut.RegisterUserAsync(_validUserRequest);
+
+        Assert.Equivalent(expectedUserResponse, userResponse);
     }
 
     [Fact]
-    public async Task Does_Not_Login_With_Incorrect_Username()
+    public async Task Does_Not_Login_With_Incorrect_Email()
     {
         User? nullUser = null;
-        A.CallTo(() => _userRepositoryMock.GetUserByUsernameAsync("wrongUsername")).Returns(nullUser);
+        A.CallTo(() => _userRepositoryMock.GetUserByEmailAsync("wrongEmail@email.com")).Returns(nullUser);
 
         async Task result() => await _sut.LoginUserAsync(_validLoginRequest);
 
@@ -118,7 +101,7 @@ public class UserServiceTests
     [Fact]
     public async Task Does_Not_Login_With_Incorrect_Password()
     {
-        A.CallTo(() => _userRepositoryMock.GetUserByUsernameAsync(_validLoginRequest.Username)).Returns(_userMock);
+        A.CallTo(() => _userRepositoryMock.GetUserByEmailAsync(_validLoginRequest.Email)).Returns(_userMock);
         A.CallTo(() => _passwordServiceMock.ComparePassword(_validLoginRequest.Password, "hashedPassword")).Returns(false);
 
         async Task result() => await _sut.LoginUserAsync(_validLoginRequest);
@@ -130,18 +113,33 @@ public class UserServiceTests
     [Fact]
     public async Task Logs_in_With_Correct_Credentials()
     {
-        A.CallTo(() => _userRepositoryMock.GetUserByUsernameAsync(_validLoginRequest.Username)).Returns(_userMock);
+        A.CallTo(() => _userRepositoryMock.GetUserByEmailAsync(_validLoginRequest.Email)).Returns(_userMock);
         A.CallTo(() => _passwordServiceMock.ComparePassword(_validLoginRequest.Password, _validLoginRequest.Password)).Returns(true);
         A.CallTo(() => _jwtTokenGeneratorMock.GenerateToken(_userMock.Id, _userMock.FirstName, _userMock.LastName)).Returns("jwtToken");
+        UserResponse expectedUserResponse = GenerateUserResponseFromUser(_userMock);
 
         var userResponse = await _sut.LoginUserAsync(_validLoginRequest);
 
-        Assert.NotNull(userResponse);
-        Assert.Equal(_userMock.Id, userResponse.Id);
-        Assert.Equal(_userMock.FirstName, userResponse.FirstName);
-        Assert.Equal(_userMock.LastName, userResponse.LastName);
-        Assert.Equal(_userMock.Email, userResponse.Email);
-        Assert.Equal(_userMock.Username, userResponse.Username);
-        Assert.Equal("jwtToken", userResponse.Token);
+        Assert.Equivalent(expectedUserResponse, userResponse);
+    }
+
+    private static UserResponse GenerateUserResponseFromUserRequest(Guid userId, RegisterUserRequest userRequest)
+    {
+        return new UserResponse(
+            Id: userId,
+            FirstName: userRequest.FirstName,
+            LastName: userRequest.LastName,
+            Email: userRequest.Email,
+            Token: "jwtToken");
+    }
+
+    private static UserResponse GenerateUserResponseFromUser(User user)
+    {
+        return new UserResponse(
+            Id: user.Id,
+            FirstName: user.FirstName,
+            LastName: user.LastName,
+            Email: user.Email,
+            Token: "jwtToken");
     }
 }

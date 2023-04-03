@@ -5,5 +5,4 @@ public record UserResponse(
     string FirstName,
     string LastName,
     string Email,
-    string Username,
     string Token);

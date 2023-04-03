@@ -17,9 +17,4 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     {
         return await _dbContext.Users.AsNoTracking().SingleOrDefaultAsync(user => user.Email == email);
     }
-
-    public async Task<User?> GetUserByUsernameAsync(string username)
-    {
-        return await _dbContext.Users.AsNoTracking().SingleOrDefaultAsync(user => user.Username == username);
-    }
 }

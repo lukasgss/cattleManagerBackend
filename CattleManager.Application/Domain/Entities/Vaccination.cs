@@ -5,6 +5,8 @@ namespace CattleManager.Application.Domain.Entities;
 public class Vaccination
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+
+    [Column(TypeName = "decimal(9, 4)")]
     public decimal DosageInMl { get; set; }
     public DateOnly Date { get; set; }
 

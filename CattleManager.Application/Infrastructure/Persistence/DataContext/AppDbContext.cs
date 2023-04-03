@@ -47,7 +47,6 @@ public class AppDbContext : DbContext
             entity.ToTable("Users");
             entity.Property(x => x.FirstName).IsRequired().HasMaxLength(255);
             entity.Property(x => x.LastName).IsRequired().HasMaxLength(255);
-            entity.Property(x => x.Username).IsRequired().HasMaxLength(255);
             entity.Property(x => x.Email).IsRequired().HasMaxLength(255);
             entity.Property(x => x.Password).IsRequired().HasMaxLength(255);
         });
@@ -105,6 +104,12 @@ public class AppDbContext : DbContext
             entity.Property(x => x.Date).IsRequired();
             entity.Property(x => x.FatherId).IsRequired();
             entity.Property(x => x.MotherId).IsRequired();
+        });
+
+        modelBuilder.Entity<Vaccine>(entity =>
+        {
+            entity.HasAlternateKey(x => x.Name)
+            .HasName("uniqueVaccineName");
         });
     }
 }

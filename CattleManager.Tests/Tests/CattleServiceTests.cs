@@ -347,7 +347,7 @@ public class CattleServiceTests
                     CattleId = cattleId ?? randomCattleId,
                     User = new User()
                     {
-                        FirstName = "FirstName", LastName = "LastName", Username = "Username", Email = "email@email.com"
+                        FirstName = "FirstName", LastName = "LastName", Email = "email@email.com"
                     }
                 }
             },
@@ -358,7 +358,6 @@ public class CattleServiceTests
                     Id = userId ?? Guid.NewGuid(),
                     FirstName = "FirstName",
                     LastName = "LastName",
-                    Username = "Username",
                     Email = "email@email.com"
                 }
             },
@@ -462,7 +461,7 @@ public class CattleServiceTests
                     CattleId = cattleId,
                     User = new User()
                     {
-                        FirstName = "FirstName", LastName = "LastName", Username = "Username", Email = "email@email.com"
+                        FirstName = "FirstName", LastName = "LastName", Email = "email@email.com"
                     }
                 }
             },
