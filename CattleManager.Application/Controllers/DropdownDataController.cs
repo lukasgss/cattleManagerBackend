@@ -24,7 +24,16 @@ public class DropdownDataController : ControllerBase
     {
         string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var maleCattleByName = await _dropdownDataService.GetMaleCattleByName(name!, new Guid(userId));
+        var maleCattleByName = await _dropdownDataService.GetMaleCattleByName(name, new Guid(userId));
         return Ok(maleCattleByName);
+    }
+
+    [HttpGet("cattle/female")]
+    public async Task<ActionResult<DropdownDataResponse>> GetFemaleCattleByNamer(string name)
+    {
+        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        var femaleCattleByName = await _dropdownDataService.GetFemaleCattleByName(name, new Guid(userId));
+        return Ok(femaleCattleByName);
     }
 }
