@@ -1,5 +1,6 @@
 using CattleManager.Application.Application.Common.Interfaces.Authorization;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
+using CattleManager.Application.Application.Common.Interfaces.FrontendDropdownData;
 using CattleManager.Application.Application.Validation;
 using CattleManager.Application.Application.Validation.Cattle;
 using Microsoft.AspNetCore.Authorization;
@@ -45,6 +46,24 @@ public class CattleController : ControllerBase
 
         var cattle = await _cattleService.GetCattleByNameAsync(name, new Guid(userId));
         return Ok(cattle);
+    }
+
+    [HttpGet("dropdown/male")]
+    public async Task<ActionResult<DropdownDataResponse>> GetMaleCattleByName(string name)
+    {
+        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        var maleCattleByName = await _cattleService.GetMaleCattleByName(name, new Guid(userId));
+        return Ok(maleCattleByName);
+    }
+
+    [HttpGet("dropdown/female")]
+    public async Task<ActionResult<DropdownDataResponse>> GetFemaleCattleByNamer(string name)
+    {
+        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        var femaleCattleByName = await _cattleService.GetFemaleCattleByName(name, new Guid(userId));
+        return Ok(femaleCattleByName);
     }
 
     [HttpPost]

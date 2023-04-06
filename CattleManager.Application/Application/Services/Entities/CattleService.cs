@@ -3,7 +3,9 @@ using CattleManager.Application.Application.Common.Exceptions;
 using CattleManager.Application.Application.Common.Interfaces.Entities.CattleBreeds;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Owners;
+using CattleManager.Application.Application.Common.Interfaces.FrontendDropdownData;
 using CattleManager.Application.Application.Common.Interfaces.GuidProvider;
+using CattleManager.Application.Application.Helpers;
 using CattleManager.Application.Application.Services.General;
 using CattleManager.Application.Domain.Entities;
 
@@ -228,5 +230,25 @@ public class CattleService : ICattleService
             cattle.DateOfSale,
             cattle.CattleOwners.Select(x => new CattleOwnerResponse(x.User.FirstName, x.User.LastName))
         );
+    }
+
+    public async Task<IEnumerable<DropdownDataResponse>> GetMaleCattleByName(string name, Guid userId)
+    {
+        if (name?.Length == 0)
+            throw new BadRequestException("Nome do animal deve ser especificado.");
+
+        string nameWithoutAccent = StringExtensions.RemoveDiacritics(name!);
+
+        return await _cattleRepository.GetMaleCattleByName(nameWithoutAccent, userId);
+    }
+
+    public async Task<IEnumerable<DropdownDataResponse>> GetFemaleCattleByName(string name, Guid userId)
+    {
+        if (name?.Length == 0)
+            throw new BadRequestException("Nome do animal deve ser especificado.");
+
+        string nameWithoutAccent = StringExtensions.RemoveDiacritics(name!);
+
+        return await _cattleRepository.GetFemaleCattleByName(nameWithoutAccent, userId);
     }
 }
