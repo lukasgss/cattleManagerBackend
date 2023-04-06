@@ -10,12 +10,14 @@ using CattleManager.Application.Application.Common.Interfaces.Entities.MilkProdu
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Vaccinations;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Vaccines;
+using CattleManager.Application.Application.Common.Interfaces.FrontendDropdownData;
 using CattleManager.Application.Application.Common.Interfaces.GuidProvider;
 using CattleManager.Application.Application.Common.Marker;
 using CattleManager.Application.Application.Middlewares;
 using CattleManager.Application.Application.Services.Authentication;
 using CattleManager.Application.Application.Services.Authorization;
 using CattleManager.Application.Application.Services.Entities;
+using CattleManager.Application.Application.Services.FrontendDropdownData;
 using CattleManager.Application.Infrastructure.Persistence;
 using CattleManager.Application.Infrastructure.Persistence.DataContext;
 using CattleManager.Application.Infrastructure.Persistence.Mappings;
@@ -54,6 +56,8 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddScoped<IVaccinationService, VaccinationService>();
     builder.Services.AddScoped<IConceptionService, ConceptionService>();
     builder.Services.AddScoped<IConceptionRepository, ConceptionRepository>();
+    builder.Services.AddScoped<IDropdownDataRepository, DropdownDataRepository>();
+    builder.Services.AddScoped<IDropdownDataService, DropdownDataService>();
     builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>(_ => new JwtTokenGenerator(
         builder.Configuration["AppSettings:Issuer"],
         builder.Configuration["AppSettings:Audience"],
