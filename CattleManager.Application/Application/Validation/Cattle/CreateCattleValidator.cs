@@ -12,10 +12,6 @@ public class CreateCattleValidator : AbstractValidator<CattleRequest>
         RuleFor(x => x.SexId).NotNull().SexIdShouldBe0Or1();
         RuleFor(x => x.Breeds).NotEmpty().HasUniqueBreeds(x => x.BreedId);
         RuleFor(x => x.PurchaseDate).DateShouldNotBeInTheFuture().When(x => x.PurchaseDate is not null);
-        RuleFor(x => x.ConceptionDate).DateShouldNotBeInTheFuture()
-            .Must((x, _) => x.ConceptionDate < x.DateOfBirth)
-            .When(x => x.ConceptionDate is not null)
-            .WithMessage("Data de concepção não pode ser após a data de nascimento.");
         RuleFor(x => x.DateOfBirth).DateShouldNotBeInTheFuture().When(x => x.DateOfBirth is not null);
         RuleFor(x => x.YearOfBirth).YearShouldNotBeGreaterThanCurrent()
             .Must((x, _) => DateValidator.YearInDateOfBirthShouldBeEqualToBirthYear(x.DateOfBirth, x.YearOfBirth))

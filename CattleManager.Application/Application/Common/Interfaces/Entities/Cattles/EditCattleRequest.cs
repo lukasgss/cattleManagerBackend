@@ -14,7 +14,6 @@ public record EditCattleRequest : ICattleRequest
     public byte SexId { get; init; }
     public IEnumerable<CattleBreedRequest> Breeds { get; init; }
     public DateOnly? PurchaseDate { get; init; }
-    public DateOnly? ConceptionDate { get; init; }
     public DateOnly? DateOfBirth { get; init; }
     public int YearOfBirth { get; init; }
     public string? Image { get; init; }

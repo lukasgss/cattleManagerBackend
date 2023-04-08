@@ -425,7 +425,6 @@ public class CattleServiceTests
             Name = "Cattlename",
             Sex = new Sex() { Gender = isMale ? "Macho" : "Fêmea" },
             SexId = isMale ? (byte)1 : (byte)0,
-            ConceptionDate = DateOnly.FromDateTime(new DateTime(2020, 1, 1)),
             Conceptions = new List<Conception>(),
             DateOfBirth = DateOnly.FromDateTime(new DateTime(2020, 9, 1)),
             YearOfBirth = 2020,
@@ -491,7 +490,6 @@ public class CattleServiceTests
             Select(x => new CattleBreedResponse(
                 x.Breed.Name, DecimalToFractionService.RealToFraction((double)x.QuantityInPercentage))),
             PurchaseDate: cattle.PurchaseDate,
-            ConceptionDate: cattle.ConceptionDate,
             DateOfBirth: cattle.DateOfBirth,
             YearOfBirth: cattle.YearOfBirth,
             Image: cattle.Image,
@@ -524,7 +522,6 @@ public class CattleServiceTests
                 new CattleBreedRequest(BreedId: _holandesId, QuantityInPercentage: .375m)
             },
             PurchaseDate = null,
-            ConceptionDate = DateOnly.FromDateTime(new DateTime(2020, 01, 01)),
             DateOfBirth = DateOnly.FromDateTime(new DateTime(2020, 09, 01)),
             YearOfBirth = 2020,
             Image = null,
@@ -550,7 +547,6 @@ public class CattleServiceTests
             SexId = cattleRequest.SexId,
             Sex = new Sex() { Id = cattleRequest.SexId, Gender = cattleRequest.SexId == 0 ? "Fêmea" : "Macho" },
             PurchaseDate = cattleRequest.PurchaseDate,
-            ConceptionDate = cattleRequest.ConceptionDate,
             DateOfBirth = cattleRequest.DateOfBirth,
             YearOfBirth = cattleRequest.YearOfBirth,
             Image = cattleRequest.Image,
@@ -604,7 +600,6 @@ public class CattleServiceTests
                 new CattleBreedRequest(BreedId: _holandesId, QuantityInPercentage: .375m)
             },
             PurchaseDate = null,
-            ConceptionDate = DateOnly.FromDateTime(new DateTime(2020, 01, 01)),
             DateOfBirth = DateOnly.FromDateTime(new DateTime(2020, 09, 01)),
             YearOfBirth = 2020,
             Image = null,

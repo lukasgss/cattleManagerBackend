@@ -13,10 +13,6 @@ namespace CattleManager.Application.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropUniqueConstraint(
-                name: "AK_Vaccines_Name",
-                table: "Vaccines");
-
             migrationBuilder.DeleteData(
                 table: "Breeds",
                 keyColumn: "Id",
@@ -62,10 +58,6 @@ namespace CattleManager.Application.Migrations
                 keyColumn: "Id",
                 keyValue: new Guid("a4ab1168-fed4-450a-8a03-ec746f30f5e0"));
 
-            migrationBuilder.DropColumn(
-                name: "Username",
-                table: "Users");
-
             migrationBuilder.AlterColumn<DateOnly>(
                 name: "Date",
                 table: "Vaccinations",
@@ -74,11 +66,6 @@ namespace CattleManager.Application.Migrations
                 oldClrType: typeof(DateOnly),
                 oldType: "date",
                 oldDefaultValue: new DateOnly(2023, 3, 9));
-
-            migrationBuilder.AddUniqueConstraint(
-                name: "uniqueVaccineName",
-                table: "Vaccines",
-                column: "Name");
         }
 
         /// <inheritdoc />

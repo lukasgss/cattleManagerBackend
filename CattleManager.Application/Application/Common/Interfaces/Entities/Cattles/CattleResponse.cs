@@ -13,7 +13,6 @@ public record CattleResponse(
     string Sex,
     IEnumerable<CattleBreedResponse> CattleBreeds,
     DateOnly? PurchaseDate,
-    DateOnly? ConceptionDate,
     DateOnly? DateOfBirth,
     int YearOfBirth,
     string? Image,

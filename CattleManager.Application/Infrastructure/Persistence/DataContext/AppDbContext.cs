@@ -25,7 +25,6 @@ public class AppDbContext : DbContext
             entity.ToTable("Cattle");
             entity.Property(x => x.Name).IsRequired().HasMaxLength(255);
             entity.Property(x => x.PurchaseDate);
-            entity.Property(x => x.ConceptionDate);
             entity.Property(x => x.DateOfBirth);
             entity.Property(x => x.YearOfBirth).IsRequired();
             entity.Property(x => x.Image).IsRequired().HasMaxLength(1000).HasDefaultValue("https://i.imgur.com/xxNaPZH.png");
@@ -41,6 +40,7 @@ public class AppDbContext : DbContext
 
             entity.HasMany(x => x.Conceptions).WithOne(x => x.Father);
         });
+        modelBuilder.Entity<Cattle>().HasIndex(x => x.Name);
 
         modelBuilder.Entity<User>(entity =>
         {

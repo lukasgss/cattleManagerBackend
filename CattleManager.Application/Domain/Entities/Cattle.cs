@@ -7,7 +7,6 @@ public class Cattle
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = null!;
     public DateOnly? PurchaseDate { get; set; }
-    public DateOnly? ConceptionDate { get; set; }
     public DateOnly? DateOfBirth { get; set; }
     // Year of birth is stored independently in case date of birth is not known,
     // with date of birth being null and only year of birth being stored. Otherwise, both are stored

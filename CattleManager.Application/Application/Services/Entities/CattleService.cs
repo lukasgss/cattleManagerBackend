@@ -132,7 +132,6 @@ public class CattleService : ICattleService
             Id = cattleRequest.Id ?? cattleId,
             Name = cattleRequest.Name,
             PurchaseDate = cattleRequest.PurchaseDate,
-            ConceptionDate = cattleRequest.ConceptionDate,
             DateOfBirth = cattleRequest.DateOfBirth,
             YearOfBirth = cattleRequest.YearOfBirth,
             Image = cattleRequest.Image,
@@ -221,7 +220,6 @@ public class CattleService : ICattleService
             Select(x => new CattleBreedResponse(
                 x.Breed.Name, DecimalToFractionService.RealToFraction((double)x.QuantityInPercentage))),
             cattle.PurchaseDate,
-            cattle.ConceptionDate,
             cattle.DateOfBirth,
             cattle.YearOfBirth,
             cattle.Image,

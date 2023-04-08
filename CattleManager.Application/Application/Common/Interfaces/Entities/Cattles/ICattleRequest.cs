@@ -11,7 +11,6 @@ public interface ICattleRequest
     byte SexId { get; init; }
     IEnumerable<CattleBreedRequest> Breeds { get; init; }
     DateOnly? PurchaseDate { get; init; }
-    DateOnly? ConceptionDate { get; init; }
     DateOnly? DateOfBirth { get; init; }
     int YearOfBirth { get; init; }
     string? Image { get; init; }
