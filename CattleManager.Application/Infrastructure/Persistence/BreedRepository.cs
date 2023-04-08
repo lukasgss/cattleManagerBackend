@@ -17,6 +17,7 @@ public class BreedRepository : IBreedRepository
     {
         return await _dbContext.Breeds
         .AsNoTracking()
+        .OrderBy(x => x.Name)
         .Select(x => new DropdownDataResponse() { Text = x.Name, Value = x.Id })
         .ToListAsync();
     }
