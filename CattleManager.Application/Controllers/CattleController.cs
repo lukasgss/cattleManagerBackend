@@ -49,7 +49,7 @@ public class CattleController : ControllerBase
     }
 
     [HttpGet("dropdown/male")]
-    public async Task<ActionResult<DropdownDataResponse>> GetMaleCattleByName(string name)
+    public async Task<ActionResult<DropdownData>> GetMaleCattleByName(string name)
     {
         string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
@@ -58,7 +58,7 @@ public class CattleController : ControllerBase
     }
 
     [HttpGet("dropdown/female")]
-    public async Task<ActionResult<DropdownDataResponse>> GetFemaleCattleByNamer(string name)
+    public async Task<ActionResult<DropdownData>> GetFemaleCattleByNamer(string name)
     {
         string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 

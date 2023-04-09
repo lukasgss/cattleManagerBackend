@@ -4,5 +4,5 @@ namespace CattleManager.Application.Application.Common.Interfaces.Entities.Breed
 
 public interface IBreedRepository
 {
-    Task<IEnumerable<DropdownDataResponse>> GetAllBreedsForDropdown();
+    Task<IEnumerable<DropdownData>> GetAllBreedsForDropdown();
 }

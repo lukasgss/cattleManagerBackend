@@ -24,7 +24,7 @@ public class BreedServiceTests
     public async Task Get_All_Breeds_For_Dropdown_Returns_All_Breeds()
     {
         Guid breedId = Guid.NewGuid();
-        IEnumerable<DropdownDataResponse> expectedBreeds = GenerateBreeds(breedId);
+        IEnumerable<DropdownData> expectedBreeds = GenerateBreeds(breedId);
         A.CallTo(() => _breedRepositoryMock.GetAllBreedsForDropdown()).Returns(expectedBreeds);
 
         var breeds = await _sut.GetAllBreedsForDropdown();
@@ -32,8 +32,8 @@ public class BreedServiceTests
         Assert.Equivalent(expectedBreeds, breeds);
     }
 
-    private static IEnumerable<DropdownDataResponse> GenerateBreeds(Guid breedId)
+    private static IEnumerable<DropdownData> GenerateBreeds(Guid breedId)
     {
-        return new List<DropdownDataResponse>() { new DropdownDataResponse() { Text = "Gir", Value = breedId } };
+        return new List<DropdownData>() { new DropdownData() { Text = "Gir", Value = breedId } };
     }
 }

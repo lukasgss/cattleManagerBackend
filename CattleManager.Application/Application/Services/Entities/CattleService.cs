@@ -230,7 +230,7 @@ public class CattleService : ICattleService
         );
     }
 
-    public async Task<IEnumerable<DropdownDataResponse>> GetMaleCattleByName(string name, Guid userId)
+    public async Task<IEnumerable<DropdownData>> GetMaleCattleByName(string name, Guid userId)
     {
         if (name?.Length == 0)
             throw new BadRequestException("Nome do animal deve ser especificado.");
@@ -240,7 +240,7 @@ public class CattleService : ICattleService
         return await _cattleRepository.GetMaleCattleByName(nameWithoutAccent, userId);
     }
 
-    public async Task<IEnumerable<DropdownDataResponse>> GetFemaleCattleByName(string name, Guid userId)
+    public async Task<IEnumerable<DropdownData>> GetFemaleCattleByName(string name, Guid userId)
     {
         if (name?.Length == 0)
             throw new BadRequestException("Nome do animal deve ser especificado.");

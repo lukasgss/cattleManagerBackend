@@ -13,12 +13,12 @@ public class BreedRepository : IBreedRepository
         _dbContext = dbContext;
     }
 
-    public async Task<IEnumerable<DropdownDataResponse>> GetAllBreedsForDropdown()
+    public async Task<IEnumerable<DropdownData>> GetAllBreedsForDropdown()
     {
         return await _dbContext.Breeds
         .AsNoTracking()
         .OrderBy(x => x.Name)
-        .Select(x => new DropdownDataResponse() { Text = x.Name, Value = x.Id })
+        .Select(x => new DropdownData() { Text = x.Name, Value = x.Id })
         .ToListAsync();
     }
 }

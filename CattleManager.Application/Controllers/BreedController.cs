@@ -18,7 +18,7 @@ public class BreedController : ControllerBase
     }
 
     [HttpGet("dropdown")]
-    public async Task<IEnumerable<DropdownDataResponse>> GetAllBreedsForDropdown()
+    public async Task<IEnumerable<DropdownData>> GetAllBreedsForDropdown()
     {
         return await _breedService.GetAllBreedsForDropdown();
     }

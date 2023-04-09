@@ -1,5 +1,6 @@
 using CattleManager.Application.Application.Common.Interfaces.Authorization;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
+using CattleManager.Application.Application.Common.Interfaces.FrontendDropdownData;
 using CattleManager.Application.Application.Validation;
 using CattleManager.Application.Application.Validation.User;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,13 @@ public class UserController : ControllerBase
 
         UserDataResponse userData = await _userService.GetUserDataByIdAsync(id, new Guid(userId));
         return Ok(userData);
+    }
+
+    [HttpGet("dropdown")]
+    public async Task<ActionResult<DropdownData>> GetUserForDropdownByNameOrLastName(string name)
+    {
+        var users = await _userService.GetUserByNameOrLastName(name);
+        return Ok(users);
     }
 
     [Route("register")]

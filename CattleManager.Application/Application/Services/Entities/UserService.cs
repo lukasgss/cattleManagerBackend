@@ -1,7 +1,9 @@
 using CattleManager.Application.Application.Common.Exceptions;
 using CattleManager.Application.Application.Common.Interfaces.Authentication;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
+using CattleManager.Application.Application.Common.Interfaces.FrontendDropdownData;
 using CattleManager.Application.Application.Common.Interfaces.GuidProvider;
+using CattleManager.Application.Application.Helpers;
 using CattleManager.Application.Domain.Entities;
 
 namespace CattleManager.Application.Application.Services.Entities;
@@ -23,6 +25,16 @@ public class UserService : IUserService
         _passwordService = passwordService;
         _jwtTokenGenerator = jwtTokenGenerator;
         _guidProvider = guidProvider;
+    }
+
+    public async Task<IEnumerable<DropdownData>> GetUserByNameOrLastName(string name)
+    {
+        if (name.Length == 0)
+            throw new BadRequestException("Especifique o nome a ser buscado.");
+
+        string nameWithoutDiacritics = StringExtensions.RemoveDiacritics(name);
+
+        return await _userRepository.GetUserByNameOrLastNameForDropdown(nameWithoutDiacritics);
     }
 
     public async Task<UserDataResponse> GetUserDataByIdAsync(Guid userIdToGet, Guid userId)

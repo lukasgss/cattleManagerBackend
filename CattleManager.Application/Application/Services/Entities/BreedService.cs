@@ -12,7 +12,7 @@ public class BreedService : IBreedService
         _breedRepository = breedRepository;
     }
 
-    public async Task<IEnumerable<DropdownDataResponse>> GetAllBreedsForDropdown()
+    public async Task<IEnumerable<DropdownData>> GetAllBreedsForDropdown()
     {
         return await _breedRepository.GetAllBreedsForDropdown();
     }

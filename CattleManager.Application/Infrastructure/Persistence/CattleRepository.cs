@@ -81,25 +81,25 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
             .SingleOrDefaultAsync(x => x.Id == cattleId && x.Users.Any(x => x.Id == userId)));
     }
 
-    public async Task<IEnumerable<DropdownDataResponse>> GetMaleCattleByName(string name, Guid userId)
+    public async Task<IEnumerable<DropdownData>> GetMaleCattleByName(string name, Guid userId)
     {
         return await _dbContext.Cattle
         .AsNoTracking()
         .Where(x => (x.SexId == (int)Gender.Male)
             && EF.Functions.ILike(EF.Functions.Unaccent(x.Name), $"%{name}%")
             && x.Users.Any(x => x.Id == userId))
-        .Select(x => new DropdownDataResponse() { Text = x.Name, Value = x.Id })
+        .Select(x => new DropdownData() { Text = x.Name, Value = x.Id })
         .ToListAsync();
     }
 
-    public async Task<IEnumerable<DropdownDataResponse>> GetFemaleCattleByName(string name, Guid userId)
+    public async Task<IEnumerable<DropdownData>> GetFemaleCattleByName(string name, Guid userId)
     {
         return await _dbContext.Cattle
         .AsNoTracking()
         .Where(x => (x.SexId == (int)Gender.Female)
             && EF.Functions.ILike(EF.Functions.Unaccent(x.Name), $"%{name}%")
             && x.Users.Any(x => x.Id == userId))
-        .Select(x => new DropdownDataResponse() { Text = x.Name, Value = x.Id })
+        .Select(x => new DropdownData() { Text = x.Name, Value = x.Id })
         .ToListAsync();
     }
 }

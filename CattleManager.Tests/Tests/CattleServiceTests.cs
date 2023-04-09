@@ -152,10 +152,10 @@ public class CattleServiceTests
         Guid userId = Guid.NewGuid();
         Guid allMaleCattleId = Guid.NewGuid();
         const string cattleName = "cattleName";
-        IEnumerable<DropdownDataResponse> expectedMaleCattleByName = GenerateDropdownDataResponse(allMaleCattleId);
+        IEnumerable<DropdownData> expectedMaleCattleByName = GenerateDropdownDataResponse(allMaleCattleId);
         A.CallTo(() => _cattleRepositoryMock.GetMaleCattleByName(cattleName, userId)).Returns(GenerateDropdownDataResponse(allMaleCattleId));
 
-        IEnumerable<DropdownDataResponse> maleCattleByName = await _sut.GetMaleCattleByName(cattleName, userId);
+        IEnumerable<DropdownData> maleCattleByName = await _sut.GetMaleCattleByName(cattleName, userId);
 
         Assert.Equivalent(expectedMaleCattleByName, maleCattleByName);
     }
@@ -167,7 +167,7 @@ public class CattleServiceTests
         Guid maleCattleId = Guid.NewGuid();
         const string cattleName = "cáttlêWìthÃccént";
         const string cattleNameWithoutAccent = "cattleWithAccent";
-        IEnumerable<DropdownDataResponse> expectedMaleCattleByName = GenerateDropdownDataResponse(maleCattleId, cattleName);
+        IEnumerable<DropdownData> expectedMaleCattleByName = GenerateDropdownDataResponse(maleCattleId, cattleName);
         A.CallTo(() => _cattleRepositoryMock.GetMaleCattleByName(cattleNameWithoutAccent, userId)).Returns(expectedMaleCattleByName);
 
         var maleCattleByName = await _sut.GetMaleCattleByName(cattleName, userId);
@@ -182,7 +182,7 @@ public class CattleServiceTests
         Guid maleCattleId = Guid.NewGuid();
         const string cattleNameWithoutAccent = "cattleWithAccent";
         const string cattleNameWithAccent = "cáttlêWìthÃccént";
-        IEnumerable<DropdownDataResponse> expectedMaleCattleByName = GenerateDropdownDataResponse(maleCattleId, cattleNameWithAccent);
+        IEnumerable<DropdownData> expectedMaleCattleByName = GenerateDropdownDataResponse(maleCattleId, cattleNameWithAccent);
         A.CallTo(() => _cattleRepositoryMock.GetMaleCattleByName(cattleNameWithoutAccent, userId)).Returns(expectedMaleCattleByName);
 
         var maleCattleByName = await _sut.GetMaleCattleByName(cattleNameWithoutAccent, userId);
@@ -208,10 +208,10 @@ public class CattleServiceTests
         Guid userId = Guid.NewGuid();
         Guid allMaleCattleId = Guid.NewGuid();
         const string cattleName = "cattleName";
-        IEnumerable<DropdownDataResponse> expectedFemaleCattleByName = GenerateDropdownDataResponse(allMaleCattleId);
+        IEnumerable<DropdownData> expectedFemaleCattleByName = GenerateDropdownDataResponse(allMaleCattleId);
         A.CallTo(() => _cattleRepositoryMock.GetMaleCattleByName(cattleName, userId)).Returns(GenerateDropdownDataResponse(allMaleCattleId));
 
-        IEnumerable<DropdownDataResponse> femaleCattleByName = await _sut.GetMaleCattleByName(cattleName, userId);
+        IEnumerable<DropdownData> femaleCattleByName = await _sut.GetMaleCattleByName(cattleName, userId);
 
         Assert.Equivalent(expectedFemaleCattleByName, femaleCattleByName);
     }
@@ -223,7 +223,7 @@ public class CattleServiceTests
         Guid femaleCattleId = Guid.NewGuid();
         const string cattleName = "cáttlêWìthÃccént";
         const string cattleNameWithoutAccent = "cattleWithAccent";
-        IEnumerable<DropdownDataResponse> expectedFemaleCattleByName = GenerateDropdownDataResponse(femaleCattleId, cattleName);
+        IEnumerable<DropdownData> expectedFemaleCattleByName = GenerateDropdownDataResponse(femaleCattleId, cattleName);
         A.CallTo(() => _cattleRepositoryMock.GetMaleCattleByName(cattleNameWithoutAccent, userId)).Returns(expectedFemaleCattleByName);
 
         var femaleCattleByName = await _sut.GetMaleCattleByName(cattleName, userId);
@@ -238,7 +238,7 @@ public class CattleServiceTests
         Guid femaleCattleId = Guid.NewGuid();
         const string cattleNameWithoutAccent = "cattleWithAccent";
         const string cattleNameWithAccent = "cáttlêWìthÃccént";
-        IEnumerable<DropdownDataResponse> expectedFemaleCattleByName = GenerateDropdownDataResponse(femaleCattleId, cattleNameWithAccent);
+        IEnumerable<DropdownData> expectedFemaleCattleByName = GenerateDropdownDataResponse(femaleCattleId, cattleNameWithAccent);
         A.CallTo(() => _cattleRepositoryMock.GetMaleCattleByName(cattleNameWithoutAccent, userId)).Returns(expectedFemaleCattleByName);
 
         var femaleCattleByName = await _sut.GetMaleCattleByName(cattleNameWithoutAccent, userId);
@@ -500,11 +500,11 @@ public class CattleServiceTests
         );
     }
 
-    private static IEnumerable<DropdownDataResponse> GenerateDropdownDataResponse(Guid cattleId, string cattleName = "Cattle name")
+    private static IEnumerable<DropdownData> GenerateDropdownDataResponse(Guid cattleId, string cattleName = "Cattle name")
     {
-        return new List<DropdownDataResponse>()
+        return new List<DropdownData>()
         {
-            new DropdownDataResponse() { Text = cattleName, Value = cattleId }
+            new DropdownData() { Text = cattleName, Value = cattleId }
         };
     }
 

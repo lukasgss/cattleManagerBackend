@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using CattleManager.Application.Application.Common.Exceptions;
 using CattleManager.Application.Application.Common.Interfaces.Authentication;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
+using CattleManager.Application.Application.Common.Interfaces.FrontendDropdownData;
 using CattleManager.Application.Application.Common.Interfaces.GuidProvider;
 using CattleManager.Application.Application.Services.Entities;
 using CattleManager.Application.Domain.Entities;
@@ -90,6 +92,32 @@ public class UserServiceTests
         UserDataResponse userDataResponse = await _sut.GetUserDataByIdAsync(userId, userId);
 
         Assert.Equivalent(expectedUserDataResponse, userDataResponse);
+    }
+
+    [Fact]
+    public async Task Get_User_By_Name_Or_Last_Name_With_Empty_String_Throws_BadRequestException()
+    {
+        string emptyString = string.Empty;
+
+        async Task result() => await _sut.GetUserByNameOrLastName(emptyString);
+
+        var exception = await Assert.ThrowsAsync<BadRequestException>(result);
+        Assert.Equal("Especifique o nome a ser buscado.", exception.Message);
+    }
+
+    [Fact]
+    public async Task Get_User_By_Name_With_Existent_Name_Returns_User()
+    {
+        const string name = "Lucas";
+        Guid userId = Guid.NewGuid();
+        IEnumerable<DropdownData> expectedUsers = new List<DropdownData>()
+        {
+            new DropdownData() { Text = "Lucas", Value = userId }
+        };
+
+        var users = await _sut.GetUserByNameOrLastName(name);
+
+        Assert.Equivalent(users, expectedUsers);
     }
 
     [Fact]
