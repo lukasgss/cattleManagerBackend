@@ -6,6 +6,6 @@ namespace CattleManager.Application.Application.Common.Interfaces.Entities.Users
 
 public interface IUserRepository : IGenericRepository<User>
 {
-    Task<IEnumerable<DropdownData>> GetUserByNameOrLastNameForDropdown(string name);
+    Task<IEnumerable<DropdownData>> GetUserByNameOrLastNameForDropdown(string firstName, string lastName, bool matchBoth);
     Task<User?> GetUserByEmailAsync(string email);
 }

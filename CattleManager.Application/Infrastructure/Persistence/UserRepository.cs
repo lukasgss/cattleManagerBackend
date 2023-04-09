@@ -19,12 +19,21 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         return await _dbContext.Users.AsNoTracking().SingleOrDefaultAsync(user => user.Email == email);
     }
 
-    public async Task<IEnumerable<DropdownData>> GetUserByNameOrLastNameForDropdown(string name)
+    public async Task<IEnumerable<DropdownData>> GetUserByNameOrLastNameForDropdown(string firstName, string lastName, bool matchBoth)
     {
-        return await _dbContext.Users
+        return matchBoth ? await _dbContext.Users
             .AsNoTracking()
-            .Where(user => EF.Functions.ILike(EF.Functions.Unaccent(user.FirstName), $"%{name}%")
-                || EF.Functions.ILike(EF.Functions.Unaccent(user.LastName), $"%{name}%"))
+            .Where(user => EF.Functions.ILike(EF.Functions.Unaccent(user.FirstName), $"{firstName}")
+                && EF.Functions.ILike(EF.Functions.Unaccent(user.LastName), $"{lastName}"))
+            .Select(user => new DropdownData() { Text = $"{user.FirstName} {user.LastName}", Value = user.Id })
+            .ToListAsync()
+            :
+            await _dbContext.Users
+            .AsNoTracking()
+            .Where(user => EF.Functions.ILike(EF.Functions.Unaccent(user.FirstName), $"{firstName}")
+                || EF.Functions.ILike(EF.Functions.Unaccent(user.LastName), $"{lastName}")
+                || EF.Functions.ILike(EF.Functions.Unaccent(user.LastName), $"{firstName}")
+                || EF.Functions.ILike(EF.Functions.Unaccent(user.FirstName), $"{lastName}"))
             .Select(user => new DropdownData() { Text = $"{user.FirstName} {user.LastName}", Value = user.Id })
             .ToListAsync();
     }

@@ -1,3 +1,4 @@
+using System.Web;
 using CattleManager.Application.Application.Common.Exceptions;
 using CattleManager.Application.Application.Common.Interfaces.Authentication;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
@@ -27,14 +28,20 @@ public class UserService : IUserService
         _guidProvider = guidProvider;
     }
 
-    public async Task<IEnumerable<DropdownData>> GetUserByNameOrLastName(string name)
+    public async Task<IEnumerable<DropdownData>> GetUserByNameOrLastName(string fullName)
     {
-        if (name.Length == 0)
+        if (fullName.Length == 0)
             throw new BadRequestException("Especifique o nome a ser buscado.");
 
-        string nameWithoutDiacritics = StringExtensions.RemoveDiacritics(name);
+        string nameWithoutDiacritics = StringExtensions.RemoveDiacritics(fullName);
+        string nameWithDatabaseWildcards = StringExtensions.AddDatabaseWildcards(nameWithoutDiacritics);
+        string[] firstNameAndLastNameSplit = nameWithDatabaseWildcards.Split(" ");
+        string firstName = firstNameAndLastNameSplit[0];
+        string lastName = string.Concat(firstNameAndLastNameSplit.Skip(1).ToArray());
 
-        return await _userRepository.GetUserByNameOrLastNameForDropdown(nameWithoutDiacritics);
+        bool matchBoth = firstName.Length > 0 && lastName.Length > 0;
+
+        return await _userRepository.GetUserByNameOrLastNameForDropdown(firstName, lastName, matchBoth);
     }
 
     public async Task<UserDataResponse> GetUserDataByIdAsync(Guid userIdToGet, Guid userId)

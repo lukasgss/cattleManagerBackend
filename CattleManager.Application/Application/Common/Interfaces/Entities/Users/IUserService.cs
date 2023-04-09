@@ -7,5 +7,5 @@ public interface IUserService
     Task<UserDataResponse> GetUserDataByIdAsync(Guid userIdToGet, Guid userId);
     Task<UserResponse> RegisterUserAsync(RegisterUserRequest userRequest);
     Task<UserResponse> LoginUserAsync(LoginUserRequest userRequest);
-    Task<IEnumerable<DropdownData>> GetUserByNameOrLastName(string name);
+    Task<IEnumerable<DropdownData>> GetUserByNameOrLastName(string fullName);
 }

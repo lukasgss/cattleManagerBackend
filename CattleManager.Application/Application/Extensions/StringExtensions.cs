@@ -24,4 +24,15 @@ public static class StringExtensions
             .ToString()
             .Normalize(NormalizationForm.FormC);
     }
+
+    public static string AddDatabaseWildcards(string str)
+    {
+        string[] splittedString = str.Split(" ");
+        string wildCardedString = string.Empty;
+        foreach (string splitString in splittedString)
+        {
+            wildCardedString += $"%{string.Concat(splitString)}% ";
+        }
+        return wildCardedString;
+    }
 }
