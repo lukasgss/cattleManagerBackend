@@ -82,6 +82,8 @@ var builder = WebApplication.CreateBuilder(args);
 
     builder.Services.AddCors(p => p.AddDefaultPolicy(policyBuilder =>
         policyBuilder.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod()));
+
+    builder.Services.AddMemoryCache();
 }
 
 var app = builder.Build();
