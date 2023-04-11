@@ -14,7 +14,6 @@ public class AppDbContext : DbContext
     public DbSet<Vaccination> Vaccinations { get; set; } = null!;
     public DbSet<Conception> Conceptions { get; set; } = null!;
     public DbSet<MilkProduction> MilkProductions { get; set; } = null!;
-    public DbSet<Sex> Sex { get; set; } = null!;
     public DbSet<Breed> Breeds { get; set; } = null!;
     public DbSet<CattleBreed> CattleBreeds { get; set; } = null!;
 
@@ -37,8 +36,9 @@ public class AppDbContext : DbContext
             entity.HasOne(x => x.Mother).WithMany(x => x.MotherChildren)
                 .HasForeignKey(x => x.MotherId).OnDelete(DeleteBehavior.SetNull);
             entity.HasMany(x => x.Users).WithMany(x => x.Cattle).UsingEntity<CattleOwner>();
-
             entity.HasMany(x => x.Conceptions).WithOne(x => x.Father);
+
+            entity.ToTable(t => t.HasCheckConstraint("CK_Cattle_SexId", @"""Cattle"".""SexId"" = 0 OR ""Cattle"".""SexId"" = 1"));
         });
         modelBuilder.Entity<Cattle>().HasIndex(x => x.Name);
 
@@ -57,26 +57,6 @@ public class AppDbContext : DbContext
             entity.Property(x => x.MilkPerDayInLiters).IsRequired().HasColumnType("decimal(6, 2)");
             entity.Property(x => x.Date).IsRequired();
             entity.Property(x => x.CattleId).IsRequired();
-        });
-
-        modelBuilder.Entity<Sex>(entity =>
-        {
-            entity.ToTable("Sex");
-            entity.HasAlternateKey(x => x.Gender);
-            entity.ToTable(x => x.HasCheckConstraint("IdIs0Or1", "\"Sex\".\"Id\" >= 0 AND \"Sex\".\"Id\" <= 1"));
-            entity.Property(x => x.Gender).IsRequired().HasMaxLength(20);
-            entity.HasData(
-                new Sex
-                {
-                    Id = 0,
-                    Gender = "Fêmea"
-                },
-                new Sex
-                {
-                    Id = 1,
-                    Gender = "Macho"
-                }
-            );
         });
 
         modelBuilder.Entity<Breed>(entity =>

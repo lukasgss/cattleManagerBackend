@@ -25,7 +25,6 @@ public class Cattle
     public Guid? FatherId { get; set; }
     public Cattle? Mother { get; set; }
     public Guid? MotherId { get; set; }
-    public Sex Sex { get; set; } = null!;
     public byte SexId { get; set; }
     public ICollection<Breed> Breeds { get; set; } = null!;
     public ICollection<CattleBreed> CattleBreeds { get; set; } = null!;

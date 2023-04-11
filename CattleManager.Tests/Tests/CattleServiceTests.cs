@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CatetleManager.Application.Domain.Entities;
+using CattleManager.Application.Application.Common.Enums;
 using CattleManager.Application.Application.Common.Exceptions;
 using CattleManager.Application.Application.Common.Interfaces.Entities.CattleBreeds;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
@@ -423,7 +424,6 @@ public class CattleServiceTests
         {
             Id = cattleId ?? Guid.NewGuid(),
             Name = "Cattlename",
-            Sex = new Sex() { Gender = isMale ? "Macho" : "Fêmea" },
             SexId = isMale ? (byte)1 : (byte)0,
             Conceptions = new List<Conception>(),
             DateOfBirth = DateOnly.FromDateTime(new DateTime(2020, 9, 1)),
@@ -485,7 +485,7 @@ public class CattleServiceTests
             FatherName: cattle.Father?.Name,
             MotherId: cattle.MotherId,
             MotherName: cattle.Mother?.Name,
-            Sex: cattle.Sex.Gender,
+            Sex: ((Gender)cattle.SexId).ToString(),
             cattle.CattleBreeds.
             Select(x => new CattleBreedResponse(
                 x.Breed.Name, DecimalToFractionService.RealToFraction((double)x.QuantityInPercentage))),
@@ -545,7 +545,6 @@ public class CattleServiceTests
             MotherId = cattleRequest.MotherId,
             Mother = new Cattle() { Id = Guid.NewGuid(), Name = "Mother" },
             SexId = cattleRequest.SexId,
-            Sex = new Sex() { Id = cattleRequest.SexId, Gender = cattleRequest.SexId == 0 ? "Fêmea" : "Macho" },
             PurchaseDate = cattleRequest.PurchaseDate,
             DateOfBirth = cattleRequest.DateOfBirth,
             YearOfBirth = cattleRequest.YearOfBirth,

@@ -29,7 +29,6 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
         .Include(x => x.Breeds)
         .Include(x => x.CattleBreeds)
             .ThenInclude(x => x.Breed)
-        .Include(x => x.Sex)
         .Where(cattle =>
             cattle.Name.ToLower().Contains(cattleName.ToLowerInvariant())
             && cattle.Users.Any(user => user.Id == userId))
@@ -44,7 +43,6 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
         .Include(x => x.Breeds)
         .Include(x => x.CattleBreeds)
             .ThenInclude(x => x.Breed)
-        .Include(x => x.Sex)
         .Where(x => x.Users.Any(x => x.Id == ownerId))
         .OrderBy(x => x.Name)
         .Skip((page - 1) * GlobalConstants.ResultsPerPage)
@@ -66,7 +64,6 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
                 .ThenInclude(x => x.User)
             .Include(x => x.CattleBreeds)
                 .ThenInclude(x => x.Breed)
-            .Include(x => x.Sex)
             .Include(x => x.Vaccinations)
             .SingleOrDefaultAsync(x => x.Id == cattleId && x.Users.Any(x => x.Id == userId)))
             :
@@ -75,7 +72,6 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
                 .ThenInclude(x => x.User)
             .Include(x => x.CattleBreeds)
                 .ThenInclude(x => x.Breed)
-            .Include(x => x.Sex)
             .Include(x => x.Vaccinations)
             .AsNoTracking()
             .SingleOrDefaultAsync(x => x.Id == cattleId && x.Users.Any(x => x.Id == userId)));

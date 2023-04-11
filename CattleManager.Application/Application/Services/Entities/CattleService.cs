@@ -215,9 +215,9 @@ public class CattleService : ICattleService
             cattle.Father?.Name,
             cattle.MotherId,
             cattle.Mother?.Name,
-            cattle.Sex.Gender,
-            cattle.CattleBreeds.
-            Select(x => new CattleBreedResponse(
+            ((Gender)cattle.SexId).ToString(),
+            cattle.CattleBreeds
+            .Select(x => new CattleBreedResponse(
                 x.Breed.Name, DecimalToFractionService.RealToFraction((double)x.QuantityInPercentage))),
             cattle.PurchaseDate,
             cattle.DateOfBirth,
