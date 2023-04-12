@@ -14,12 +14,14 @@ namespace CattleManager.Tests.Tests;
 public class BreedServiceTests
 {
     private readonly IBreedService _sut;
+    private readonly IMemoryCache _memoryCacheMock;
     private readonly IBreedRepository _breedRepositoryMock;
 
     public BreedServiceTests()
     {
         _breedRepositoryMock = A.Fake<IBreedRepository>();
-        _sut = new BreedService(_breedRepositoryMock);
+        _memoryCacheMock = A.Fake<IMemoryCache>();
+        _sut = new BreedService(_breedRepositoryMock, _memoryCacheMock);
     }
 
     [Fact]
