@@ -1,3 +1,3 @@
 namespace CattleManager.Application.Application.Common.Interfaces.Entities.MilkProductions;
 
-public record MilkProductionResponse(Guid Id, decimal MilkPerDayInLiters, DateOnly Date, Guid CattleId);
+public record MilkProductionResponse(Guid Id, decimal MilkInLiters, string PeriodOfDay, DateOnly Date, Guid CattleId);

@@ -213,7 +213,7 @@ public class MilkProductionServiceTests
             Id = milkProductionId ?? _guidProvider.NewGuid(),
             CattleId = cattleId,
             Date = DateOnly.FromDateTime(DateTime.Now),
-            MilkPerDayInLiters = 15
+            MilkInLiters = 15
         };
     }
 
@@ -231,9 +231,10 @@ public class MilkProductionServiceTests
     {
         return new MilkProductionResponse(
             Id: milkProductionId ?? _guidProvider.NewGuid(),
-            milkProduction.MilkPerDayInLiters,
-            milkProduction.Date,
-            milkProduction.CattleId);
+            MilkInLiters: milkProduction.MilkInLiters,
+            PeriodOfDay: "afternoon",
+            Date: milkProduction.Date,
+            CattleId: milkProduction.CattleId);
     }
 
     private List<MilkProductionResponse> GenerateListOfMilkProductionResponseFromListOfMilkProductions(List<MilkProduction> milkProductions)
@@ -249,7 +250,8 @@ public class MilkProductionServiceTests
     private static MilkProductionRequest GenerateMilkProductionRequest(Guid cattleId)
     {
         return new MilkProductionRequest(
-            MilkPerDayInLiters: 15,
+            MilkInLiters: 15,
+            PeriodOfDay: "afternoon",
             Date: DateOnly.FromDateTime(DateTime.Now),
             CattleId: cattleId
         );
@@ -259,7 +261,8 @@ public class MilkProductionServiceTests
     {
         return new EditMilkProductionRequest(
             Id: milkProductionId,
-            MilkPerDayInLiters: 15,
+            MilkInLiters: 15,
+            PeriodOfDay: "afternoon",
             Date: DateOnly.FromDateTime(DateTime.Now),
             CattleId: cattleId ?? Guid.NewGuid()
         );

@@ -54,9 +54,12 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<MilkProduction>(entity =>
         {
             entity.ToTable("MilkProductions");
-            entity.Property(x => x.MilkPerDayInLiters).IsRequired().HasColumnType("decimal(6, 2)");
+            entity.Property(x => x.MilkInLiters).IsRequired().HasColumnType("decimal(6, 2)");
+            entity.Property(x => x.PeriodOfDay).IsRequired().HasMaxLength(9);
             entity.Property(x => x.Date).IsRequired();
             entity.Property(x => x.CattleId).IsRequired();
+
+            entity.ToTable(t => t.HasCheckConstraint("CK_MilkProduction_PeriodOfDay", @"""MilkProductions"".""PeriodOfDay"" = 'morning' OR ""MilkProductions"".""PeriodOfDay"" = 'afternoon' OR ""MilkProductions"".""PeriodOfDay"" = 'night' OR ""MilkProductions"".""PeriodOfDay"" = 'whole day'"));
         });
 
         modelBuilder.Entity<Breed>(entity =>

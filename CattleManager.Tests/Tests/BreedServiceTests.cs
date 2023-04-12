@@ -1,3 +1,4 @@
+using System.Buffers;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using CattleManager.Application.Application.Common.Interfaces.FrontendDropdownDa
 using CattleManager.Application.Application.Services.Entities;
 using FakeItEasy;
 using Xunit;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace CattleManager.Tests.Tests;
 
