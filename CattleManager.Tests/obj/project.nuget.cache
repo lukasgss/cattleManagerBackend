@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "ozWoiTAhkUpa83vTpq9IXfYFBS4NFDjtyMNcYbTlH8jZZQLcjZR3h9AEJ+v1hcVXpQGTKjGetrddJFk2sR7QDA==",
+  "dgSpecHash": "Rr5YjegMso8C/8GGY1pxfTRgDSSlpZrr+B/iRcwHGwLNAnB8BcUIGM1QNK/09J+6Adrjlb2KmeuHRxy5hK9vCw==",
   "success": true,
   "projectFilePath": "/home/lucas/Dev/csharp/projects/CattleManager/backend/CattleManager.Tests/CattleManager.Tests.csproj",
   "expectedPackageFiles": [

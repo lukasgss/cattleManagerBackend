@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CattleManager.Application.Domain.Entities;
 
+[Index(nameof(Name), IsUnique = true)]
 public class Vaccine
 {
     public Guid Id { get; set; } = Guid.NewGuid();
