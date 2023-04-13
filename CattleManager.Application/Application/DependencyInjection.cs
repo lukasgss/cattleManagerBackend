@@ -4,6 +4,7 @@ using CattleManager.Application.Application.Common.Interfaces.Entities.Breeds;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Conceptions;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkProductions;
+using CattleManager.Application.Application.Common.Interfaces.Entities.MilkSales;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Vaccinations;
 using CattleManager.Application.Application.Common.Marker;
@@ -26,6 +27,7 @@ public static class DependencyInjection
         services.AddScoped<IVaccinationService, VaccinationService>();
         services.AddScoped<IConceptionService, ConceptionService>();
         services.AddScoped<IBreedService, BreedService>();
+        services.AddScoped<IMilkSaleService, MilkSaleService>();
         services.AddValidatorsFromAssemblyContaining<IAssemblyMarker>();
 
         return services;

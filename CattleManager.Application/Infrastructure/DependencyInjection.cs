@@ -2,6 +2,7 @@ using CattleManager.Application.Application.Common.Interfaces.Entities.Breeds;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Conceptions;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkProductions;
+using CattleManager.Application.Application.Common.Interfaces.Entities.MilkSales;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Vaccinations;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Vaccines;
@@ -22,6 +23,7 @@ public static class DependencyInjection
         services.AddScoped<IVaccineRepository, VaccineRepository>();
         services.AddScoped<IConceptionRepository, ConceptionRepository>();
         services.AddScoped<IBreedRepository, BreedRepository>();
+        services.AddScoped<IMilkSaleRepository, MilkSaleRepository>();
         services.AddSingleton<IGuidProvider, GuidProvider>();
 
         return services;

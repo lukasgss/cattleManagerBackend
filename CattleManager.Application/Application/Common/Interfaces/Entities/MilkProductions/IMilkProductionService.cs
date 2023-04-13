@@ -1,5 +1,3 @@
-using CattleManager.Application.Domain.Entities;
-
 namespace CattleManager.Application.Application.Common.Interfaces.Entities.MilkProductions;
 
 public interface IMilkProductionService
