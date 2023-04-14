@@ -1,3 +1,4 @@
+using CattleManager.Application.Application.Common.Enums;
 using CattleManager.Application.Application.Common.Interfaces.FrontendDropdownData;
 using CattleManager.Application.Application.Common.Interfaces.GenericRepository;
 using CattleManager.Application.Domain.Entities;
@@ -13,4 +14,6 @@ public interface ICattleRepository : IGenericRepository<Cattle>
     Task<Cattle?> GetCattleDataOnlyById(Guid cattleId, Guid userId);
     Task<IEnumerable<DropdownData>> GetMaleCattleByName(string name, Guid userId);
     Task<IEnumerable<DropdownData>> GetFemaleCattleByName(string name, Guid userId);
+    Task<IEnumerable<Cattle>> GetAllChildrenFromCattleAsync(Guid cattleId, Guid userId, Gender gender);
+    Task<Cattle?> GetCattleIdAndSexByCattleIdAsync(Guid cattleId, Guid userId);
 }

@@ -11,5 +11,6 @@ public interface ICattleService
     Task<CattleResponse> EditCattle(EditCattleRequest cattleRequest, Guid userId, Guid routeId);
     Task<IEnumerable<DropdownData>> GetMaleCattleByName(string name, Guid userId);
     Task<IEnumerable<DropdownData>> GetFemaleCattleByName(string name, Guid userId);
+    Task<IEnumerable<CattleResponse>> GetAllChildrenFromCattle(Guid cattleId, Guid userId);
     Task DeleteCattle(Guid cattleId, Guid userId);
 }

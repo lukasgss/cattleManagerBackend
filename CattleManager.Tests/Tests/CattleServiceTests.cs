@@ -248,6 +248,38 @@ public class CattleServiceTests
     }
 
     [Fact]
+    public async Task Get_All_Children_From_Non_Existent_Cattle_Throws_NotFoundException()
+    {
+        Guid cattleId = Guid.NewGuid();
+        Guid userId = Guid.NewGuid();
+        Cattle? nullCattle = null;
+        A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleId, userId, false)).Returns(nullCattle);
+
+        async Task result() => await _sut.GetAllChildrenFromCattle(cattleId, userId);
+
+        var exception = await Assert.ThrowsAsync<NotFoundException>(result);
+        Assert.Equal("Animal com o id especificado não existe.", exception.Message);
+    }
+
+    [Fact]
+    public async Task Get_All_Children_From_Cattle_Returns_All_Children()
+    {
+        Guid cattleId = Guid.NewGuid();
+        Guid userId = Guid.NewGuid();
+        Cattle cattle = GenerateCattle();
+        A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleId, userId, false)).Returns(cattle);
+        Guid cattleChildId = Guid.NewGuid();
+        Cattle cattleChild = GenerateCattle(cattleChildId);
+        List<Cattle> cattleChildren = new() { cattleChild };
+        List<CattleResponse> expectedCattleResponse = new() { GenerateCattleResponseDto(cattleChild) };
+        A.CallTo(() => _cattleRepositoryMock.GetAllChildrenFromCattleAsync(cattleId, userId, (Gender)cattle.SexId)).Returns(cattleChildren);
+
+        IEnumerable<CattleResponse> cattleResponse = await _sut.GetAllChildrenFromCattle(cattleId, userId);
+
+        Assert.Equivalent(expectedCattleResponse, cattleResponse);
+    }
+
+    [Fact]
     public async Task Register_Cattle_With_Already_Existing_Name_And_Is_Owned_By_User_Throws_ConflictException()
     {
         Guid userId = Guid.NewGuid();

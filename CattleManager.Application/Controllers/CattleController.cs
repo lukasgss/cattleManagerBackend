@@ -48,6 +48,15 @@ public class CattleController : ControllerBase
         return Ok(cattle);
     }
 
+    [HttpGet("children/{id:guid}")]
+    public async Task<ActionResult<IEnumerable<CattleResponse>>> GetAllChildrenFromCattle(Guid id)
+    {
+        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        IEnumerable<CattleResponse> cattleChildren = await _cattleService.GetAllChildrenFromCattle(id, new Guid(userId));
+        return Ok(cattleChildren);
+    }
+
     [HttpGet("dropdown/male")]
     public async Task<ActionResult<DropdownData>> GetMaleCattleByName(string name)
     {

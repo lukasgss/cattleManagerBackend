@@ -117,6 +117,44 @@ public class CattleService : ICattleService
         await _cattleRepository.CommitAsync();
     }
 
+    public async Task<IEnumerable<DropdownData>> GetMaleCattleByName(string name, Guid userId)
+    {
+        if (name?.Length == 0)
+            throw new BadRequestException("Nome do animal deve ser especificado.");
+
+        string nameWithoutAccent = StringExtensions.RemoveDiacritics(name!);
+
+        return await _cattleRepository.GetMaleCattleByName(nameWithoutAccent, userId);
+    }
+
+    public async Task<IEnumerable<DropdownData>> GetFemaleCattleByName(string name, Guid userId)
+    {
+        if (name?.Length == 0)
+            throw new BadRequestException("Nome do animal deve ser especificado.");
+
+        string nameWithoutAccent = StringExtensions.RemoveDiacritics(name!);
+
+        return await _cattleRepository.GetFemaleCattleByName(nameWithoutAccent, userId);
+    }
+
+    public async Task<IEnumerable<CattleResponse>> GetAllChildrenFromCattle(Guid cattleId, Guid userId)
+    {
+        Cattle? cattle = await _cattleRepository.GetCattleById(cattleId, userId, trackChanges: false);
+        if (cattle is null)
+            throw new NotFoundException("Animal com o id especificado não existe.");
+
+        IEnumerable<Cattle> cattleChildren =
+            await _cattleRepository.GetAllChildrenFromCattleAsync(cattleId, userId, (Gender)cattle.SexId);
+
+        List<CattleResponse> cattleChildrenResponse = new();
+        foreach (Cattle animal in cattleChildren)
+        {
+            cattleChildrenResponse.Add(GenerateCattleResponseDto(animal));
+        }
+
+        return cattleChildrenResponse;
+    }
+
     private async Task ValidateCattleName(string cattleName, Guid userId)
     {
         var cattleByName = await _cattleRepository.GetCattleByName(cattleName, userId);
@@ -228,25 +266,5 @@ public class CattleService : ICattleService
             cattle.DateOfSale,
             cattle.CattleOwners.Select(x => new CattleOwnerResponse(x.User.FirstName, x.User.LastName))
         );
-    }
-
-    public async Task<IEnumerable<DropdownData>> GetMaleCattleByName(string name, Guid userId)
-    {
-        if (name?.Length == 0)
-            throw new BadRequestException("Nome do animal deve ser especificado.");
-
-        string nameWithoutAccent = StringExtensions.RemoveDiacritics(name!);
-
-        return await _cattleRepository.GetMaleCattleByName(nameWithoutAccent, userId);
-    }
-
-    public async Task<IEnumerable<DropdownData>> GetFemaleCattleByName(string name, Guid userId)
-    {
-        if (name?.Length == 0)
-            throw new BadRequestException("Nome do animal deve ser especificado.");
-
-        string nameWithoutAccent = StringExtensions.RemoveDiacritics(name!);
-
-        return await _cattleRepository.GetFemaleCattleByName(nameWithoutAccent, userId);
     }
 }

@@ -98,4 +98,44 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
         .Select(x => new DropdownData() { Text = x.Name, Value = x.Id })
         .ToListAsync();
     }
+
+    public async Task<IEnumerable<Cattle>> GetAllChildrenFromCattleAsync(Guid cattleId, Guid userId, Gender cattleGender)
+    {
+        if (cattleGender == Gender.Male)
+        {
+            return await _dbContext.Cattle
+            .AsNoTracking()
+            .Where(cattle => cattle.Father != null
+                && cattle.Father.Id == cattleId
+                && cattle.Users.Any(user => user.Id == userId))
+            .Include(x => x.CattleOwners)
+                .ThenInclude(x => x.User)
+            .Include(x => x.CattleBreeds)
+                .ThenInclude(x => x.Breed)
+            .ToListAsync();
+        }
+        return await _dbContext.Cattle
+        .AsNoTracking()
+        .Where(cattle => cattle.Mother != null
+            && cattle.Mother.Id == cattleId
+            && cattle.Users.Any(user => user.Id == userId))
+        .Include(x => x.CattleOwners)
+            .ThenInclude(x => x.User)
+        .Include(x => x.CattleBreeds)
+            .ThenInclude(x => x.Breed)
+        .ToListAsync();
+    }
+
+    public async Task<Cattle?> GetCattleIdAndSexByCattleIdAsync(Guid cattleId, Guid userId)
+    {
+        return await _dbContext.Cattle
+        .AsNoTracking()
+        .Select(cattle => new Cattle()
+        {
+            Id = cattle.Id,
+            SexId = cattle.SexId
+        })
+        .FirstOrDefaultAsync(cattle => cattle.Id == cattleId
+            && cattle.Users.Any(user => user.Id == userId));
+    }
 }
