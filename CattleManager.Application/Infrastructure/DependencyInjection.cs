@@ -1,6 +1,8 @@
+using CattleManager.Application.Application.Common.Interfaces.DateTimeProvider;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Breeds;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Conceptions;
+using CattleManager.Application.Application.Common.Interfaces.Entities.Messages;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkProductions;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkSales;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
@@ -24,7 +26,9 @@ public static class DependencyInjection
         services.AddScoped<IConceptionRepository, ConceptionRepository>();
         services.AddScoped<IBreedRepository, BreedRepository>();
         services.AddScoped<IMilkSaleRepository, MilkSaleRepository>();
+        services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddSingleton<IGuidProvider, GuidProvider>();
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
         return services;
     }

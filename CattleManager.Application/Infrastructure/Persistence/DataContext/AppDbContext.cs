@@ -17,12 +17,12 @@ public class AppDbContext : DbContext
     public DbSet<Breed> Breeds { get; set; } = null!;
     public DbSet<CattleBreed> CattleBreeds { get; set; } = null!;
     public DbSet<MilkSale> MilkSales { get; set; } = null!;
+    public DbSet<Message> Messages { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Cattle>(entity =>
         {
-            entity.ToTable("Cattle");
             entity.Property(x => x.Image).HasDefaultValue("https://i.imgur.com/xxNaPZH.png");
             entity.HasOne(x => x.Father).WithMany(x => x.FatherChildren)
                 .HasForeignKey(x => x.FatherId).OnDelete(DeleteBehavior.SetNull);
@@ -54,8 +54,6 @@ public class AppDbContext : DbContext
                         }
                     );
                 });
-
-        modelBuilder.Entity<Conception>(entity => entity.ToTable("Conceptions"));
 
         modelBuilder.Entity<Vaccine>(entity =>
         {

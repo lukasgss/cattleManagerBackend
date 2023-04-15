@@ -2,6 +2,7 @@ using AutoMapper;
 using CatetleManager.Application.Domain.Entities;
 using CattleManager.Application.Application.Common.Interfaces.CattleParents;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Conceptions;
+using CattleManager.Application.Application.Common.Interfaces.Entities.Messages;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkProductions;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkSales;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
