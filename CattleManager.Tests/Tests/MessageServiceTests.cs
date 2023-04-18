@@ -77,6 +77,34 @@ public class MessageServiceTests
     }
 
     [Fact]
+    public async Task Get_Amount_Of_Message_Notifications_From_Non_Existent_User_Throws_NotFoundException()
+    {
+        User? nullUser = null;
+        A.CallTo(() => _userRepositoryMock.GetByIdAsync(_receiverId)).Returns(nullUser);
+
+        async Task result() => await _sut.GetAmountOfMessageNotificationsFromDistinctUsers(_receiverId);
+
+        var exception = await Assert.ThrowsAsync<NotFoundException>(result);
+        Assert.Equal("Usuário com o id especificado não existe.", exception.Message);
+    }
+
+    [Fact]
+    public async Task Get_Amount_Of_Message_Notifications_Returns_Amount_Of_Notifications()
+    {
+        User user = new();
+        const int amountOfNotifications = 5;
+        A.CallTo(() => _messageRepositoryMock.GetAmountOfMessageNotifications(_receiverId)).Returns(amountOfNotifications);
+        MessageNotificationAmount expectedMessageNotificationAmount = new()
+        {
+            Amount = amountOfNotifications
+        };
+
+        MessageNotificationAmount messageNotificationAmount = await _sut.GetAmountOfMessageNotificationsFromDistinctUsers(_receiverId);
+
+        Assert.Equivalent(expectedMessageNotificationAmount, messageNotificationAmount);
+    }
+
+    [Fact]
     public async Task Send_Message_As_Another_User_Throws_UnauthorizedException()
     {
         MessageRequest messageRequest = GenerateMessageRequest();

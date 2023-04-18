@@ -8,5 +8,5 @@ public interface IMessageRepository : IGenericRepository<Message>
     double GetAmountOfPages(Guid senderId, Guid receiverId);
     Task<IEnumerable<Message>> GetAllMessagesToUser(Guid senderId, Guid receiverId, int page);
     Task<Message?> GetMessageByIdAsync(Guid messageId, Guid userId);
-    Task<Message> CreateMessage(MessageRequest messageRequest);
+    Task<int> GetAmountOfMessageNotifications(Guid userId);
 }

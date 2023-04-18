@@ -21,11 +21,6 @@ public class MessageRepository : GenericRepository<Message>, IMessageRepository
             .Count() / (double)GlobalConstants.ResultsPerPage);
     }
 
-    public Task<Message> CreateMessage(MessageRequest messageRequest)
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task<IEnumerable<Message>> GetAllMessagesToUser(Guid senderId, Guid receiverId, int page)
     {
         return await _dbContext.Messages
@@ -41,8 +36,19 @@ public class MessageRepository : GenericRepository<Message>, IMessageRepository
     public async Task<Message?> GetMessageByIdAsync(Guid messageId, Guid userId)
     {
         return await _dbContext.Messages
-        .AsNoTracking()
-        .FirstOrDefaultAsync(message => message.Id == messageId
-            && (message.Receiver.Id == userId || message.Sender.Id == userId));
+            .AsNoTracking()
+            .FirstOrDefaultAsync(message => message.Id == messageId
+                && (message.Receiver.Id == userId || message.Sender.Id == userId));
+    }
+
+    public async Task<int> GetAmountOfMessageNotifications(Guid userId)
+    {
+        return await _dbContext.Messages
+            .AsNoTracking()
+            .Where(message => message.Receiver.Id == userId
+                && !message.HasBeenRead)
+            .Select(message => new { message.SenderId })
+            .Distinct()
+            .CountAsync();
     }
 }

@@ -38,6 +38,19 @@ public class MessageService : IMessageService
         return new PaginatedMessageResponse(messages, page, amountOfPages);
     }
 
+    public async Task<MessageNotificationAmount> GetAmountOfMessageNotificationsFromDistinctUsers(Guid userId)
+    {
+        User? user = await _userRepository.GetByIdAsync(userId);
+        if (user is null)
+            throw new NotFoundException("Usuário com o id especificado não existe.");
+
+        int amountOfNotifications = await _messageRepository.GetAmountOfMessageNotifications(userId);
+        return new MessageNotificationAmount()
+        {
+            Amount = amountOfNotifications
+        };
+    }
+
     public async Task<MessageResponse> GetMessageByIdAsync(Guid messageId, Guid userId)
     {
         Message? message = await _messageRepository.GetMessageByIdAsync(messageId, userId);

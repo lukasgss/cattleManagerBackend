@@ -37,6 +37,15 @@ public class MessageController : ControllerBase
         return Ok(messageResponse);
     }
 
+    [HttpGet("notifications")]
+    public async Task<ActionResult<MessageNotificationAmount>> GetAmountOfMessageNotifications()
+    {
+        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        MessageNotificationAmount notificationAmount = await _messageService.GetAmountOfMessageNotificationsFromDistinctUsers(new Guid(userId));
+        return Ok(notificationAmount);
+    }
+
     [HttpPost]
     public async Task<ActionResult<MessageResponse>> SendMessage(MessageRequest messageRequest)
     {
