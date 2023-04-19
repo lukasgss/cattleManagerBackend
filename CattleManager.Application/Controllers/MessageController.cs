@@ -19,12 +19,12 @@ public class MessageController : ControllerBase
         _userAuthorizationService = userAuthorizationService;
     }
 
-    [HttpGet("user/{receiverId:guid}")]
-    public async Task<ActionResult<PaginatedMessageResponse>> GetAllMessagesToUser(Guid receiverId, int page)
+    [HttpGet("user/{senderId:guid}")]
+    public async Task<ActionResult<PaginatedMessageResponse>> GetAllMessagesToUser(Guid senderId, int page = 1)
     {
-        string senderId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        string receiverId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        PaginatedMessageResponse messages = await _messageService.GetAllMessagesToUserAsync(new Guid(senderId), receiverId, page);
+        PaginatedMessageResponse messages = await _messageService.GetAllMessagesToUserAsync(new Guid(receiverId), senderId, page);
         return Ok(messages);
     }
 
@@ -44,6 +44,15 @@ public class MessageController : ControllerBase
 
         MessageNotificationAmount notificationAmount = await _messageService.GetAmountOfMessageNotificationsFromDistinctUsers(new Guid(userId));
         return Ok(notificationAmount);
+    }
+
+    [HttpGet("read/{senderId:guid}")]
+    public async Task<ActionResult> ReadMessage(Guid senderId)
+    {
+        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        await _messageService.MarkMessagesAsRead(new Guid(userId), senderId);
+        return Ok();
     }
 
     [HttpPost]

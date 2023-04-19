@@ -9,4 +9,5 @@ public interface IMessageRepository : IGenericRepository<Message>
     Task<IEnumerable<Message>> GetAllMessagesToUser(Guid senderId, Guid receiverId, int page);
     Task<Message?> GetMessageByIdAsync(Guid messageId, Guid userId);
     Task<int> GetAmountOfMessageNotifications(Guid userId);
+    Task MarkMessagesAsRead(Guid userId, Guid senderId);
 }

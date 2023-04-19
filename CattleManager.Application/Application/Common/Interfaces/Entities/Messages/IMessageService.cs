@@ -8,4 +8,5 @@ public interface IMessageService
     Task<MessageResponse> SendMessageAsync(MessageRequest messageRequest, Guid senderId);
     Task<MessageResponse> GetMessageByIdAsync(Guid messageId, Guid userId);
     Task<MessageNotificationAmount> GetAmountOfMessageNotificationsFromDistinctUsers(Guid userId);
+    Task MarkMessagesAsRead(Guid userId, Guid senderId);
 }

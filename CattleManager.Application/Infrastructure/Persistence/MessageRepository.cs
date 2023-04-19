@@ -51,4 +51,13 @@ public class MessageRepository : GenericRepository<Message>, IMessageRepository
             .Distinct()
             .CountAsync();
     }
+
+    public async Task MarkMessagesAsRead(Guid userId, Guid senderId)
+    {
+        await _dbContext.Messages
+            .Where(message => message.SenderId == senderId
+                && message.ReceiverId == userId)
+            .ExecuteUpdateAsync(message => message.SetProperty(m => m.HasBeenRead, true));
+        await CommitAsync();
+    }
 }

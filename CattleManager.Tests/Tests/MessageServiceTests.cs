@@ -105,6 +105,18 @@ public class MessageServiceTests
     }
 
     [Fact]
+    public async Task Mark_Messages_As_Read_From_Non_Existent_Sender_Throws_NotFoundException()
+    {
+        User? nullUser = null;
+        A.CallTo(() => _userRepositoryMock.GetByIdAsync(_senderId)).Returns(nullUser);
+
+        async Task result() => await _sut.MarkMessagesAsRead(_receiverId, _senderId);
+
+        var exception = await Assert.ThrowsAsync<NotFoundException>(result);
+        Assert.Equal("Usuário com o id especificado não existe.", exception.Message);
+    }
+
+    [Fact]
     public async Task Send_Message_As_Another_User_Throws_UnauthorizedException()
     {
         MessageRequest messageRequest = GenerateMessageRequest();

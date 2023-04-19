@@ -26,7 +26,7 @@ public class MessageService : IMessageService
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task<PaginatedMessageResponse> GetAllMessagesToUserAsync(Guid senderId, Guid receiverId, int page)
+    public async Task<PaginatedMessageResponse> GetAllMessagesToUserAsync(Guid receiverId, Guid senderId, int page)
     {
         double amountOfPages = _messageRepository.GetAmountOfPages(senderId, receiverId);
 
@@ -64,6 +64,15 @@ public class MessageService : IMessageService
             HasBeenRead: message.HasBeenRead,
             SenderId: message.SenderId,
             ReceiverId: message.ReceiverId);
+    }
+
+    public async Task MarkMessagesAsRead(Guid userId, Guid senderId)
+    {
+        User? sender = await _userRepository.GetByIdAsync(senderId);
+        if (sender is null)
+            throw new NotFoundException("Usuário com o id especificado não existe.");
+
+        await _messageRepository.MarkMessagesAsRead(userId, senderId);
     }
 
     public async Task<MessageResponse> SendMessageAsync(MessageRequest messageRequest, Guid senderId)
