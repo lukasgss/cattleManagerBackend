@@ -2,5 +2,4 @@ namespace CattleManager.Application.Application.Common.Interfaces.Entities.Messa
 
 public record MessageRequest(
     string Content,
-    Guid SenderId,
     Guid ReceiverId);

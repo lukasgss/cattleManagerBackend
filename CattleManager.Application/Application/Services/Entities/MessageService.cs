@@ -77,14 +77,11 @@ public class MessageService : IMessageService
 
     public async Task<MessageResponse> SendMessageAsync(MessageRequest messageRequest, Guid senderId)
     {
-        if (senderId != messageRequest.SenderId)
-            throw new UnauthorizedException("Você não possui autorização para enviar essa mensagem com o remetente especificado.");
-
         User? receiver = await _userRepository.GetByIdAsync(messageRequest.ReceiverId);
         if (receiver is null)
             throw new NotFoundException("Destinatário com o id especificado não existe.");
 
-        User? sender = await _userRepository.GetByIdAsync(messageRequest.SenderId);
+        User? sender = await _userRepository.GetByIdAsync(senderId);
         if (sender is null)
             throw new NotFoundException("Remetente com o id especificado não existe.");
 

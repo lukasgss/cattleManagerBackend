@@ -117,18 +117,6 @@ public class MessageServiceTests
     }
 
     [Fact]
-    public async Task Send_Message_As_Another_User_Throws_UnauthorizedException()
-    {
-        MessageRequest messageRequest = GenerateMessageRequest();
-        Guid anotherUserId = Guid.NewGuid();
-
-        async Task result() => await _sut.SendMessageAsync(messageRequest, anotherUserId);
-
-        var exception = await Assert.ThrowsAsync<UnauthorizedException>(result);
-        Assert.Equal("Você não possui autorização para enviar essa mensagem com o remetente especificado.", exception.Message);
-    }
-
-    [Fact]
     public async Task Send_Message_With_Non_Existent_Receiver_Throws_NotFoundException()
     {
         User? nullReceiver = null;
@@ -201,7 +189,6 @@ public class MessageServiceTests
     {
         return new MessageRequest(
             Content: "Content",
-            SenderId: _senderId,
             ReceiverId: _receiverId);
     }
 
@@ -211,7 +198,7 @@ public class MessageServiceTests
         {
             Content = messageRequest.Content,
             ReceiverId = messageRequest.ReceiverId,
-            SenderId = messageRequest.SenderId,
+            SenderId = _senderId,
             Date = date
         };
     }
