@@ -36,6 +36,9 @@ public class Cattle
     [Required]
     public byte SexId { get; set; }
 
+    [Required]
+    public bool IsInLactationPeriod { get; set; }
+
     public virtual ICollection<User> Users { get; set; } = null!;
     public virtual ICollection<CattleOwner> CattleOwners { get; set; } = null!;
     public virtual ICollection<Cattle> MotherChildren { get; set; } = null!;

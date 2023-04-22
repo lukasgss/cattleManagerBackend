@@ -10,6 +10,7 @@ public record CattleResponse(
     string? FatherName,
     Guid? MotherId,
     string? MotherName,
+    bool IsInLactationPeriod,
     string Sex,
     IEnumerable<CattleBreedResponse> CattleBreeds,
     DateOnly? PurchaseDate,

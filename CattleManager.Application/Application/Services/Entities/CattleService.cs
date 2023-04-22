@@ -253,6 +253,7 @@ public class CattleService : ICattleService
             cattle.Father?.Name,
             cattle.MotherId,
             cattle.Mother?.Name,
+            cattle.IsInLactationPeriod,
             ((Gender)cattle.SexId).ToString(),
             cattle.CattleBreeds
             .Select(x => new CattleBreedResponse(

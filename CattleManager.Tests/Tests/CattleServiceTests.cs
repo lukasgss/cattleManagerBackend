@@ -418,6 +418,7 @@ public class CattleServiceTests
             Id = cattleId ?? Guid.NewGuid(),
             Name = "Cattlename",
             SexId = isMale ? (byte)1 : (byte)0,
+            IsInLactationPeriod = true,
             Conceptions = new List<Conception>(),
             DateOfBirth = DateOnly.FromDateTime(new DateTime(2020, 9, 1)),
             YearOfBirth = 2020,
@@ -478,6 +479,7 @@ public class CattleServiceTests
             FatherName: cattle.Father?.Name,
             MotherId: cattle.MotherId,
             MotherName: cattle.Mother?.Name,
+            IsInLactationPeriod: cattle.IsInLactationPeriod,
             Sex: ((Gender)cattle.SexId).ToString(),
             cattle.CattleBreeds.
             Select(x => new CattleBreedResponse(
@@ -509,6 +511,7 @@ public class CattleServiceTests
             FatherId = fatherId,
             MotherId = motherId,
             SexId = 0,
+            IsInLactationPeriod = true,
             Breeds = new List<CattleBreedRequest>()
             {
                 new CattleBreedRequest(BreedId: _girId, QuantityInPercentage: .625m),
@@ -538,6 +541,7 @@ public class CattleServiceTests
             MotherId = cattleRequest.MotherId,
             Mother = new Cattle() { Id = Guid.NewGuid(), Name = "Mother" },
             SexId = cattleRequest.SexId,
+            IsInLactationPeriod = true,
             PurchaseDate = cattleRequest.PurchaseDate,
             DateOfBirth = cattleRequest.DateOfBirth,
             YearOfBirth = cattleRequest.YearOfBirth,
@@ -591,6 +595,7 @@ public class CattleServiceTests
                 new CattleBreedRequest(BreedId: _girId, QuantityInPercentage: .625m),
                 new CattleBreedRequest(BreedId: _holandesId, QuantityInPercentage: .375m)
             },
+            IsInLactationPeriod = true,
             PurchaseDate = null,
             DateOfBirth = DateOnly.FromDateTime(new DateTime(2020, 09, 01)),
             YearOfBirth = 2020,
