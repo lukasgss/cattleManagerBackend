@@ -12,7 +12,7 @@ public record EditCattleRequest : ICattleRequest
     public Guid? FatherId { get; init; }
     public Guid? MotherId { get; init; }
     public byte SexId { get; init; }
-    public bool IsInLactationPeriod { get; set; }
+    public bool IsInLactationPeriod { get; init; }
     public IEnumerable<CattleBreedRequest> Breeds { get; init; }
     public DateOnly? PurchaseDate { get; init; }
     public DateOnly? DateOfBirth { get; init; }

@@ -138,4 +138,13 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
         .FirstOrDefaultAsync(cattle => cattle.Id == cattleId
             && cattle.Users.Any(user => user.Id == userId));
     }
+
+    public async Task<int> GetAmountOfCattleInLactationPeriodAsync(Guid userId)
+    {
+        return await _dbContext.Cattle
+            .AsNoTracking()
+            .Where(cattle => cattle.Users.Any(user => user.Id == userId)
+                && cattle.IsInLactationPeriod)
+            .CountAsync();
+    }
 }

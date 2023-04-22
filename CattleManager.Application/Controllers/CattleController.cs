@@ -75,6 +75,15 @@ public class CattleController : ControllerBase
         return Ok(femaleCattleByName);
     }
 
+    [HttpGet("lactation-period/amount")]
+    public async Task<ActionResult<AmountOfCattleInLactationPeriod>> GetAmountOfCattleInLactationPeriod()
+    {
+        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        AmountOfCattleInLactationPeriod amount = await _cattleService.GetAmountOfCattleInLactationPeriodAsync(new Guid(userId));
+        return Ok(amount);
+    }
+
     [HttpPost]
     public async Task<ActionResult<CattleResponse>> CreateNewCattle(CattleRequest cattleRequest)
     {

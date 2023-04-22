@@ -258,6 +258,21 @@ public class CattleServiceTests
     }
 
     [Fact]
+    public async Task Get_Amount_Of_Cattle_In_Lactation_Returns_Amount_Of_Cattle_In_Lactation()
+    {
+        const int amountOfCattleInLactation = 700;
+        AmountOfCattleInLactationPeriod expectedAmountOfCattleInLactationPeriod = new()
+        {
+            Amount = amountOfCattleInLactation
+        };
+        A.CallTo(() => _cattleRepositoryMock.GetAmountOfCattleInLactationPeriodAsync(_userId)).Returns(amountOfCattleInLactation);
+
+        AmountOfCattleInLactationPeriod amountOfCattleInLactationPeriod = await _sut.GetAmountOfCattleInLactationPeriodAsync(_userId);
+
+        Assert.Equivalent(expectedAmountOfCattleInLactationPeriod, amountOfCattleInLactationPeriod);
+    }
+
+    [Fact]
     public async Task Register_Cattle_With_Already_Existing_Name_And_Is_Owned_By_User_Throws_ConflictException()
     {
         CattleRequest cattleRequest = GenerateCattleRequest(_userId, fatherId: Guid.NewGuid(), motherId: Guid.NewGuid());

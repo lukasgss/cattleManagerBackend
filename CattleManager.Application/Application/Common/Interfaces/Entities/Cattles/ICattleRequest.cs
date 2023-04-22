@@ -9,6 +9,7 @@ public interface ICattleRequest
     Guid? FatherId { get; init; }
     Guid? MotherId { get; init; }
     byte SexId { get; init; }
+    bool IsInLactationPeriod { get; init; }
     IEnumerable<CattleBreedRequest> Breeds { get; init; }
     DateOnly? PurchaseDate { get; init; }
     DateOnly? DateOfBirth { get; init; }

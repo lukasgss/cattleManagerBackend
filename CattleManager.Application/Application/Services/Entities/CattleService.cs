@@ -50,6 +50,15 @@ public class CattleService : ICattleService
         return GenerateCattleResponseDto(cattle);
     }
 
+    public async Task<AmountOfCattleInLactationPeriod> GetAmountOfCattleInLactationPeriodAsync(Guid userId)
+    {
+        int amountOfCattleInLactationPeriod = await _cattleRepository.GetAmountOfCattleInLactationPeriodAsync(userId);
+        return new AmountOfCattleInLactationPeriod()
+        {
+            Amount = amountOfCattleInLactationPeriod
+        };
+    }
+
     public async Task<IEnumerable<CattleResponse>> GetCattleByNameAsync(string cattleName, Guid userId)
     {
         var cattleByName = await _cattleRepository.GetCattleByName(cattleName, userId);
@@ -172,6 +181,7 @@ public class CattleService : ICattleService
             PurchaseDate = cattleRequest.PurchaseDate,
             DateOfBirth = cattleRequest.DateOfBirth,
             YearOfBirth = cattleRequest.YearOfBirth,
+            IsInLactationPeriod = cattleRequest.IsInLactationPeriod,
             Image = cattleRequest.Image,
             DateOfDeath = cattleRequest.DateOfDeath,
             CauseOfDeath = cattleRequest.CauseOfDeath,
