@@ -147,4 +147,13 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
                 && cattle.IsInLactationPeriod)
             .CountAsync();
     }
+
+    public async Task<int> GetAmountOfCattleInDryPeriodAsync(Guid userId)
+    {
+        return await _dbContext.Cattle
+            .AsNoTracking()
+            .Where(cattle => cattle.Users.Any(user => user.Id == userId)
+                && !cattle.IsInLactationPeriod)
+            .CountAsync();
+    }
 }

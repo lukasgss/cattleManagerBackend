@@ -1,4 +1,5 @@
 using CattleManager.Application.Application.Common.Interfaces.Authorization;
+using CattleManager.Application.Application.Common.Interfaces.Common;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
 using CattleManager.Application.Application.Common.Interfaces.FrontendDropdownData;
 using CattleManager.Application.Application.Validation;
@@ -76,11 +77,20 @@ public class CattleController : ControllerBase
     }
 
     [HttpGet("lactation-period/amount")]
-    public async Task<ActionResult<AmountOfCattleInLactationPeriod>> GetAmountOfCattleInLactationPeriod()
+    public async Task<ActionResult<AmountOfEntity>> GetAmountOfCattleInLactationPeriod()
     {
         string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        AmountOfCattleInLactationPeriod amount = await _cattleService.GetAmountOfCattleInLactationPeriodAsync(new Guid(userId));
+        AmountOfEntity amount = await _cattleService.GetAmountOfCattleInLactationPeriodAsync(new Guid(userId));
+        return Ok(amount);
+    }
+
+    [HttpGet("dry-period/amount")]
+    public async Task<ActionResult<AmountOfEntity>> GetAmountOfCattleInDryPeriod()
+    {
+        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        AmountOfEntity amount = await _cattleService.GetAmountOfCattleInDryPeriodAsync(new Guid(userId));
         return Ok(amount);
     }
 

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CatetleManager.Application.Domain.Entities;
 using CattleManager.Application.Application.Common.Enums;
 using CattleManager.Application.Application.Common.Exceptions;
+using CattleManager.Application.Application.Common.Interfaces.Common;
 using CattleManager.Application.Application.Common.Interfaces.Entities.CattleBreeds;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Owners;
@@ -261,15 +262,30 @@ public class CattleServiceTests
     public async Task Get_Amount_Of_Cattle_In_Lactation_Returns_Amount_Of_Cattle_In_Lactation()
     {
         const int amountOfCattleInLactation = 700;
-        AmountOfCattleInLactationPeriod expectedAmountOfCattleInLactationPeriod = new()
+        AmountOfEntity expectedAmountOfCattleInLactationPeriod = new()
         {
             Amount = amountOfCattleInLactation
         };
         A.CallTo(() => _cattleRepositoryMock.GetAmountOfCattleInLactationPeriodAsync(_userId)).Returns(amountOfCattleInLactation);
 
-        AmountOfCattleInLactationPeriod amountOfCattleInLactationPeriod = await _sut.GetAmountOfCattleInLactationPeriodAsync(_userId);
+        AmountOfEntity amountOfCattleInLactationPeriod = await _sut.GetAmountOfCattleInLactationPeriodAsync(_userId);
 
         Assert.Equivalent(expectedAmountOfCattleInLactationPeriod, amountOfCattleInLactationPeriod);
+    }
+
+    [Fact]
+    public async Task Get_Amount_Of_Cattle_In_Dry_Period_Returns_Amount_Of_Cattle_In_Dry_Period()
+    {
+        const int amountOfDryCattle = 400;
+        AmountOfEntity expectedAmountOfCattleInDryPeriod = new()
+        {
+            Amount = amountOfDryCattle
+        };
+        A.CallTo(() => _cattleRepositoryMock.GetAmountOfCattleInDryPeriodAsync(_userId)).Returns(amountOfDryCattle);
+
+        AmountOfEntity amountOfCattleInDryPeriod = await _sut.GetAmountOfCattleInDryPeriodAsync(_userId);
+
+        Assert.Equivalent(expectedAmountOfCattleInDryPeriod, amountOfCattleInDryPeriod);
     }
 
     [Fact]

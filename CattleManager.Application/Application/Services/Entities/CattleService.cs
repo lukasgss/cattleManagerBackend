@@ -1,5 +1,6 @@
 using CattleManager.Application.Application.Common.Enums;
 using CattleManager.Application.Application.Common.Exceptions;
+using CattleManager.Application.Application.Common.Interfaces.Common;
 using CattleManager.Application.Application.Common.Interfaces.Entities.CattleBreeds;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Owners;
@@ -50,12 +51,21 @@ public class CattleService : ICattleService
         return GenerateCattleResponseDto(cattle);
     }
 
-    public async Task<AmountOfCattleInLactationPeriod> GetAmountOfCattleInLactationPeriodAsync(Guid userId)
+    public async Task<AmountOfEntity> GetAmountOfCattleInLactationPeriodAsync(Guid userId)
     {
         int amountOfCattleInLactationPeriod = await _cattleRepository.GetAmountOfCattleInLactationPeriodAsync(userId);
-        return new AmountOfCattleInLactationPeriod()
+        return new AmountOfEntity()
         {
             Amount = amountOfCattleInLactationPeriod
+        };
+    }
+
+    public async Task<AmountOfEntity> GetAmountOfCattleInDryPeriodAsync(Guid userId)
+    {
+        int amountNotInLactationPeriod = await _cattleRepository.GetAmountOfCattleInDryPeriodAsync(userId);
+        return new AmountOfEntity()
+        {
+            Amount = amountNotInLactationPeriod
         };
     }
 
