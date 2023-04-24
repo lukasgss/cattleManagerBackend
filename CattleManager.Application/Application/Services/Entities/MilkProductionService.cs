@@ -1,7 +1,9 @@
 using AutoMapper;
 using CattleManager.Application.Application.Common.Exceptions;
+using CattleManager.Application.Application.Common.Interfaces.DateTimeProvider;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkProductions;
+using CattleManager.Application.Application.Common.Interfaces.InCommon;
 using CattleManager.Application.Domain.Entities;
 
 namespace CattleManager.Application.Application.Services.Entities;
@@ -11,15 +13,18 @@ public class MilkProductionService : IMilkProductionService
     private readonly IMilkProductionRepository _milkProductionRepository;
     private readonly ICattleRepository _cattleRepository;
     private readonly IMapper _mapper;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
     public MilkProductionService(
         IMilkProductionRepository milkProductionRepository,
         ICattleRepository cattleRepository,
-        IMapper mapper)
+        IMapper mapper,
+        IDateTimeProvider dateTimeProvider)
     {
         _milkProductionRepository = milkProductionRepository;
         _cattleRepository = cattleRepository;
         _mapper = mapper;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<MilkProductionResponse> GetMilkProductionByIdAsync(Guid milkProductionId, Guid userId)
@@ -45,6 +50,20 @@ public class MilkProductionService : IMilkProductionService
 
         List<MilkProductionResponse> milkProductionsResponse = _mapper.Map<List<MilkProductionResponse>>(milkProductions);
         return new PaginatedMilkProductionResponse(milkProductionsResponse, page, amountOfPages);
+    }
+
+    public async Task<AverageOfEntity> GetMilkProductionAverageFromAllCattleAsync(Guid userId, int month, int year)
+    {
+        if (month < 1 || month > 12)
+            throw new BadRequestException("Mês deve ser entre 1 e 12.");
+
+        int currentMonth = _dateTimeProvider.Now().Month;
+        int currentYear = _dateTimeProvider.Now().Year;
+
+        if (year > currentYear || (month > currentMonth && year == currentYear))
+            throw new BadRequestException("Data especificada deve ser menor ou igual à data atual.");
+
+        return await _milkProductionRepository.GetMilkProductionAverageFromAllCattle(userId, month, year);
     }
 
     public async Task<MilkProductionResponse> CreateMilkProductionAsync(MilkProductionRequest milkProductionRequest, Guid userId)

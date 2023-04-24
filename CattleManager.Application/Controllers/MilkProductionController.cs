@@ -1,5 +1,6 @@
 using CattleManager.Application.Application.Common.Interfaces.Authorization;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkProductions;
+using CattleManager.Application.Application.Common.Interfaces.InCommon;
 using CattleManager.Application.Application.Validation;
 using CattleManager.Application.Application.Validation.MilkProduction;
 using Microsoft.AspNetCore.Authorization;
@@ -36,8 +37,18 @@ public class MilkProductionController : ControllerBase
     public async Task<ActionResult<IEnumerable<MilkProductionResponse>>> GetMilkProductionsFromCattle(Guid cattleId, int page = 1)
     {
         string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
         var milkProductions = await _milkProductionService.GetAllMilkProductionsFromCattleAsync(cattleId, new Guid(userId), page);
         return Ok(milkProductions);
+    }
+
+    [HttpGet("average")]
+    public async Task<ActionResult<AverageOfEntity>> GetMilkProductionAverageFromAllCattle(int month, int year)
+    {
+        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        var milkAverage = await _milkProductionService.GetMilkProductionAverageFromAllCattleAsync(new Guid(userId), month, year);
+        return Ok(milkAverage);
     }
 
     [HttpPost]

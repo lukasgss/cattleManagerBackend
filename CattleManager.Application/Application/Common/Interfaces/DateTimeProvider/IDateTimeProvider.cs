@@ -2,5 +2,6 @@ namespace CattleManager.Application.Application.Common.Interfaces.DateTimeProvid
 
 public interface IDateTimeProvider
 {
+    DateTime Now();
     DateTime UtcNow();
 }
