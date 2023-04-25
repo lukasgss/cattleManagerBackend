@@ -8,9 +8,11 @@ using CattleManager.Application.Application.Common.Interfaces.Entities.MilkProdu
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkSales;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Vaccinations;
+using CattleManager.Application.Application.Common.Interfaces.ServiceValidations;
 using CattleManager.Application.Application.Common.Marker;
 using CattleManager.Application.Application.Services.Authentication;
 using CattleManager.Application.Application.Services.Authorization;
+using CattleManager.Application.Application.Services.CommonValidations;
 using CattleManager.Application.Application.Services.Entities;
 using FluentValidation;
 
@@ -30,6 +32,7 @@ public static class DependencyInjection
         services.AddScoped<IBreedService, BreedService>();
         services.AddScoped<IMilkSaleService, MilkSaleService>();
         services.AddScoped<IMessageService, MessageService>();
+        services.AddScoped<IServiceValidations, ServiceValidations>();
         services.AddValidatorsFromAssemblyContaining<IAssemblyMarker>();
 
         return services;

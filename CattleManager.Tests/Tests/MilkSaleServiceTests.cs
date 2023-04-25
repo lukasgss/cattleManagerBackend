@@ -6,6 +6,8 @@ using CattleManager.Application.Application.Common.Exceptions;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkSales;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
 using CattleManager.Application.Application.Common.Interfaces.GuidProvider;
+using CattleManager.Application.Application.Common.Interfaces.InCommon;
+using CattleManager.Application.Application.Common.Interfaces.ServiceValidations;
 using CattleManager.Application.Application.Services.Entities;
 using CattleManager.Application.Domain.Entities;
 using FakeItEasy;
@@ -20,6 +22,7 @@ public class MilkSaleServiceTests
     private readonly IUserRepository _userRepositoryMock;
     private readonly IMapper _mapperMock;
     private readonly IGuidProvider _guidProvider;
+    private readonly IServiceValidations _serviceValidationsMock;
     private static readonly Guid _milkSaleId = Guid.NewGuid();
     private static readonly Guid _userId = Guid.NewGuid();
 
@@ -29,7 +32,13 @@ public class MilkSaleServiceTests
         _userRepositoryMock = A.Fake<IUserRepository>();
         _mapperMock = A.Fake<IMapper>();
         _guidProvider = A.Fake<IGuidProvider>();
-        _sut = new MilkSaleService(_milkSaleRepositoryMock, _mapperMock, _userRepositoryMock, _guidProvider);
+        _serviceValidationsMock = A.Fake<IServiceValidations>();
+        _sut = new MilkSaleService(
+            _milkSaleRepositoryMock,
+            _mapperMock,
+            _userRepositoryMock,
+            _guidProvider,
+            _serviceValidationsMock);
     }
 
     [Fact]
@@ -66,6 +75,25 @@ public class MilkSaleServiceTests
         MilkSaleResponse milkSaleResponse = await _sut.GetMilkSaleByIdAsync(_milkSaleId, _userId);
 
         Assert.Equivalent(expectedMilkSaleResponse, milkSaleResponse);
+    }
+
+    [Fact]
+    public async Task Get_Milk_Sales_Average_Total_Income_In_Specific_Date_Returns_Average_Total_Income()
+    {
+        const int month = 2;
+        const int year = 2023;
+        AverageOfEntity expectedAverageTotalIncome = new()
+        {
+            Average = 8000,
+            Quantity = 16
+        };
+
+        A.CallTo(() => _milkSaleRepositoryMock.GetMilkSalesAverageTotalIncomeInSpecificMonthAsync(_userId, month, year))
+            .Returns(expectedAverageTotalIncome);
+
+        AverageOfEntity averageTotalIncome = await _sut.GetMilkSalesAverageTotalIncomeInSpecificMonthAsync(_userId, month, year);
+
+        Assert.Equivalent(expectedAverageTotalIncome, averageTotalIncome);
     }
 
     [Fact]
