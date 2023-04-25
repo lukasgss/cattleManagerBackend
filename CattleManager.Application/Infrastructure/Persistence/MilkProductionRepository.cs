@@ -21,7 +21,7 @@ public class MilkProductionRepository : GenericRepository<MilkProduction>, IMilk
             && x.Cattle.Users.Any(x => x.Id == userId)).Count() / (double)GlobalConstants.ResultsPerPage);
     }
 
-    public async Task<AverageOfEntity> GetMilkProductionAverageFromAllCattle(Guid userId, int month, int year)
+    public async Task<AverageOfEntity> GetAverageMilkProductionFromAllCattleAsync(Guid userId, int month, int year)
     {
         DateOnly startDate = new(year, month, 1);
         DateOnly endDate = startDate.AddDays(DateTime.DaysInMonth(year, month) - 1);
@@ -52,6 +52,28 @@ public class MilkProductionRepository : GenericRepository<MilkProduction>, IMilk
         {
             Average = milkAverage,
             Quantity = amountOfAnimals
+        };
+    }
+
+    public async Task<AverageMilkProduction> GetAverageMilkProductionFromCattleAsync(Guid cattleId, Guid userId, int month, int year)
+    {
+        DateOnly startDate = new(year, month, 1);
+        DateOnly endDate = startDate.AddDays(DateTime.DaysInMonth(year, month) - 1);
+
+        var query = await _dbContext.MilkProductions
+            .AsNoTracking()
+            .Where(milkProduction => milkProduction.CattleId == cattleId
+                && milkProduction.Cattle.Users.Any(user => user.Id == userId)
+                && milkProduction.Date >= startDate && milkProduction.Date <= endDate)
+            .GroupBy(mp => mp.Date)
+            .ToListAsync();
+
+        decimal average = query.ConvertAll(x => x.ToList())
+            .Average(x => x.Sum(s => s.MilkInLiters));
+
+        return new AverageMilkProduction()
+        {
+            Average = average
         };
     }
 

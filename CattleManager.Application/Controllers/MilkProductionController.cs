@@ -43,12 +43,25 @@ public class MilkProductionController : ControllerBase
     }
 
     [HttpGet("average")]
-    public async Task<ActionResult<AverageOfEntity>> GetMilkProductionAverageFromAllCattle(int month, int year)
+    public async Task<ActionResult<AverageOfEntity>> GetAverageMilkProductionFromAllCattle(int month, int year)
     {
         string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        AverageOfEntity milkAverage = await _milkProductionService.GetAverageMilkProductionFromAllCattleAsync(new Guid(userId), month, year);
-        return Ok(milkAverage);
+        AverageOfEntity averageMilkProduction =
+            await _milkProductionService.GetAverageMilkProductionFromAllCattleAsync(new Guid(userId), month, year);
+
+        return Ok(averageMilkProduction);
+    }
+
+    [HttpGet("average/{cattleId:guid}")]
+    public async Task<ActionResult<AverageMilkProduction>> GetAverageMilkProductionFromCattle(Guid cattleId, int month, int year)
+    {
+        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        AverageMilkProduction averageMilkProduction =
+            await _milkProductionService.GetAverageMilkProductionFromCattleAsync(cattleId, new Guid(userId), month, year);
+
+        return Ok(averageMilkProduction);
     }
 
     [HttpPost]

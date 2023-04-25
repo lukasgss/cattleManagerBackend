@@ -54,16 +54,22 @@ public class MilkProductionService : IMilkProductionService
 
     public async Task<AverageOfEntity> GetAverageMilkProductionFromAllCattleAsync(Guid userId, int month, int year)
     {
-        if (month < 1 || month > 12)
-            throw new BadRequestException("Mês deve ser entre 1 e 12.");
+        ValidateMonth(month);
+        ValidateDate(month, year);
 
-        int currentMonth = _dateTimeProvider.Now().Month;
-        int currentYear = _dateTimeProvider.Now().Year;
+        return await _milkProductionRepository.GetAverageMilkProductionFromAllCattleAsync(userId, month, year);
+    }
 
-        if (year > currentYear || (month > currentMonth && year == currentYear))
-            throw new BadRequestException("Data especificada deve ser menor ou igual à data atual.");
+    public async Task<AverageMilkProduction> GetAverageMilkProductionFromCattleAsync(Guid cattleId, Guid userId, int month, int year)
+    {
+        ValidateMonth(month);
+        ValidateDate(month, year);
 
-        return await _milkProductionRepository.GetMilkProductionAverageFromAllCattle(userId, month, year);
+        Cattle? cattle = await _cattleRepository.GetCattleById(cattleId, userId, false);
+        if (cattle is null)
+            throw new NotFoundException("Animal com o id especificado não existe.");
+
+        return await _milkProductionRepository.GetAverageMilkProductionFromCattleAsync(cattleId, userId, month, year);
     }
 
     public async Task<MilkProductionResponse> CreateMilkProductionAsync(MilkProductionRequest milkProductionRequest, Guid userId)
@@ -106,5 +112,20 @@ public class MilkProductionService : IMilkProductionService
 
         _milkProductionRepository.Delete(milkProduction);
         await _milkProductionRepository.CommitAsync();
+    }
+
+    private static void ValidateMonth(int month)
+    {
+        if (month < 1 || month > 12)
+            throw new BadRequestException("Mês deve ser entre 1 e 12.");
+    }
+
+    private void ValidateDate(int month, int year)
+    {
+        int currentMonth = _dateTimeProvider.Now().Month;
+        int currentYear = _dateTimeProvider.Now().Year;
+
+        if (year > currentYear || (month > currentMonth && year == currentYear))
+            throw new BadRequestException("Data especificada deve ser menor ou igual à data atual.");
     }
 }
