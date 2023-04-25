@@ -24,7 +24,6 @@ public class MilkProductionServiceTests
     private readonly ICattleRepository _cattleRepositoryMock;
     private readonly IMapper _mapperMock;
     private readonly IGuidProvider _guidProvider;
-    private readonly IDateTimeProvider _dateTimeProviderMock;
     private readonly IServiceValidations _serviceValidationsMock;
     private static readonly Guid _userId = Guid.NewGuid();
     private static readonly Guid _cattleId = Guid.NewGuid();
@@ -34,14 +33,12 @@ public class MilkProductionServiceTests
         _milkProductionRepositoryMock = A.Fake<IMilkProductionRepository>();
         _cattleRepositoryMock = A.Fake<ICattleRepository>();
         _mapperMock = A.Fake<IMapper>();
-        _dateTimeProviderMock = A.Fake<IDateTimeProvider>();
         _serviceValidationsMock = A.Fake<IServiceValidations>();
         _guidProvider = new GuidProvider();
         _sut = new MilkProductionService(
             _milkProductionRepositoryMock,
             _cattleRepositoryMock,
             _mapperMock,
-            _dateTimeProviderMock,
             _serviceValidationsMock);
     }
 
@@ -113,7 +110,6 @@ public class MilkProductionServiceTests
         const int month = 1;
         const int year = 1;
         DateTime currentDate = new(2023, month, year);
-        A.CallTo(() => _dateTimeProviderMock.Now()).Returns(currentDate);
         AverageOfEntity expectedAverageMilkProduction = new()
         {
             Average = 30,
@@ -132,7 +128,6 @@ public class MilkProductionServiceTests
         const int month = 1;
         const int year = 1;
         DateTime currentDate = new(2023, month, year);
-        A.CallTo(() => _dateTimeProviderMock.Now()).Returns(currentDate);
         AverageMilkProduction expectedAverageMilkProduction = new()
         {
             Average = 30,

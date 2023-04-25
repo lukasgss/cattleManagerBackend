@@ -82,7 +82,7 @@ public class UserServiceTests
             Email = "email@email.com",
             Password = "password"
         };
-        UserDataResponse expectedUserDataResponse = new UserDataResponse(
+        UserDataResponse expectedUserDataResponse = new(
             user.Id,
             user.FirstName,
             user.LastName,

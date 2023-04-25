@@ -264,7 +264,7 @@ public class VaccinationServiceTests
         Assert.Equivalent(expectedVaccinationResponse, vaccinationResponse);
     }
 
-    private List<VaccinationResponse> GenerateListOfVaccinationResponse(List<Vaccination> vaccinations)
+    private static List<VaccinationResponse> GenerateListOfVaccinationResponse(List<Vaccination> vaccinations)
     {
         List<VaccinationResponse> vaccinationResponses = new();
         foreach (Vaccination vaccination in vaccinations)

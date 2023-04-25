@@ -14,20 +14,17 @@ public class MilkProductionService : IMilkProductionService
     private readonly IMilkProductionRepository _milkProductionRepository;
     private readonly ICattleRepository _cattleRepository;
     private readonly IMapper _mapper;
-    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IServiceValidations _serviceValidations;
 
     public MilkProductionService(
         IMilkProductionRepository milkProductionRepository,
         ICattleRepository cattleRepository,
         IMapper mapper,
-        IDateTimeProvider dateTimeProvider,
         IServiceValidations serviceValidations)
     {
         _milkProductionRepository = milkProductionRepository;
         _cattleRepository = cattleRepository;
         _mapper = mapper;
-        _dateTimeProvider = dateTimeProvider;
         _serviceValidations = serviceValidations;
     }
 
@@ -116,20 +113,5 @@ public class MilkProductionService : IMilkProductionService
 
         _milkProductionRepository.Delete(milkProduction);
         await _milkProductionRepository.CommitAsync();
-    }
-
-    private static void ValidateMonth(int month)
-    {
-        if (month < 1 || month > 12)
-            throw new BadRequestException("Mês deve ser entre 1 e 12.");
-    }
-
-    private void ValidateDate(int month, int year)
-    {
-        int currentMonth = _dateTimeProvider.Now().Month;
-        int currentYear = _dateTimeProvider.Now().Year;
-
-        if (year > currentYear || (month > currentMonth && year == currentYear))
-            throw new BadRequestException("Data especificada deve ser menor ou igual à data atual.");
     }
 }

@@ -64,7 +64,7 @@ public static class DecimalToFractionService
             else
             {
                 // Middle is our best fraction
-                return new Fraction((n * middle_d + middle_n) * sign, middle_d);
+                return new Fraction(((n * middle_d) + middle_n) * sign, middle_d);
             }
         }
     }
