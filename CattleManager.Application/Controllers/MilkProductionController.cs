@@ -47,7 +47,7 @@ public class MilkProductionController : ControllerBase
     {
         string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var milkAverage = await _milkProductionService.GetMilkProductionAverageFromAllCattleAsync(new Guid(userId), month, year);
+        AverageOfEntity milkAverage = await _milkProductionService.GetAverageMilkProductionFromAllCattleAsync(new Guid(userId), month, year);
         return Ok(milkAverage);
     }
 

@@ -103,14 +103,14 @@ public class MilkProductionServiceTests
     }
 
     [Fact]
-    public async Task Get_Milk_Production_Average_From_All_Cattle_With_Invalid_Month_Throws_BadRequestException()
+    public async Task Get_Average_Milk_Production_From_All_Cattle_With_Invalid_Month_Throws_BadRequestException()
     {
         const int smallerMonth = 0;
         const int biggerMonth = 13;
         const string exceptionMessage = "Mês deve ser entre 1 e 12.";
 
-        async Task smallerMonthResult() => await _sut.GetMilkProductionAverageFromAllCattleAsync(_userId, smallerMonth, 2023);
-        async Task biggerMonthResult() => await _sut.GetMilkProductionAverageFromAllCattleAsync(_userId, biggerMonth, 2023);
+        async Task smallerMonthResult() => await _sut.GetAverageMilkProductionFromAllCattleAsync(_userId, smallerMonth, 2023);
+        async Task biggerMonthResult() => await _sut.GetAverageMilkProductionFromAllCattleAsync(_userId, biggerMonth, 2023);
 
         var smallerMonthException = await Assert.ThrowsAsync<BadRequestException>(smallerMonthResult);
         Assert.Equal(exceptionMessage, smallerMonthException.Message);
@@ -119,34 +119,34 @@ public class MilkProductionServiceTests
     }
 
     [Fact]
-    public async Task Get_Milk_Production_Average_From_All_Catle_With_Year_Greater_Than_Current_Year_Throws_BadRequestException()
+    public async Task Get_Average_Milk_Production_From_All_Catle_With_Year_Greater_Than_Current_Year_Throws_BadRequestException()
     {
         const int biggerYear = 5000;
         DateTime currentDate = new(2023, 01, 01);
         A.CallTo(() => _dateTimeProviderMock.Now()).Returns(currentDate);
 
-        async Task result() => await _sut.GetMilkProductionAverageFromAllCattleAsync(_userId, 1, biggerYear);
+        async Task result() => await _sut.GetAverageMilkProductionFromAllCattleAsync(_userId, 1, biggerYear);
 
         var exception = await Assert.ThrowsAsync<BadRequestException>(result);
         Assert.Equal("Data especificada deve ser menor ou igual à data atual.", exception.Message);
     }
 
     [Fact]
-    public async Task Get_Milk_Production_Average_From_All_Cattle_With_Month_Greater_Than_Current_And_Current_Year_Throws_BadRequstException()
+    public async Task Get_Average_Milk_Production_From_All_Cattle_With_Month_Greater_Than_Current_And_Current_Year_Throws_BadRequstException()
     {
         const int biggerMonth = 12;
         const int currentYear = 2023;
         DateTime currentDate = new(currentYear, 01, 01);
         A.CallTo(() => _dateTimeProviderMock.Now()).Returns(currentDate);
 
-        async Task result() => await _sut.GetMilkProductionAverageFromAllCattleAsync(_userId, biggerMonth, currentYear);
+        async Task result() => await _sut.GetAverageMilkProductionFromAllCattleAsync(_userId, biggerMonth, currentYear);
 
         var exception = await Assert.ThrowsAsync<BadRequestException>(result);
         Assert.Equal("Data especificada deve ser menor ou igual à data atual.", exception.Message);
     }
 
     [Fact]
-    public async Task Get_Milk_Production_Average_From_All_Cattle_Returns_Average_From_All_Cattle()
+    public async Task Get_Average_Milk_Production_From_All_Cattle_Returns_Average_From_All_Cattle()
     {
         const int month = 1;
         const int year = 1;
@@ -159,7 +159,7 @@ public class MilkProductionServiceTests
         };
         A.CallTo(() => _milkProductionRepositoryMock.GetMilkProductionAverageFromAllCattle(_userId, month, year)).Returns(expectedMilkProductionAverage);
 
-        AverageOfEntity milkProductionAverage = await _sut.GetMilkProductionAverageFromAllCattleAsync(_userId, month, year);
+        AverageOfEntity milkProductionAverage = await _sut.GetAverageMilkProductionFromAllCattleAsync(_userId, month, year);
 
         Assert.Equivalent(expectedMilkProductionAverage, milkProductionAverage);
     }
