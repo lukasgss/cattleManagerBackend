@@ -1,5 +1,6 @@
 using CattleManager.Application.Application.Common.Interfaces.Authorization;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkSales;
+using CattleManager.Application.Application.Common.Interfaces.InCommon;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,6 +36,16 @@ public class MilkSaleController : ControllerBase
 
         MilkSaleResponse milkSale = await _milkSaleService.GetMilkSaleByIdAsync(milkSaleId, new Guid(userId));
         return Ok(milkSale);
+    }
+
+    [HttpGet("average/income")]
+    public async Task<ActionResult<AverageOfEntity>> GetMilkSaleAverageTotalIncomeInSpecificMonth(int month, int year)
+    {
+        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        AverageOfEntity averageTotalIncome =
+            await _milkSaleService.GetMilkSalesAverageTotalIncomeInSpecificMonthAsync(new Guid(userId), month, year);
+        return Ok(averageTotalIncome);
     }
 
     [HttpPost]

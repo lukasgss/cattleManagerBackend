@@ -3,6 +3,8 @@ using CattleManager.Application.Application.Common.Exceptions;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkSales;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
 using CattleManager.Application.Application.Common.Interfaces.GuidProvider;
+using CattleManager.Application.Application.Common.Interfaces.InCommon;
+using CattleManager.Application.Application.Common.Interfaces.ServiceValidations;
 using CattleManager.Application.Domain.Entities;
 
 namespace CattleManager.Application.Application.Services.Entities;
@@ -13,17 +15,20 @@ public class MilkSaleService : IMilkSaleService
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
     private readonly IGuidProvider _guidProvider;
+    private readonly IServiceValidations _serviceValidations;
 
     public MilkSaleService(
         IMilkSaleRepository milkSaleRepository,
         IMapper mapper,
         IUserRepository userRepository,
-        IGuidProvider guidProvider)
+        IGuidProvider guidProvider,
+        IServiceValidations serviceValidations)
     {
         _milkSaleRepository = milkSaleRepository;
         _mapper = mapper;
         _userRepository = userRepository;
         _guidProvider = guidProvider;
+        _serviceValidations = serviceValidations;
     }
 
     public async Task<IEnumerable<MilkSaleResponse>> GetAllMilkSalesAsync(Guid userId)
@@ -52,6 +57,14 @@ public class MilkSaleService : IMilkSaleService
             TotalPrice = milkSale.MilkInLiters * milkSale.PricePerLiter,
             Date = milkSale.Date
         };
+    }
+
+    public async Task<AverageOfEntity> GetMilkSalesAverageTotalIncomeInSpecificMonthAsync(Guid userId, int month, int year)
+    {
+        _serviceValidations.ValidateMonth(month);
+        _serviceValidations.ValidateDate(month, year);
+
+        return await _milkSaleRepository.GetMilkSalesAverageTotalIncomeInSpecificMonthAsync(userId, month, year);
     }
 
     public async Task<MilkSaleResponse> CreateMilkSaleAsync(CreateMilkSale createMilkSale, Guid userId)

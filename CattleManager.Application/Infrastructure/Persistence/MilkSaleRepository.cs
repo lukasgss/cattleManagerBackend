@@ -1,4 +1,5 @@
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkSales;
+using CattleManager.Application.Application.Common.Interfaces.InCommon;
 using CattleManager.Application.Domain.Entities;
 using CattleManager.Application.Infrastructure.Persistence.DataContext;
 
@@ -29,5 +30,26 @@ public class MilkSaleRepository : GenericRepository<MilkSale>, IMilkSaleReposito
         await _dbContext.MilkSales
         .AsNoTracking()
         .SingleOrDefaultAsync(milkSale => milkSale.Id == milkSaleId && milkSale.Owner.Id == userId);
+    }
+
+    public async Task<AverageOfEntity> GetMilkSalesAverageTotalIncomeInSpecificMonthAsync(Guid userId, int month, int year)
+    {
+        DateOnly startDate = new(year, month, 1);
+        DateOnly endDate = startDate.AddDays(DateTime.DaysInMonth(year, month) - 1);
+
+        var query = await _dbContext.MilkSales
+            .AsNoTracking()
+            .Where(milkSale => milkSale.Date >= startDate && milkSale.Date <= endDate
+                && milkSale.Owner.Id == userId)
+            .ToListAsync();
+
+        decimal average = query.Average(x => x.MilkInLiters * x.PricePerLiter);
+        int amountOfSales = query.Select(x => x.Id).Count();
+
+        return new AverageOfEntity()
+        {
+            Average = average,
+            Quantity = amountOfSales
+        };
     }
 }

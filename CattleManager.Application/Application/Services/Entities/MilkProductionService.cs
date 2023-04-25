@@ -4,6 +4,7 @@ using CattleManager.Application.Application.Common.Interfaces.DateTimeProvider;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkProductions;
 using CattleManager.Application.Application.Common.Interfaces.InCommon;
+using CattleManager.Application.Application.Common.Interfaces.ServiceValidations;
 using CattleManager.Application.Domain.Entities;
 
 namespace CattleManager.Application.Application.Services.Entities;
@@ -14,17 +15,20 @@ public class MilkProductionService : IMilkProductionService
     private readonly ICattleRepository _cattleRepository;
     private readonly IMapper _mapper;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IServiceValidations _serviceValidations;
 
     public MilkProductionService(
         IMilkProductionRepository milkProductionRepository,
         ICattleRepository cattleRepository,
         IMapper mapper,
-        IDateTimeProvider dateTimeProvider)
+        IDateTimeProvider dateTimeProvider,
+        IServiceValidations serviceValidations)
     {
         _milkProductionRepository = milkProductionRepository;
         _cattleRepository = cattleRepository;
         _mapper = mapper;
         _dateTimeProvider = dateTimeProvider;
+        _serviceValidations = serviceValidations;
     }
 
     public async Task<MilkProductionResponse> GetMilkProductionByIdAsync(Guid milkProductionId, Guid userId)
@@ -54,16 +58,16 @@ public class MilkProductionService : IMilkProductionService
 
     public async Task<AverageOfEntity> GetAverageMilkProductionFromAllCattleAsync(Guid userId, int month, int year)
     {
-        ValidateMonth(month);
-        ValidateDate(month, year);
+        _serviceValidations.ValidateMonth(month);
+        _serviceValidations.ValidateDate(month, year);
 
         return await _milkProductionRepository.GetAverageMilkProductionFromAllCattleAsync(userId, month, year);
     }
 
     public async Task<AverageMilkProduction> GetAverageMilkProductionFromCattleAsync(Guid cattleId, Guid userId, int month, int year)
     {
-        ValidateMonth(month);
-        ValidateDate(month, year);
+        _serviceValidations.ValidateMonth(month);
+        _serviceValidations.ValidateDate(month, year);
 
         Cattle? cattle = await _cattleRepository.GetCattleById(cattleId, userId, false);
         if (cattle is null)
