@@ -6,12 +6,12 @@ namespace CattleManager.Application.Application.Services.Authorization;
 
 public class UserAuthorizationService : IUserAuthorizationService
 {
-    public string GetUserIdFromJwtToken(ClaimsPrincipal user)
+    public Guid GetUserIdFromJwtToken(ClaimsPrincipal user)
     {
         string? userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (userId is null)
             throw new ForbiddenException("Você não possui permissão.");
 
-        return userId;
+        return Guid.Parse(userId);
     }
 }
