@@ -71,6 +71,20 @@ public class VaccinationServiceTests
     }
 
     [Fact]
+    public async Task Get_All_Vaccinations_From_Non_Existent_Cattle_Throws_NotFoundException()
+    {
+        Guid cattleId = Guid.NewGuid();
+        Guid userId = Guid.NewGuid();
+        Cattle? nullCattle = null;
+        A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleId, userId, false)).Returns(nullCattle);
+
+        async Task result() => await _sut.GetAllVaccinationsFromCattleAsync(cattleId, userId, 1);
+
+        var exception = await Assert.ThrowsAsync<NotFoundException>(result);
+        Assert.Equal("Animal com o id especificado não existe.", exception.Message);
+    }
+
+    [Fact]
     public async Task Get_All_Vaccinations_From_Cattle_With_Zero_Vaccinations_Returns_Empty_List()
     {
         Guid cattleId = Guid.NewGuid();
@@ -80,7 +94,7 @@ public class VaccinationServiceTests
         A.CallTo(() => _mapperMock.Map<List<VaccinationResponse>>(new List<Vaccination>())).Returns(new List<VaccinationResponse>());
         PaginatedVaccinationResponse expectedVaccinationResponse = new(new List<VaccinationResponse>(), 1, 1);
 
-        var vaccinationsFromCattle = await _sut.GetAllVaccinationsFromCattle(cattleId, userId, 1);
+        var vaccinationsFromCattle = await _sut.GetAllVaccinationsFromCattleAsync(cattleId, userId, 1);
 
         Assert.Equivalent(expectedVaccinationResponse, vaccinationsFromCattle);
     }
@@ -103,7 +117,7 @@ public class VaccinationServiceTests
         A.CallTo(() => _mapperMock.Map<List<VaccinationResponse>>(vaccinations)).Returns(expectedVaccinationResponses);
         PaginatedVaccinationResponse expectedResponse = new(expectedVaccinationResponses, 1, 1);
 
-        PaginatedVaccinationResponse vaccinationResponses = await _sut.GetAllVaccinationsFromCattle(cattleId, userId, 1);
+        PaginatedVaccinationResponse vaccinationResponses = await _sut.GetAllVaccinationsFromCattleAsync(cattleId, userId, 1);
 
         Assert.Equivalent(expectedResponse, vaccinationResponses);
     }

@@ -24,7 +24,7 @@ public class VaccinationController : ControllerBase
     {
         Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var vaccinationsFromCattle = await _vaccinationService.GetAllVaccinationsFromCattle(cattleId, userId, page);
+        var vaccinationsFromCattle = await _vaccinationService.GetAllVaccinationsFromCattleAsync(cattleId, userId, page);
         return Ok(vaccinationsFromCattle);
     }
 

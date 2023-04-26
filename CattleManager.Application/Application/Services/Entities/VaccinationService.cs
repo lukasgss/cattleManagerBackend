@@ -34,8 +34,12 @@ public class VaccinationService : IVaccinationService
         return _mapper.Map<VaccinationResponse>(vaccination);
     }
 
-    public async Task<PaginatedVaccinationResponse> GetAllVaccinationsFromCattle(Guid cattleId, Guid userId, int page)
+    public async Task<PaginatedVaccinationResponse> GetAllVaccinationsFromCattleAsync(Guid cattleId, Guid userId, int page)
     {
+        Cattle? cattle = await _cattleRepository.GetCattleById(cattleId, userId, false);
+        if (cattle is null)
+            throw new NotFoundException("Animal com o id especificado não existe.");
+
         double amountOfPages = _vaccinationRepository.GetAmountOfPages(cattleId, userId);
         if ((page > amountOfPages && amountOfPages > 1) || page < 1)
             throw new BadRequestException($"Resultado possui {amountOfPages} página(s), insira um valor entre 1 e o número de páginas.");
