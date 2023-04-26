@@ -5,6 +5,7 @@ using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
 using CattleManager.Application.Application.Common.Interfaces.GuidProvider;
 using CattleManager.Application.Application.Common.Interfaces.InCommon;
 using CattleManager.Application.Application.Common.Interfaces.ServiceValidations;
+using CattleManager.Application.Application.Services.CommonValidations;
 using CattleManager.Application.Domain.Entities;
 
 namespace CattleManager.Application.Application.Services.Entities;
@@ -16,6 +17,7 @@ public class MilkSaleService : IMilkSaleService
     private readonly IMapper _mapper;
     private readonly IGuidProvider _guidProvider;
     private readonly IServiceValidations _serviceValidations;
+
 
     public MilkSaleService(
         IMilkSaleRepository milkSaleRepository,
@@ -61,7 +63,7 @@ public class MilkSaleService : IMilkSaleService
 
     public async Task<AverageOfEntity> GetMilkSalesAverageTotalIncomeInSpecificMonthAsync(Guid userId, int month, int year)
     {
-        _serviceValidations.ValidateMonth(month);
+        ServiceValidations.ValidateMonth(month);
         _serviceValidations.ValidateDate(month, year);
 
         return await _milkSaleRepository.GetMilkSalesAverageTotalIncomeInSpecificMonthAsync(userId, month, year);
