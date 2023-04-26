@@ -31,6 +31,7 @@ public class CattleServiceTests
     private static readonly Guid _userId = Guid.NewGuid();
     private static readonly Guid _girId = Guid.NewGuid();
     private static readonly Guid _holandesId = Guid.NewGuid();
+    private const string _cattleName = "cattleName";
     public CattleServiceTests()
     {
         _cattleRepositoryMock = A.Fake<ICattleRepository>();
@@ -292,21 +293,21 @@ public class CattleServiceTests
     public async Task Register_Cattle_With_Already_Existing_Name_And_Is_Owned_By_User_Throws_ConflictException()
     {
         CattleRequest cattleRequest = GenerateCattleRequest(_userId, fatherId: Guid.NewGuid(), motherId: Guid.NewGuid());
-        A.CallTo(() => _cattleRepositoryMock.GetCattleByName(cattleRequest.Name, _userId)).Returns(new List<Cattle>() { new Cattle() });
+        A.CallTo(() => _cattleRepositoryMock.GetCattleBySpecificName(cattleRequest.Name, _userId)).Returns(new Cattle());
 
         async Task result() => await _sut.CreateCattle(cattleRequest, _userId);
 
         var exception = await Assert.ThrowsAsync<ConflictException>(result);
-        Assert.Equal("Gado com esse nome já existe.", exception.Message);
+        Assert.Equal("Animal com esse nome já existe.", exception.Message);
     }
 
     [Fact]
     public async Task Register_Cattle_With_Non_Existent_Father_Id_Throws_NotFoundException()
     {
         CattleRequest cattleRequest = GenerateCattleRequest(_userId, fatherId: Guid.NewGuid(), motherId: Guid.NewGuid());
-        A.CallTo(() => _cattleRepositoryMock.GetCattleByName(cattleRequest.Name, _userId)).Returns(new List<Cattle>());
-        Cattle? nullCattleFather = null;
-        A.CallTo(() => _cattleRepositoryMock.GetByIdAsync(cattleRequest.FatherId ?? Guid.NewGuid())).Returns(nullCattleFather);
+        Cattle? nullCattle = null;
+        A.CallTo(() => _cattleRepositoryMock.GetCattleBySpecificName(cattleRequest.Name, _userId)).Returns(nullCattle);
+        A.CallTo(() => _cattleRepositoryMock.GetByIdAsync(cattleRequest.FatherId ?? Guid.NewGuid())).Returns(nullCattle);
 
         async Task result() => await _sut.CreateCattle(cattleRequest, _userId);
 
@@ -318,7 +319,8 @@ public class CattleServiceTests
     public async Task Register_Cattle_With_Female_Father_Throws_BadRequestException()
     {
         CattleRequest cattleRequest = GenerateCattleRequest(_userId, fatherId: _cattleId, motherId: null);
-        A.CallTo(() => _cattleRepositoryMock.GetCattleByName(cattleRequest.Name, _userId)).Returns(new List<Cattle>());
+        Cattle? nullCattle = null;
+        A.CallTo(() => _cattleRepositoryMock.GetCattleBySpecificName(cattleRequest.Name, _userId)).Returns(nullCattle);
         Cattle cattleFather = GenerateCattle(cattleId: _cattleId, userId: _userId, isMale: false);
         A.CallTo(() => _cattleRepositoryMock.GetByIdAsync(cattleRequest.FatherId ?? Guid.NewGuid())).Returns(cattleFather);
 
@@ -332,9 +334,9 @@ public class CattleServiceTests
     public async Task Register_Cattle_With_Non_Existent_Mother_Throws_NotFoundException()
     {
         CattleRequest cattleRequest = GenerateCattleRequest(_userId, fatherId: null, motherId: Guid.NewGuid());
-        A.CallTo(() => _cattleRepositoryMock.GetCattleByName(cattleRequest.Name, _userId)).Returns(new List<Cattle>());
-        Cattle? nullCattleMother = null;
-        A.CallTo(() => _cattleRepositoryMock.GetByIdAsync(cattleRequest.MotherId ?? Guid.NewGuid())).Returns(nullCattleMother);
+        Cattle? nullCattle = null;
+        A.CallTo(() => _cattleRepositoryMock.GetCattleBySpecificName(cattleRequest.Name, _userId)).Returns(nullCattle);
+        A.CallTo(() => _cattleRepositoryMock.GetByIdAsync(cattleRequest.MotherId ?? Guid.NewGuid())).Returns(nullCattle);
 
         async Task result() => await _sut.CreateCattle(cattleRequest, _userId);
 
@@ -346,11 +348,12 @@ public class CattleServiceTests
     public async Task Register_Cattle_With_Male_Mother_Throws_BadRequestException()
     {
         CattleRequest cattleRequest = GenerateCattleRequest(userId: _userId, fatherId: null, motherId: _cattleId);
-        A.CallTo(() => _cattleRepositoryMock.GetCattleByName(cattleRequest.Name, _userId)).Returns(new List<Cattle>());
+        Cattle? nullCattle = null;
+        A.CallTo(() => _cattleRepositoryMock.GetCattleBySpecificName(cattleRequest.Name, _userId)).Returns(nullCattle);
         Cattle cattleMotherResponse = GenerateCattle(cattleId: _cattleId, userId: _userId, isMale: true);
         A.CallTo(() => _cattleRepositoryMock.GetByIdAsync(cattleRequest.MotherId ?? Guid.NewGuid())).Returns(cattleMotherResponse);
 
-        async Task result() => await _sut.CreateCattle(cattleRequest, _cattleId);
+        async Task result() => await _sut.CreateCattle(cattleRequest, _userId);
 
         var exception = await Assert.ThrowsAsync<BadRequestException>(result);
         Assert.Equal("Mãe do animal não pode ser do sexo masculino.", exception.Message);
@@ -364,7 +367,8 @@ public class CattleServiceTests
         Guid motherId = Guid.NewGuid();
         CattleRequest cattleRequest = GenerateCattleRequest(_userId, fatherId, motherId);
 
-        A.CallTo(() => _cattleRepositoryMock.GetCattleByName(cattleRequest.Name, _userId)).Returns(new List<Cattle>());
+        Cattle? nullCattle = null;
+        A.CallTo(() => _cattleRepositoryMock.GetCattleBySpecificName(cattleRequest.Name, _userId)).Returns(nullCattle);
         Cattle father = GenerateCattle(fatherId, _userId, true);
         A.CallTo(() => _cattleRepositoryMock.GetByIdAsync(fatherId)).Returns(father);
         Cattle mother = GenerateCattle(fatherId, _userId, false);
@@ -386,12 +390,26 @@ public class CattleServiceTests
     {
         EditCattleRequest editCattleRequest = GenerateEditCattleRequest(_cattleId, _userId, Guid.NewGuid(), Guid.NewGuid());
         Cattle? nullCattle = null;
-        A.CallTo(() => _cattleRepositoryMock.GetCattleById(_cattleId, _userId, true)).Returns(nullCattle);
+        A.CallTo(() => _cattleRepositoryMock.GetCattleById(_cattleId, _userId, false)).Returns(nullCattle);
 
         async Task result() => await _sut.EditCattle(editCattleRequest, _userId, editCattleRequest.Id!.Value);
 
         var exception = await Assert.ThrowsAsync<NotFoundException>(result);
-        Assert.Equal("Gado com o id especificado não existe.", exception.Message);
+        Assert.Equal("Animal com o id especificado não existe.", exception.Message);
+    }
+
+    [Fact]
+    public async Task Edit_Cattle_With_Already_Existent_Name_Throws_ConflictException()
+    {
+        EditCattleRequest editCattleRequest = GenerateEditCattleRequest(_cattleId, _userId);
+        Cattle existentCattle = new() { Id = Guid.NewGuid(), Name = _cattleName };
+        A.CallTo(() => _cattleRepositoryMock.GetCattleById(_cattleId, _userId, false)).Returns(new Cattle());
+        A.CallTo(() => _cattleRepositoryMock.GetCattleBySpecificName(_cattleName, _userId)).Returns(existentCattle);
+
+        async Task result() => await _sut.EditCattle(editCattleRequest, _userId, _cattleId);
+
+        var exception = await Assert.ThrowsAsync<ConflictException>(result);
+        Assert.Equal("Animal com esse nome já existe.", exception.Message);
     }
 
     [Fact]
@@ -410,11 +428,15 @@ public class CattleServiceTests
     [Fact]
     public async Task Edit_Cattle_With_Valid_Data_Returns_Edited_Cattle()
     {
+        // Arrange
         Guid fatherId = Guid.NewGuid();
         Guid motherId = Guid.NewGuid();
         EditCattleRequest cattleRequest = GenerateEditCattleRequest(_cattleId, _userId, fatherId, motherId);
         Cattle cattle = GenerateCattleFromCattleRequest(cattleRequest, _cattleId);
+
         A.CallTo(() => _cattleRepositoryMock.GetCattleById(_cattleId, _userId, true)).Returns(cattle);
+        Cattle? nullCattle = null;
+        A.CallTo(() => _cattleRepositoryMock.GetCattleBySpecificName(_cattleName, _userId)).Returns(nullCattle);
         Cattle father = GenerateCattle(fatherId, _userId, true);
         A.CallTo(() => _cattleRepositoryMock.GetByIdAsync(fatherId)).Returns(father);
         Cattle mother = GenerateCattle(fatherId, _userId, false);
@@ -424,8 +446,10 @@ public class CattleServiceTests
         A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleFromCattleRequest.Id, _userId, true)).Returns(cattleFromCattleRequest);
         CattleResponse cattleResponse = GenerateCattleResponseDto(cattleFromCattleRequest);
 
+        // Act
         var cattleResult = await _sut.EditCattle(cattleRequest, _userId, _cattleId);
 
+        // Assert
         Assert.Equivalent(cattleResponse, cattleResult);
     }
 
@@ -538,7 +562,7 @@ public class CattleServiceTests
     {
         return new CattleRequest()
         {
-            Name = "Jupiter",
+            Name = _cattleName,
             FatherId = fatherId,
             MotherId = motherId,
             SexId = 0,
@@ -617,7 +641,7 @@ public class CattleServiceTests
         return new EditCattleRequest()
         {
             Id = cattleId,
-            Name = "Jupiter",
+            Name = _cattleName,
             FatherId = fatherId,
             MotherId = motherId,
             SexId = 0,

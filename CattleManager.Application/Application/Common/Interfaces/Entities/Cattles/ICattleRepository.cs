@@ -9,6 +9,7 @@ public interface ICattleRepository : IGenericRepository<Cattle>
 {
     double GetAmountOfPages(Guid userId);
     Task<IEnumerable<Cattle>> GetCattleByName(string cattleName, Guid userId);
+    Task<Cattle?> GetCattleBySpecificName(string cattleName, Guid userId);
     Task<Cattle?> GetCattleById(Guid cattleId, Guid ownerId, bool trackChanges = true);
     Task<IEnumerable<Cattle>> GetAllCattleFromOwner(Guid ownerId, int page);
     Task<Cattle?> GetCattleDataOnlyById(Guid cattleId, Guid userId);
