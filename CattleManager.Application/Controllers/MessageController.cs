@@ -22,45 +22,45 @@ public class MessageController : ControllerBase
     [HttpGet("user/{senderId:guid}")]
     public async Task<ActionResult<PaginatedMessageResponse>> GetAllMessagesToUser(Guid senderId, int page = 1)
     {
-        string receiverId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid receiverId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        PaginatedMessageResponse messages = await _messageService.GetAllMessagesToUserAsync(new Guid(receiverId), senderId, page);
+        PaginatedMessageResponse messages = await _messageService.GetAllMessagesToUserAsync(receiverId, senderId, page);
         return Ok(messages);
     }
 
     [HttpGet("{messageId:guid}", Name = "GetMessageById")]
     public async Task<ActionResult<MessageResponse>> GetMessageById(Guid messageId)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        MessageResponse messageResponse = await _messageService.GetMessageByIdAsync(messageId, new Guid(userId));
+        MessageResponse messageResponse = await _messageService.GetMessageByIdAsync(messageId, userId);
         return Ok(messageResponse);
     }
 
     [HttpGet("notifications")]
     public async Task<ActionResult<MessageNotificationAmount>> GetAmountOfMessageNotifications()
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        MessageNotificationAmount notificationAmount = await _messageService.GetAmountOfMessageNotificationsFromDistinctUsers(new Guid(userId));
+        MessageNotificationAmount notificationAmount = await _messageService.GetAmountOfMessageNotificationsFromDistinctUsers(userId);
         return Ok(notificationAmount);
     }
 
     [HttpGet("read/{senderId:guid}")]
     public async Task<ActionResult> ReadMessage(Guid senderId)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        await _messageService.MarkMessagesAsRead(new Guid(userId), senderId);
+        await _messageService.MarkMessagesAsRead(userId, senderId);
         return Ok();
     }
 
     [HttpPost]
     public async Task<ActionResult<MessageResponse>> SendMessage(MessageRequest messageRequest)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        MessageResponse message = await _messageService.SendMessageAsync(messageRequest, new Guid(userId));
+        MessageResponse message = await _messageService.SendMessageAsync(messageRequest, userId);
         return new CreatedAtRouteResult(nameof(GetMessageById), new { MessageId = message.Id }, message);
     }
 }

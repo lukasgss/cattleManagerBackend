@@ -24,9 +24,9 @@ public class UserController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<UserResponse>> GetUserDataById(Guid id)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        UserDataResponse userData = await _userService.GetUserDataByIdAsync(id, new Guid(userId));
+        UserDataResponse userData = await _userService.GetUserDataByIdAsync(id, userId);
         return Ok(userData);
     }
 

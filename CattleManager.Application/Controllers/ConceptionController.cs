@@ -29,36 +29,36 @@ public class ConceptionController : ControllerBase
     [HttpGet("cattle/{id:guid}")]
     public async Task<ActionResult<ICollection<ConceptionResponse>>> GetAllConceptionsFromCattleByCattleId(Guid id, int page = 1)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var conceptionsFromCattle = await _conceptionService.GetAllConceptionsFromCattleAsync(id, new Guid(userId), page);
+        var conceptionsFromCattle = await _conceptionService.GetAllConceptionsFromCattleAsync(id, userId, page);
         return Ok(conceptionsFromCattle);
     }
 
     [HttpPost]
     public async Task<ActionResult<ConceptionResponse>> CreateConception(CreateConceptionRequest conceptionRequest)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var createdConception = await _conceptionService.CreateConceptionAsync(conceptionRequest, new Guid(userId));
+        var createdConception = await _conceptionService.CreateConceptionAsync(conceptionRequest, userId);
         return new CreatedAtRouteResult(nameof(GetConceptionById), new { id = createdConception.Id }, createdConception);
     }
 
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<ConceptionResponse>> EditConception(EditConceptionRequest conceptionRequest, Guid id)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        ConceptionResponse conceptionResponse = await _conceptionService.EditConceptionAsync(conceptionRequest, new Guid(userId), id);
+        ConceptionResponse conceptionResponse = await _conceptionService.EditConceptionAsync(conceptionRequest, userId, id);
         return Ok(conceptionResponse);
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> DeleteConception(Guid id)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        await _conceptionService.DeleteConceptionAsync(id, new Guid(userId));
+        await _conceptionService.DeleteConceptionAsync(id, userId);
         return Ok();
     }
 }

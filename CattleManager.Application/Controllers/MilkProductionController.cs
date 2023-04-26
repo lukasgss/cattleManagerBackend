@@ -27,28 +27,28 @@ public class MilkProductionController : ControllerBase
     [HttpGet("{id:guid}", Name = "GetMilkProductionById")]
     public async Task<MilkProductionResponse> GetMilkProductionById(Guid id)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        return await _milkProductionService.GetMilkProductionByIdAsync(id, new Guid(userId));
+        return await _milkProductionService.GetMilkProductionByIdAsync(id, userId);
     }
 
     [Route("cattle/{cattleId:guid}")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<MilkProductionResponse>>> GetMilkProductionsFromCattle(Guid cattleId, int page = 1)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var milkProductions = await _milkProductionService.GetAllMilkProductionsFromCattleAsync(cattleId, new Guid(userId), page);
+        var milkProductions = await _milkProductionService.GetAllMilkProductionsFromCattleAsync(cattleId, userId, page);
         return Ok(milkProductions);
     }
 
     [HttpGet("average")]
     public async Task<ActionResult<AverageOfEntity>> GetAverageMilkProductionFromAllCattle(int month, int year)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
         AverageOfEntity averageMilkProduction =
-            await _milkProductionService.GetAverageMilkProductionFromAllCattleAsync(new Guid(userId), month, year);
+            await _milkProductionService.GetAverageMilkProductionFromAllCattleAsync(userId, month, year);
 
         return Ok(averageMilkProduction);
     }
@@ -56,10 +56,10 @@ public class MilkProductionController : ControllerBase
     [HttpGet("average/{cattleId:guid}")]
     public async Task<ActionResult<AverageMilkProduction>> GetAverageMilkProductionFromCattle(Guid cattleId, int month, int year)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
         AverageMilkProduction averageMilkProduction =
-            await _milkProductionService.GetAverageMilkProductionFromCattleAsync(cattleId, new Guid(userId), month, year);
+            await _milkProductionService.GetAverageMilkProductionFromCattleAsync(cattleId, userId, month, year);
 
         return Ok(averageMilkProduction);
     }
@@ -75,27 +75,27 @@ public class MilkProductionController : ControllerBase
             return ValidationProblem(modelStateDictionary);
         }
 
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var milkProduction = await _milkProductionService.CreateMilkProductionAsync(milkProductionRequest, new Guid(userId));
+        var milkProduction = await _milkProductionService.CreateMilkProductionAsync(milkProductionRequest, userId);
         return new CreatedAtRouteResult(nameof(GetMilkProductionById), new { milkProduction.Id }, milkProduction);
     }
 
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<MilkProductionResponse>> EditMilkProduction(Guid id, EditMilkProductionRequest milkProduction)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var editedMilkProduction = await _milkProductionService.EditMilkProductionByIdAsync(milkProduction, new Guid(userId), id);
+        var editedMilkProduction = await _milkProductionService.EditMilkProductionByIdAsync(milkProduction, userId, id);
         return Ok(editedMilkProduction);
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> DeleteMilkProduction(Guid id)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        await _milkProductionService.DeleteMilkProductionByIdAsync(id, new Guid(userId));
+        await _milkProductionService.DeleteMilkProductionByIdAsync(id, userId);
         return Ok();
     }
 }

@@ -22,36 +22,36 @@ public class VaccinationController : ControllerBase
     [HttpGet("{cattleId:guid}")]
     public async Task<ActionResult<IEnumerable<VaccinationResponse>>> GetAllVaccinationsFromCattle(Guid cattleId, int page = 1)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var vaccinationsFromCattle = await _vaccinationService.GetAllVaccinationsFromCattle(cattleId, new Guid(userId), page);
+        var vaccinationsFromCattle = await _vaccinationService.GetAllVaccinationsFromCattle(cattleId, userId, page);
         return Ok(vaccinationsFromCattle);
     }
 
     [HttpPost]
     public async Task<ActionResult<VaccinationResponse>> CreateVacination(CreateVaccinationRequest vaccinationRequest)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var vaccination = await _vaccinationService.CreateVaccinationAsync(vaccinationRequest, new Guid(userId));
+        var vaccination = await _vaccinationService.CreateVaccinationAsync(vaccinationRequest, userId);
         return Ok(vaccination);
     }
 
     [HttpPut("{vaccinationId:guid}")]
     public async Task<ActionResult<VaccinationResponse>> EditVaccination(Guid vaccinationId, EditVaccinationRequest vaccinationRequest)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var editedVaccination = await _vaccinationService.EditVaccinationAsync(vaccinationRequest, vaccinationId, new Guid(userId));
+        var editedVaccination = await _vaccinationService.EditVaccinationAsync(vaccinationRequest, vaccinationId, userId);
         return Ok(editedVaccination);
     }
 
     [HttpDelete("{vaccinationId:guid}")]
     public async Task<ActionResult> DeleteVaccination(Guid vaccinationId)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        await _vaccinationService.DeleteVaccinationAsync(vaccinationId, new Guid(userId));
+        await _vaccinationService.DeleteVaccinationAsync(vaccinationId, userId);
         return Ok();
     }
 }

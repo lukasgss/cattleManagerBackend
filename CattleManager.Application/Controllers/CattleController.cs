@@ -26,71 +26,71 @@ public class CattleController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CattleResponse>>> GetAllCattlesFromOwner(int page = 1)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var cattle = await _cattleService.GetAllCattleFromOwner(new Guid(userId), page);
+        var cattle = await _cattleService.GetAllCattleFromOwner(userId, page);
         return Ok(cattle);
     }
 
     [HttpGet("{id:guid}", Name = "GetCattleById")]
     public async Task<ActionResult<CattleResponse>> GetCattleById(Guid id)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        return await _cattleService.GetCattleById(id, new Guid(userId));
+        return await _cattleService.GetCattleById(id, userId);
     }
 
     [HttpGet("{name}")]
     public async Task<ActionResult<IEnumerable<CattleResponse>>> GetCattleByName(string name)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var cattle = await _cattleService.GetCattleByNameAsync(name, new Guid(userId));
+        var cattle = await _cattleService.GetCattleByNameAsync(name, userId);
         return Ok(cattle);
     }
 
     [HttpGet("children/{id:guid}")]
     public async Task<ActionResult<IEnumerable<CattleResponse>>> GetAllChildrenFromCattle(Guid id)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        IEnumerable<CattleResponse> cattleChildren = await _cattleService.GetAllChildrenFromCattle(id, new Guid(userId));
+        IEnumerable<CattleResponse> cattleChildren = await _cattleService.GetAllChildrenFromCattle(id, userId);
         return Ok(cattleChildren);
     }
 
     [HttpGet("dropdown/male")]
     public async Task<ActionResult<DropdownData>> GetMaleCattleByName(string name)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var maleCattleByName = await _cattleService.GetMaleCattleByName(name, new Guid(userId));
+        var maleCattleByName = await _cattleService.GetMaleCattleByName(name, userId);
         return Ok(maleCattleByName);
     }
 
     [HttpGet("dropdown/female")]
     public async Task<ActionResult<DropdownData>> GetFemaleCattleByNamer(string name)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var femaleCattleByName = await _cattleService.GetFemaleCattleByName(name, new Guid(userId));
+        var femaleCattleByName = await _cattleService.GetFemaleCattleByName(name, userId);
         return Ok(femaleCattleByName);
     }
 
     [HttpGet("lactation-period/amount")]
     public async Task<ActionResult<AmountOfEntity>> GetAmountOfCattleInLactationPeriod()
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        AmountOfEntity amount = await _cattleService.GetAmountOfCattleInLactationPeriodAsync(new Guid(userId));
+        AmountOfEntity amount = await _cattleService.GetAmountOfCattleInLactationPeriodAsync(userId);
         return Ok(amount);
     }
 
     [HttpGet("dry-period/amount")]
     public async Task<ActionResult<AmountOfEntity>> GetAmountOfCattleInDryPeriod()
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        AmountOfEntity amount = await _cattleService.GetAmountOfCattleInDryPeriodAsync(new Guid(userId));
+        AmountOfEntity amount = await _cattleService.GetAmountOfCattleInDryPeriodAsync(userId);
         return Ok(amount);
     }
 
@@ -105,9 +105,9 @@ public class CattleController : ControllerBase
             return ValidationProblem(modelStateDictionary);
         }
 
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var cattle = await _cattleService.CreateCattle(cattleRequest, new Guid(userId));
+        var cattle = await _cattleService.CreateCattle(cattleRequest, userId);
         return new CreatedAtRouteResult(nameof(GetCattleById), new { id = cattle.Id }, cattle);
     }
 
@@ -122,18 +122,18 @@ public class CattleController : ControllerBase
             return ValidationProblem(modelStateDictionary);
         }
 
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var cattle = await _cattleService.EditCattle(cattleRequest, new Guid(userId), cattleId);
+        var cattle = await _cattleService.EditCattle(cattleRequest, userId, cattleId);
         return Ok(cattle);
     }
 
     [HttpDelete("{cattleId:guid}")]
     public async Task<ActionResult> DeleteCattle(Guid cattleId)
     {
-        string userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        await _cattleService.DeleteCattle(cattleId, new Guid(userId));
+        await _cattleService.DeleteCattle(cattleId, userId);
         return Ok();
     }
 }
