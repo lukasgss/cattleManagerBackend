@@ -24,7 +24,7 @@ public class ServiceValidationsTests
     {
         const int smallerMonth = 0;
 
-        void result() => _sut.ValidateMonth(smallerMonth);
+        static void result() => ServiceValidations.ValidateMonth(smallerMonth);
 
         var exception = Assert.Throws<BadRequestException>(result);
         Assert.Equal("Mês deve ser entre 1 e 12.", exception.Message);
@@ -35,7 +35,7 @@ public class ServiceValidationsTests
     {
         const int biggerMonth = 14;
 
-        void result() => _sut.ValidateMonth(biggerMonth);
+        static void result() => ServiceValidations.ValidateMonth(biggerMonth);
 
         var exception = Assert.Throws<BadRequestException>(result);
         Assert.Equal("Mês deve ser entre 1 e 12.", exception.Message);

@@ -2,6 +2,5 @@ namespace CattleManager.Application.Application.Common.Interfaces.ServiceValidat
 
 public interface IServiceValidations
 {
-    void ValidateMonth(int month);
     void ValidateDate(int month, int year);
 }

@@ -13,7 +13,7 @@ public class ServiceValidations : IServiceValidations
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public void ValidateMonth(int month)
+    public static void ValidateMonth(int month)
     {
         if (month < 1 || month > 12)
             throw new BadRequestException("Mês deve ser entre 1 e 12.");
