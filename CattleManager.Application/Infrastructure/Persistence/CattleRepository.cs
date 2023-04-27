@@ -173,6 +173,7 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
                 YearOfBirth = cattle.YearOfBirth
             })
             .ToListAsync();
+    }
 
     public async Task<Cattle?> GetCattleBySpecificName(string cattleName, Guid userId)
     {
