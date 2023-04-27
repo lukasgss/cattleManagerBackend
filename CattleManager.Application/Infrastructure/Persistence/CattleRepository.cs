@@ -32,6 +32,7 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
         .Where(cattle =>
             cattle.Name.ToLower().Contains(cattleName.ToLowerInvariant())
             && cattle.Users.Any(user => user.Id == userId))
+        .AsNoTracking()
         .ToListAsync();
     }
 
@@ -157,6 +158,7 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
             .CountAsync();
     }
 
+
     public async Task<IEnumerable<Cattle>> GetAllChildrenFromCattleAsync(Guid cattleId, Guid userId)
     {
         return await _dbContext.Cattle
@@ -171,5 +173,19 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
                 YearOfBirth = cattle.YearOfBirth
             })
             .ToListAsync();
+
+    public async Task<Cattle?> GetCattleBySpecificName(string cattleName, Guid userId)
+    {
+        return await _dbContext.Cattle
+            .Include(x => x.Users)
+            .Include(x => x.CattleOwners)
+                .ThenInclude(x => x.User)
+            .Include(x => x.Breeds)
+            .Include(x => x.CattleBreeds)
+                .ThenInclude(x => x.Breed)
+            .AsNoTracking()
+            .SingleOrDefaultAsync(cattle =>
+                cattle.Name.ToLower() == cattleName.ToLowerInvariant()
+                && cattle.Users.Any(user => user.Id == userId));
     }
 }

@@ -71,7 +71,7 @@ public class CattleService : ICattleService
 
     public async Task<IEnumerable<CattleResponse>> GetCattleByNameAsync(string cattleName, Guid userId)
     {
-        var cattleByName = await _cattleRepository.GetCattleByName(cattleName, userId);
+        IEnumerable<Cattle> cattleByName = await _cattleRepository.GetCattleByName(cattleName, userId);
 
         List<CattleResponse> cattleResponse = new();
         foreach (Cattle cattle in cattleByName)
@@ -106,7 +106,10 @@ public class CattleService : ICattleService
 
     public async Task<CattleResponse> CreateCattle(CattleRequest cattleRequest, Guid userId)
     {
-        await ValidateCattleName(cattleRequest.Name, userId);
+        Cattle? cattleByName = await _cattleRepository.GetCattleBySpecificName(cattleRequest.Name, userId);
+        if (cattleByName is not null)
+            throw new ConflictException("Animal com esse nome já existe.");
+
         await ValidateCattleParents(cattleRequest.FatherId, cattleRequest.MotherId);
 
         Cattle cattleToRegister = GenerateCattleFromRequest(cattleRequest);
@@ -119,7 +122,7 @@ public class CattleService : ICattleService
 
         var createdCattle = await GetCattleById(cattleToRegister.Id, userId);
         if (createdCattle is null)
-            throw new Exception("Não foi possível retornar os dados do gado.");
+            throw new Exception("Não foi possível retornar os dados do animal.");
 
         return createdCattle;
     }
@@ -127,13 +130,16 @@ public class CattleService : ICattleService
     public async Task<CattleResponse> EditCattle(EditCattleRequest cattleRequest, Guid userId, Guid routeId)
     {
         if (routeId != cattleRequest.Id)
-            throw new BadRequestException("Id da rota não coincide com o id do gado especificado.");
+            throw new BadRequestException("Id da rota não coincide com o id do animal especificado.");
 
-        var cattle = await _cattleRepository.GetCattleById(cattleRequest.Id.Value, userId, true);
+        Cattle? cattle = await _cattleRepository.GetCattleById(cattleRequest.Id.Value, userId, false);
         if (cattle is null)
-            throw new NotFoundException("Gado com o id especificado não existe.");
+            throw new NotFoundException("Animal com o id especificado não existe.");
 
-        await ValidateCattleName(cattleRequest.Name, userId);
+        Cattle? cattleByName = await _cattleRepository.GetCattleBySpecificName(cattleRequest.Name, userId);
+        if (cattleByName is not null && cattleByName.Name == cattleRequest.Name && cattleByName.Id != cattleRequest.Id)
+            throw new ConflictException("Animal com esse nome já existe.");
+
         await ValidateCattleParents(cattleRequest.FatherId, cattleRequest.MotherId, cattleRequest.Id);
 
         Cattle cattleToEdit = GenerateCattleFromRequest(cattleRequest);
@@ -143,7 +149,7 @@ public class CattleService : ICattleService
 
         var updatedCattle = await GetCattleById(cattleToEdit.Id, userId);
         if (updatedCattle is null)
-            throw new Exception("Não foi possível retornar os dados do gado.");
+            throw new Exception("Não foi possível retornar os dados do animal.");
 
         return updatedCattle;
     }
@@ -194,13 +200,6 @@ public class CattleService : ICattleService
         }
 
         return cattleChildrenResponse;
-    }
-
-    private async Task ValidateCattleName(string cattleName, Guid userId)
-    {
-        var cattleByName = await _cattleRepository.GetCattleByName(cattleName, userId);
-        if (cattleByName.Any())
-            throw new ConflictException("Gado com esse nome já existe.");
     }
 
     private Cattle GenerateCattleFromRequest(ICattleRequest cattleRequest)
