@@ -100,7 +100,7 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
         .ToListAsync();
     }
 
-    public async Task<IEnumerable<Cattle>> GetAllChildrenFromCattleAsync(Guid cattleId, Guid userId, Gender cattleGender)
+    public async Task<IEnumerable<Cattle>> GetAllChildrenFromCattleFromSpecificGenderAsync(Guid cattleId, Guid userId, Gender cattleGender)
     {
         if (cattleGender == Gender.Male)
         {
@@ -157,6 +157,22 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
                 && !cattle.IsInLactationPeriod)
             .CountAsync();
     }
+
+
+    public async Task<IEnumerable<Cattle>> GetAllChildrenFromCattleAsync(Guid cattleId, Guid userId)
+    {
+        return await _dbContext.Cattle
+            .AsNoTracking()
+            .Where(cattle => cattle.Users.Any(user => user.Id == userId)
+                && cattle.Mother != null && cattle.Mother.Id == cattleId)
+            .OrderByDescending(cattle => cattle.DateOfBirth)
+            .Select(cattle => new Cattle()
+            {
+                Name = cattle.Name,
+                DateOfBirth = cattle.DateOfBirth,
+                YearOfBirth = cattle.YearOfBirth
+            })
+            .ToListAsync();
 
     public async Task<Cattle?> GetCattleBySpecificName(string cattleName, Guid userId)
     {

@@ -18,7 +18,6 @@ public class MilkSaleService : IMilkSaleService
     private readonly IGuidProvider _guidProvider;
     private readonly IServiceValidations _serviceValidations;
 
-
     public MilkSaleService(
         IMilkSaleRepository milkSaleRepository,
         IMapper mapper,

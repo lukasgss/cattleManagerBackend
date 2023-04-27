@@ -252,7 +252,7 @@ public class CattleServiceTests
         Cattle cattleChild = GenerateCattle(cattleChildId);
         List<Cattle> cattleChildren = new() { cattleChild };
         List<CattleResponse> expectedCattleResponse = new() { GenerateCattleResponseDto(cattleChild) };
-        A.CallTo(() => _cattleRepositoryMock.GetAllChildrenFromCattleAsync(_cattleId, _userId, (Gender)cattle.SexId)).Returns(cattleChildren);
+        A.CallTo(() => _cattleRepositoryMock.GetAllChildrenFromCattleFromSpecificGenderAsync(_cattleId, _userId, (Gender)cattle.SexId)).Returns(cattleChildren);
 
         IEnumerable<CattleResponse> cattleResponse = await _sut.GetAllChildrenFromCattle(_cattleId, _userId);
 
@@ -287,6 +287,64 @@ public class CattleServiceTests
         AmountOfEntity amountOfCattleInDryPeriod = await _sut.GetAmountOfCattleInDryPeriodAsync(_userId);
 
         Assert.Equivalent(expectedAmountOfCattleInDryPeriod, amountOfCattleInDryPeriod);
+    }
+
+    [Fact]
+    public async Task Get_All_Calving_Intervals_From_Non_Existent_Cattle_Throws_NotFoundException()
+    {
+        Cattle? nullCattle = null;
+        A.CallTo(() => _cattleRepositoryMock.GetCattleById(_cattleId, _userId, false)).Returns(nullCattle);
+
+        async Task result() => await _sut.GetAllCalvingIntervalsFromCattleAsync(_cattleId, _userId);
+
+        var exception = await Assert.ThrowsAsync<NotFoundException>(result);
+        Assert.Equal("Animal com o id especificado não existe.", exception.Message);
+    }
+
+    [Fact]
+    public async Task Get_All_Calving_Intervals_From_Male_Cattle_Throws_BadRequestException()
+    {
+        A.CallTo(() => _cattleRepositoryMock.GetCattleById(_cattleId, _userId, false)).Returns(new Cattle() { SexId = (byte)Gender.Male });
+
+        async Task result() => await _sut.GetAllCalvingIntervalsFromCattleAsync(_cattleId, _userId);
+
+        var exception = await Assert.ThrowsAsync<BadRequestException>(result);
+        Assert.Equal("Não é possível obter intervalo entre partos de animais machos.", exception.Message);
+    }
+
+    [Fact]
+    public async Task Get_All_Calving_Internals_From_Cattle_With_No_Children_Returns_Empty_List()
+    {
+        List<Cattle> childrenFromCattle = new();
+        List<CalvingInterval> expectedCalvingInternals = new();
+        A.CallTo(() => _cattleRepositoryMock.GetCattleById(_cattleId, _userId, false)).Returns(new Cattle() { SexId = (byte)Gender.Female });
+        A.CallTo(() => _cattleRepositoryMock.GetAllChildrenFromCattleAsync(_cattleId, _userId)).Returns(childrenFromCattle);
+
+        IEnumerable<CalvingInterval> calvingIntervals = await _sut.GetAllCalvingIntervalsFromCattleAsync(_cattleId, _userId);
+
+        Assert.Equivalent(expectedCalvingInternals, calvingIntervals);
+    }
+
+    [Fact]
+    public async Task Get_All_Calving_Internals_From_Cattle_Returns_All_Calving_Internals()
+    {
+        const string childOneName = "childOneName";
+        const string childTwoName = "childTwoName";
+        List<Cattle> childrenFromCattle = new()
+        {
+            new Cattle() { Name = childOneName, DateOfBirth = new DateOnly(2022, 01, 01) },
+            new Cattle() { Name = childTwoName,  DateOfBirth = new DateOnly(2019, 06, 15) }
+        };
+        List<CalvingInterval> expectedCalvingIntervals = new()
+        {
+            new CalvingInterval() { From = childrenFromCattle[0].Name, To = childrenFromCattle[1].Name, Years = 2, Months = 6, Days = 16 }
+        };
+        A.CallTo(() => _cattleRepositoryMock.GetCattleById(_cattleId, _userId, false)).Returns(new Cattle() { SexId = (byte)Gender.Female });
+        A.CallTo(() => _cattleRepositoryMock.GetAllChildrenFromCattleAsync(_cattleId, _userId)).Returns(childrenFromCattle);
+
+        IEnumerable<CalvingInterval> calvingIntervals = await _sut.GetAllCalvingIntervalsFromCattleAsync(_cattleId, _userId);
+
+        Assert.Equivalent(expectedCalvingIntervals, calvingIntervals);
     }
 
     [Fact]
