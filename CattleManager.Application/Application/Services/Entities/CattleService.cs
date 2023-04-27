@@ -82,6 +82,28 @@ public class CattleService : ICattleService
         return cattleResponse;
     }
 
+    public async Task<IEnumerable<CalvingInterval>> GetAllCalvingIntervalsFromCattleAsync(Guid cattleId, Guid userId)
+    {
+        Cattle? cattle = await _cattleRepository.GetCattleById(cattleId, userId, false);
+        if (cattle is null)
+            throw new NotFoundException("Animal com o id especificado não existe.");
+
+        if ((Gender)cattle.SexId == Gender.Male)
+            throw new BadRequestException("Não é possível obter intervalo entre partos de animais machos.");
+
+        List<Cattle> allChildrenFromCattle = (List<Cattle>)await _cattleRepository.GetAllChildrenFromCattleAsync(cattleId, userId);
+        List<CalvingInterval> calvingIntervals = new();
+        for (int i = 0; i < allChildrenFromCattle.Count - 1; i++)
+        {
+            CalvingInterval calvingInterval =
+                CalculateCalvingInterval(allChildrenFromCattle[i], allChildrenFromCattle[i + 1]);
+
+            calvingIntervals.Add(calvingInterval);
+        }
+
+        return calvingIntervals;
+    }
+
     public async Task<CattleResponse> CreateCattle(CattleRequest cattleRequest, Guid userId)
     {
         await ValidateCattleName(cattleRequest.Name, userId);
@@ -163,7 +185,7 @@ public class CattleService : ICattleService
             throw new NotFoundException("Animal com o id especificado não existe.");
 
         IEnumerable<Cattle> cattleChildren =
-            await _cattleRepository.GetAllChildrenFromCattleAsync(cattleId, userId, (Gender)cattle.SexId);
+            await _cattleRepository.GetAllChildrenFromCattleFromSpecificGenderAsync(cattleId, userId, (Gender)cattle.SexId);
 
         List<CattleResponse> cattleChildrenResponse = new();
         foreach (Cattle animal in cattleChildren)
@@ -287,5 +309,44 @@ public class CattleService : ICattleService
             cattle.DateOfSale,
             cattle.CattleOwners.Select(x => new CattleOwnerResponse(x.User.FirstName, x.User.LastName))
         );
+    }
+
+    private static CalvingInterval CalculateCalvingInterval(Cattle cattle1, Cattle cattle2)
+    {
+        DateOnly date1 = cattle1.DateOfBirth ?? new DateOnly(cattle1.YearOfBirth, 1, 1);
+        DateOnly date2 = cattle2.DateOfBirth ?? new DateOnly(cattle2.YearOfBirth, 1, 1);
+
+        if (date2 < date1)
+        {
+            (date1, date2) = (date2, date1);
+        }
+
+        int years = date2.Year - date1.Year;
+        int months = date2.Month - date1.Month;
+        int days = date2.Day - date1.Day;
+
+        if (days < 0)
+        {
+            months--;
+            days += DateTime.DaysInMonth(date1.Year, date1.Month);
+        }
+        if (months < 0)
+        {
+            years--;
+            months += 12;
+        }
+
+        int totalMonths = (years * 12) + months;
+        int totalYears = totalMonths / 12;
+        int remainingMonths = totalMonths % 12;
+
+        return new CalvingInterval()
+        {
+            From = cattle1.Name,
+            To = cattle2.Name,
+            Years = totalYears,
+            Months = remainingMonths,
+            Days = days
+        };
     }
 }

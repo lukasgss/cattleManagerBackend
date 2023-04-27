@@ -94,6 +94,17 @@ public class CattleController : ControllerBase
         return Ok(amount);
     }
 
+    [HttpGet("calving-intervals/{cattleId:guid}")]
+    public async Task<ActionResult<IEnumerable<CalvingInterval>>> GetAllCalvingIntervalsFromCattle(Guid cattleId)
+    {
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        IEnumerable<CalvingInterval> calvingIntervals =
+            await _cattleService.GetAllCalvingIntervalsFromCattleAsync(cattleId, userId);
+
+        return Ok(calvingIntervals);
+    }
+
     [HttpPost]
     public async Task<ActionResult<CattleResponse>> CreateNewCattle(CattleRequest cattleRequest)
     {
