@@ -2,7 +2,8 @@ using AutoMapper;
 using CattleManager.Application.Application.Common.Exceptions;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MedicalRecords;
-using CattleManager.Application.Application.Common.Interfaces.GuidProvider;
+using CattleManager.Application.Application.Common.Interfaces.ServiceValidations;
+using CattleManager.Application.Application.Services.CommonValidations;
 using CattleManager.Application.Domain.Entities;
 
 namespace CattleManager.Application.Application.Services.Entities;
@@ -11,15 +12,18 @@ public class MedicalRecordService : IMedicalRecordService
 {
     private readonly IMedicalRecordRepository _medicalRecordRepository;
     private readonly ICattleRepository _cattleRepository;
+    private readonly IServiceValidations _serviceValidations;
     private readonly IMapper _mapper;
 
     public MedicalRecordService(
         IMedicalRecordRepository medicalRecordRepository,
         ICattleRepository cattleRepository,
+        IServiceValidations serviceValidations,
         IMapper mapper)
     {
         _medicalRecordRepository = medicalRecordRepository;
         _cattleRepository = cattleRepository;
+        _serviceValidations = serviceValidations;
         _mapper = mapper;
     }
 
@@ -48,6 +52,14 @@ public class MedicalRecordService : IMedicalRecordService
 
         IEnumerable<MedicalRecord> medicalRecords = await _medicalRecordRepository.GetAllMedicalRecordsFromCattleAsync(cattleId, userId);
         return _mapper.Map<List<MedicalRecordResponse>>(medicalRecords);
+    }
+
+    public async Task<AmountOfMedicalRecords> GetAmountOfMedicalRecordsInSpecificMonthAndYearAsync(Guid userId, int month, int year)
+    {
+        ServiceValidations.ValidateMonth(month);
+        _serviceValidations.ValidateDate(month, year);
+
+        return await _medicalRecordRepository.GetAmountOfMedicalRecordsInSpecificMonthAndYearAsync(userId, month, year);
     }
 
     public async Task<MedicalRecordResponse> CreateMedicalRecordAsync(CreateMedicalRecord createMedicalRecord, Guid userId)
