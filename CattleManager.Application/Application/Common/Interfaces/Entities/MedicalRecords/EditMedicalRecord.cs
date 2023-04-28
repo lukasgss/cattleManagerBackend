@@ -2,7 +2,7 @@ using CattleManager.Application.Application.Common.Enums;
 
 namespace CattleManager.Application.Application.Common.Interfaces.Entities.MedicalRecords;
 
-public record EditMedicalRecords(
+public record EditMedicalRecord(
     Guid Id,
     string Description,
     DateOnly Date,

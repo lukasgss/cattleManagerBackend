@@ -5,6 +5,6 @@ namespace CattleManager.Application.Application.Common.Interfaces.Entities.Medic
 
 public interface IMedicalRecordRepository : IGenericRepository<MedicalRecord>
 {
-    Task<MedicalRecord?> GetMedicalRecordByIdAsync(Guid medicalRecordId, Guid userId);
+    Task<MedicalRecord?> GetMedicalRecordByIdAsync(Guid medicalRecordId, Guid userId, bool trackChanges = true);
     Task<IEnumerable<MedicalRecord>> GetAllMedicalRecordsFromCattleAsync(Guid cattleId, Guid userId);
 }
