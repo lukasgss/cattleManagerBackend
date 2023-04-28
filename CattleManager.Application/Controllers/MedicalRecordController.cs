@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using CattleManager.Application.Application.Common.Interfaces.Authorization;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MedicalRecords;
 using Microsoft.AspNetCore.Authorization;
@@ -26,6 +27,16 @@ public class MedicalRecordController : ControllerBase
 
         MedicalRecordResponse medicalRecord = await _medicalRecordService.GetMedicalRecordByIdAsync(id, userId);
         return Ok(medicalRecord);
+    }
+
+    [HttpGet("amount")]
+    public async Task<ActionResult<AmountOfMedicalRecords>> GetAmountOfMedicalRecordsInSpecificMonthAndYear([Required] int month, [Required] int year)
+    {
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        AmountOfMedicalRecords amountOfMedicalRecords =
+            await _medicalRecordService.GetAmountOfMedicalRecordsInSpecificMonthAndYearAsync(userId, month, year);
+        return Ok(amountOfMedicalRecords);
     }
 
     [HttpPost]

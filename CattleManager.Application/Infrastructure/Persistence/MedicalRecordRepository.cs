@@ -22,6 +22,22 @@ public class MedicalRecordRepository : GenericRepository<MedicalRecord>, IMedica
             .ToListAsync();
     }
 
+    public async Task<AmountOfMedicalRecords> GetAmountOfMedicalRecordsInSpecificMonthAndYearAsync(Guid userId, int month, int year)
+    {
+        DateOnly startDate = new(year, month, 1);
+        DateOnly endDate = startDate.AddDays(DateTime.DaysInMonth(year, month) - 1);
+        int amountOfMedicalRecords = await _dbContext.MedicalRecords
+            .AsNoTracking()
+            .Where(record => record.Cattle.Users.Any(user => user.Id == userId)
+                && record.Date >= startDate && record.Date <= endDate)
+            .Select(record => record.Id).CountAsync();
+
+        return new AmountOfMedicalRecords()
+        {
+            Amount = amountOfMedicalRecords
+        };
+    }
+
     public async Task<MedicalRecord?> GetMedicalRecordByIdAsync(Guid medicalRecordId, Guid userId, bool trackChanges = true)
     {
         return trackChanges ? await _dbContext.MedicalRecords

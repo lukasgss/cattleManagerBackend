@@ -5,7 +5,7 @@ using AutoMapper;
 using CattleManager.Application.Application.Common.Exceptions;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MedicalRecords;
-using CattleManager.Application.Application.Common.Interfaces.GuidProvider;
+using CattleManager.Application.Application.Common.Interfaces.ServiceValidations;
 using CattleManager.Application.Application.Services.Entities;
 using CattleManager.Application.Domain.Entities;
 using FakeItEasy;
@@ -17,6 +17,7 @@ public class MedicalRecordServiceTests
 {
     private readonly IMedicalRecordService _sut;
     private readonly IMedicalRecordRepository _medicalRecordRepositoryMock;
+    private readonly IServiceValidations _serviceValidationsMock;
     private readonly IMapper _mapperMock;
     private readonly ICattleRepository _cattleRepositoryMock;
     private static readonly Guid _medicalRecordId = Guid.NewGuid();
@@ -28,8 +29,13 @@ public class MedicalRecordServiceTests
     {
         _medicalRecordRepositoryMock = A.Fake<IMedicalRecordRepository>();
         _cattleRepositoryMock = A.Fake<ICattleRepository>();
+        _serviceValidationsMock = A.Fake<IServiceValidations>();
         _mapperMock = A.Fake<IMapper>();
-        _sut = new MedicalRecordService(_medicalRecordRepositoryMock, _cattleRepositoryMock, _mapperMock);
+        _sut = new MedicalRecordService(
+            _medicalRecordRepositoryMock,
+            _cattleRepositoryMock,
+            _serviceValidationsMock,
+            _mapperMock);
     }
 
     [Fact]
@@ -81,6 +87,20 @@ public class MedicalRecordServiceTests
         IEnumerable<MedicalRecordResponse> medicalRecordsResponse = await _sut.GetAllMedicalRecordsFromCattleAsync(_cattleId, _userId);
 
         Assert.Equivalent(expectedMedicalRecordsResponse, medicalRecordsResponse);
+    }
+
+    [Fact]
+    public async Task Get_Amount_Of_Medical_Records_Returns_Amount_Of_Medical_Records()
+    {
+        const int month = 8;
+        const int year = 2019;
+        AmountOfMedicalRecords expectedAmountOfMedicalRecords = GenerateAmountOfMedicalRecords();
+        A.CallTo(() => _medicalRecordRepositoryMock.GetAmountOfMedicalRecordsInSpecificMonthAndYearAsync(_userId, month, year))
+            .Returns(expectedAmountOfMedicalRecords);
+
+        AmountOfMedicalRecords amountOfMedicalRecords = await _sut.GetAmountOfMedicalRecordsInSpecificMonthAndYearAsync(_userId, month, year);
+
+        Assert.Equivalent(expectedAmountOfMedicalRecords, amountOfMedicalRecords);
     }
 
     [Fact]
@@ -161,6 +181,14 @@ public class MedicalRecordServiceTests
 
         var exception = await Assert.ThrowsAsync<NotFoundException>(result);
         Assert.Equal("Registro médico com o id especificado não existe.", exception.Message);
+    }
+
+    private static AmountOfMedicalRecords GenerateAmountOfMedicalRecords()
+    {
+        return new AmountOfMedicalRecords()
+        {
+            Amount = 8
+        };
     }
 
     private static EditMedicalRecord GenerateEditMedicalRecord()
