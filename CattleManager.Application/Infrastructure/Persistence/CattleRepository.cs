@@ -158,7 +158,6 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
             .CountAsync();
     }
 
-
     public async Task<IEnumerable<Cattle>> GetAllChildrenFromCattleAsync(Guid cattleId, Guid userId)
     {
         return await _dbContext.Cattle

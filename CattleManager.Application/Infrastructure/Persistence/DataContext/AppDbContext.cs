@@ -18,6 +18,7 @@ public class AppDbContext : DbContext
     public DbSet<CattleBreed> CattleBreeds { get; set; } = null!;
     public DbSet<MilkSale> MilkSales { get; set; } = null!;
     public DbSet<Message> Messages { get; set; } = null!;
+    public DbSet<MedicalRecord> MedicalRecords { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
