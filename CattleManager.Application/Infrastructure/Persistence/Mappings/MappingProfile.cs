@@ -2,7 +2,7 @@ using AutoMapper;
 using CatetleManager.Application.Domain.Entities;
 using CattleManager.Application.Application.Common.Interfaces.CattleParents;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Conceptions;
-using CattleManager.Application.Application.Common.Interfaces.Entities.Messages;
+using CattleManager.Application.Application.Common.Interfaces.Entities.MedicalRecords;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkProductions;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkSales;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
@@ -34,5 +34,8 @@ public class MappingProfile : Profile
         CreateMap<CreateMilkSale, MilkSale>().ReverseMap();
         CreateMap<EditMilkSale, MilkSale>().ReverseMap();
         CreateMap<MilkSale, MilkSaleResponse>().ReverseMap();
+
+        CreateMap<CreateMedicalRecord, MedicalRecord>().ReverseMap();
+        CreateMap<MedicalRecord, MedicalRecordResponse>().ReverseMap();
     }
 }
