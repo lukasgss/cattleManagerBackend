@@ -22,9 +22,13 @@ public class MedicalRecordRepository : GenericRepository<MedicalRecord>, IMedica
             .ToListAsync();
     }
 
-    public async Task<MedicalRecord?> GetMedicalRecordByIdAsync(Guid medicalRecordId, Guid userId)
+    public async Task<MedicalRecord?> GetMedicalRecordByIdAsync(Guid medicalRecordId, Guid userId, bool trackChanges = true)
     {
-        return await _dbContext.MedicalRecords
+        return trackChanges ? await _dbContext.MedicalRecords
+            .FirstOrDefaultAsync(record => record.Id == medicalRecordId
+                && record.Cattle.Users.Any(user => user.Id == userId))
+            :
+            await _dbContext.MedicalRecords
             .AsNoTracking()
             .FirstOrDefaultAsync(record => record.Id == medicalRecordId
                 && record.Cattle.Users.Any(user => user.Id == userId));

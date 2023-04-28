@@ -36,4 +36,22 @@ public class MedicalRecordController : ControllerBase
         MedicalRecordResponse medicalRecord = await _medicalRecordService.CreateMedicalRecordAsync(createMedicalRecord, userId);
         return new CreatedAtRouteResult(nameof(GetMedicalRecordById), new { medicalRecord.Id }, medicalRecord);
     }
+
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<MedicalRecordResponse>> EditMedicalRecord(EditMedicalRecord editMedicalRecord, Guid id)
+    {
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        MedicalRecordResponse medicalRecord = await _medicalRecordService.EditMedicalRecordAsync(editMedicalRecord, userId, id);
+        return Ok(medicalRecord);
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult> DeleteMedicalRecord(Guid id)
+    {
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        await _medicalRecordService.DeleteMedicalRecordAsync(id, userId);
+        return Ok();
+    }
 }

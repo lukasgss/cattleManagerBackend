@@ -18,27 +18,25 @@ public class MedicalRecordServiceTests
     private readonly IMedicalRecordService _sut;
     private readonly IMedicalRecordRepository _medicalRecordRepositoryMock;
     private readonly IMapper _mapperMock;
-    private readonly IGuidProvider _guidProviderMock;
     private readonly ICattleRepository _cattleRepositoryMock;
     private static readonly Guid _medicalRecordId = Guid.NewGuid();
     private static readonly Guid _userId = Guid.NewGuid();
     private static readonly Guid _cattleId = Guid.NewGuid();
-    private static readonly DateOnly _medicalRecordDate = new DateOnly(2020, 8, 8);
+    private static readonly DateOnly _medicalRecordDate = new(2020, 8, 8);
 
     public MedicalRecordServiceTests()
     {
         _medicalRecordRepositoryMock = A.Fake<IMedicalRecordRepository>();
         _cattleRepositoryMock = A.Fake<ICattleRepository>();
         _mapperMock = A.Fake<IMapper>();
-        _guidProviderMock = A.Fake<IGuidProvider>();
-        _sut = new MedicalRecordService(_medicalRecordRepositoryMock, _cattleRepositoryMock, _mapperMock, _guidProviderMock);
+        _sut = new MedicalRecordService(_medicalRecordRepositoryMock, _cattleRepositoryMock, _mapperMock);
     }
 
     [Fact]
     public async Task Get_Medical_Record_By_Non_Existent_Id_Throws_NotFoundException()
     {
         MedicalRecord? nullMedicalRecord = null;
-        A.CallTo(() => _medicalRecordRepositoryMock.GetMedicalRecordByIdAsync(_medicalRecordId, _userId)).Returns(nullMedicalRecord);
+        A.CallTo(() => _medicalRecordRepositoryMock.GetMedicalRecordByIdAsync(_medicalRecordId, _userId, false)).Returns(nullMedicalRecord);
 
         async Task result() => await _sut.GetMedicalRecordByIdAsync(_medicalRecordId, _userId);
 
@@ -50,7 +48,7 @@ public class MedicalRecordServiceTests
     public async Task Get_Medical_Record_By_Id_Returns_Medical_Record()
     {
         MedicalRecord medicalRecord = GenerateMedicalRecord();
-        A.CallTo(() => _medicalRecordRepositoryMock.GetMedicalRecordByIdAsync(_medicalRecordId, _userId)).Returns(medicalRecord);
+        A.CallTo(() => _medicalRecordRepositoryMock.GetMedicalRecordByIdAsync(_medicalRecordId, _userId, false)).Returns(medicalRecord);
         MedicalRecordResponse expectedMedicalRecordResponse = GenerateMedicalRecordResponseFromMedicalRecord(medicalRecord);
 
         MedicalRecordResponse medicalRecordResponse = await _sut.GetMedicalRecordByIdAsync(_medicalRecordId, _userId);
@@ -103,13 +101,77 @@ public class MedicalRecordServiceTests
     {
         CreateMedicalRecord createMedicalRecord = GenerateCreateMedicalRecord();
         A.CallTo(() => _cattleRepositoryMock.GetCattleById(_cattleId, _userId, false)).Returns(new Cattle() { Id = _cattleId });
-        A.CallTo(() => _guidProviderMock.NewGuid()).Returns(_medicalRecordId);
         MedicalRecord medicalRecord = GenerateMedicalRecord();
+        A.CallTo(() => _mapperMock.Map<MedicalRecord>(createMedicalRecord)).Returns(medicalRecord);
         MedicalRecordResponse expectedMedicalRecordResponse = GenerateMedicalRecordResponseFromMedicalRecord(medicalRecord);
+        A.CallTo(() => _mapperMock.Map<MedicalRecordResponse>(medicalRecord)).Returns(expectedMedicalRecordResponse);
 
         MedicalRecordResponse medicalRecordResponse = await _sut.CreateMedicalRecordAsync(createMedicalRecord, _userId);
 
         Assert.Equivalent(expectedMedicalRecordResponse, medicalRecordResponse);
+    }
+
+    [Fact]
+    public async Task Edit_Medical_Record_With_Different_Route_Id_From_Specified_In_Request_Throws_BadRequestException()
+    {
+        Guid routeId = Guid.NewGuid();
+        EditMedicalRecord editMedicalRecord = GenerateEditMedicalRecord();
+
+        async Task result() => await _sut.EditMedicalRecordAsync(editMedicalRecord, _userId, routeId);
+
+        var exception = await Assert.ThrowsAsync<BadRequestException>(result);
+        Assert.Equal("Rota não coincide com o id especificado.", exception.Message);
+    }
+
+    [Fact]
+    public async Task Edit_Non_Existent_Medical_Record_Throws_NotFoundException()
+    {
+        MedicalRecord? nullMedicalRecord = null;
+        EditMedicalRecord editMedicalRecord = GenerateEditMedicalRecord();
+        A.CallTo(() => _medicalRecordRepositoryMock.GetMedicalRecordByIdAsync(_medicalRecordId, _userId, false)).Returns(nullMedicalRecord);
+
+        async Task result() => await _sut.EditMedicalRecordAsync(editMedicalRecord, _userId, _medicalRecordId);
+
+        var exception = await Assert.ThrowsAsync<NotFoundException>(result);
+        Assert.Equal("Registro médico com o id especificado não existe.", exception.Message);
+    }
+
+    [Fact]
+    public async Task Edit_Medical_Record_Returns_Edited_Medical_Record()
+    {
+        EditMedicalRecord editMedicalRecord = GenerateEditMedicalRecord();
+        MedicalRecord medicalRecord = GenerateMedicalRecord();
+        A.CallTo(() => _medicalRecordRepositoryMock.GetMedicalRecordByIdAsync(_medicalRecordId, _userId, false)).Returns(medicalRecord);
+        A.CallTo(() => _mapperMock.Map<MedicalRecord>(editMedicalRecord)).Returns(medicalRecord);
+        MedicalRecordResponse expectedMedicalRecordResponse = GenerateMedicalRecordResponseFromMedicalRecord(medicalRecord);
+        A.CallTo(() => _mapperMock.Map<MedicalRecordResponse>(medicalRecord)).Returns(expectedMedicalRecordResponse);
+
+        MedicalRecordResponse medicalRecordResponse = await _sut.EditMedicalRecordAsync(editMedicalRecord, _userId, _medicalRecordId);
+
+        Assert.Equivalent(expectedMedicalRecordResponse, medicalRecordResponse);
+    }
+
+    [Fact]
+    public async Task Delete_Non_Existent_Medical_Record_Throws_NotFoundException()
+    {
+        MedicalRecord? nullMedicalRecord = null;
+        A.CallTo(() => _medicalRecordRepositoryMock.GetMedicalRecordByIdAsync(_medicalRecordId, _userId, true)).Returns(nullMedicalRecord);
+
+        async Task result() => await _sut.DeleteMedicalRecordAsync(_medicalRecordId, _userId);
+
+        var exception = await Assert.ThrowsAsync<NotFoundException>(result);
+        Assert.Equal("Registro médico com o id especificado não existe.", exception.Message);
+    }
+
+    private static EditMedicalRecord GenerateEditMedicalRecord()
+    {
+        return new EditMedicalRecord(
+            Id: _medicalRecordId,
+            Description: "description",
+            Date: _medicalRecordDate,
+            Type: 0,
+            Location: "location",
+            CattleId: _cattleId);
     }
 
     private static CreateMedicalRecord GenerateCreateMedicalRecord()

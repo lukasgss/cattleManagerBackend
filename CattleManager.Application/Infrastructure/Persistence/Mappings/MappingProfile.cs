@@ -36,6 +36,7 @@ public class MappingProfile : Profile
         CreateMap<MilkSale, MilkSaleResponse>().ReverseMap();
 
         CreateMap<CreateMedicalRecord, MedicalRecord>().ReverseMap();
+        CreateMap<EditMedicalRecord, MedicalRecord>().ReverseMap();
         CreateMap<MedicalRecord, MedicalRecordResponse>().ReverseMap();
     }
 }
