@@ -97,6 +97,17 @@ public class MilkSaleServiceTests
     }
 
     [Fact]
+    public async Task Get_History_Of_Milk_Prices_Return_History_Of_Prices()
+    {
+        IEnumerable<MilkPriceHistory> expectedMilkPriceHistory = GenerateListOfMilkPriceHistory();
+        A.CallTo(() => _milkSaleRepositoryMock.GetMilkPriceHistoryAsync(_userId)).Returns(expectedMilkPriceHistory);
+
+        IEnumerable<MilkPriceHistory> milkPriceHistory = await _sut.GetHistoryOfMilkPrices(_userId);
+
+        Assert.Equivalent(expectedMilkPriceHistory, milkPriceHistory);
+    }
+
+    [Fact]
     public async Task Create_Milk_Sale_With_Non_Existent_Owner_Throws_BadRequestException()
     {
         User? nullMilkSaleOwner = null;
@@ -212,5 +223,24 @@ public class MilkSaleServiceTests
             PricePerLiter: milkSale.PricePerLiter,
             Date: milkSale.Date
         );
+    }
+
+    private static IEnumerable<MilkPriceHistory> GenerateListOfMilkPriceHistory()
+    {
+        return new List<MilkPriceHistory>()
+        {
+            new MilkPriceHistory()
+            {
+                From = new DateOnly(2020, 08, 04),
+                To = new DateOnly(2021, 06, 02),
+                Price = 2.32m
+            },
+            new MilkPriceHistory()
+            {
+                From = new DateOnly(2021, 06, 08),
+                To = null,
+                Price = 2.46m
+            },
+        };
     }
 }

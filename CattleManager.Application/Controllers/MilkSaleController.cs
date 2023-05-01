@@ -48,6 +48,15 @@ public class MilkSaleController : ControllerBase
         return Ok(averageTotalIncome);
     }
 
+    [HttpGet("price-history")]
+    public async Task<ActionResult<IEnumerable<MilkPriceHistory>>> GetMilkPriceHistory()
+    {
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        IEnumerable<MilkPriceHistory> milkPriceHistory = await _milkSaleService.GetHistoryOfMilkPrices(userId);
+        return Ok(milkPriceHistory);
+    }
+
     [HttpPost]
     public async Task<ActionResult<MilkSaleResponse>> CreateMilkSale(CreateMilkSale createMilkSale)
     {
