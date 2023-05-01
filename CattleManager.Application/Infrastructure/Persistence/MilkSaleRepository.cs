@@ -22,6 +22,40 @@ public class MilkSaleRepository : GenericRepository<MilkSale>, IMilkSaleReposito
         .ToListAsync();
     }
 
+    public async Task<IEnumerable<MilkPriceHistory>> GetMilkPriceHistoryAsync(Guid userId)
+    {
+        var query = await _dbContext.MilkSales
+            .AsNoTracking()
+            .GroupBy(milkSale => milkSale.PricePerLiter)
+            .ToListAsync();
+
+        List<MilkSale> milkSales = query.ConvertAll(x => x.ToList())
+            .SelectMany(milkSale => milkSale)
+            .OrderByDescending(milkSale => milkSale.Date)
+            .ToList();
+
+        List<MilkPriceHistory> milkPriceHistory = new()
+        {
+            new MilkPriceHistory()
+            {
+                From = milkSales[0].Date,
+                To = null,
+                Price = milkSales[0].PricePerLiter
+            }
+        };
+        for (int i = 1; i < milkSales.Count - 1; i++)
+        {
+            milkPriceHistory.Add(new MilkPriceHistory()
+            {
+                From = milkSales[i + 1].Date,
+                To = milkSales[i].Date,
+                Price = milkSales[i + 1].PricePerLiter
+            });
+        }
+
+        return milkPriceHistory;
+    }
+
     public async Task<MilkSale?> GetMilkSaleById(Guid milkSaleId, Guid userId, bool trackChanges = true)
     {
         return trackChanges ? await _dbContext.MilkSales

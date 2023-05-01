@@ -60,6 +60,11 @@ public class MilkSaleService : IMilkSaleService
         };
     }
 
+    public async Task<IEnumerable<MilkPriceHistory>> GetHistoryOfMilkPrices(Guid userId)
+    {
+        return await _milkSaleRepository.GetMilkPriceHistoryAsync(userId);
+    }
+
     public async Task<AverageOfEntity> GetMilkSalesAverageTotalIncomeInSpecificMonthAsync(Guid userId, int month, int year)
     {
         ServiceValidations.ValidateMonth(month);
