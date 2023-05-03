@@ -58,6 +58,15 @@ public class CattleController : ControllerBase
         return Ok(cattleChildren);
     }
 
+    [HttpGet("dropdown/all")]
+    public async Task<ActionResult<IEnumerable<DropdownData>>> GetAllCattleByName(string name)
+    {
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        IEnumerable<DropdownData> cattleByName = await _cattleService.GetAllCattleByNameForDropdownAsync(userId, name);
+        return Ok(cattleByName);
+    }
+
     [HttpGet("dropdown/male")]
     public async Task<ActionResult<DropdownData>> GetMaleCattleByName(string name)
     {

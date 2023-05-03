@@ -100,6 +100,16 @@ public class CattleRepository : GenericRepository<Cattle>, ICattleRepository
         .ToListAsync();
     }
 
+    public async Task<IEnumerable<DropdownData>> GetAllCattleByNameForDropdownAsync(string name, Guid userId)
+    {
+        return await _dbContext.Cattle
+        .AsNoTracking()
+        .Where(x => EF.Functions.ILike(EF.Functions.Unaccent(x.Name), $"%{name}%")
+            && x.Users.Any(x => x.Id == userId))
+        .Select(x => new DropdownData() { Text = x.Name, Value = x.Id })
+        .ToListAsync();
+    }
+
     public async Task<IEnumerable<Cattle>> GetAllChildrenFromCattleFromSpecificGenderAsync(Guid cattleId, Guid userId, Gender cattleGender)
     {
         if (cattleGender == Gender.Male)
