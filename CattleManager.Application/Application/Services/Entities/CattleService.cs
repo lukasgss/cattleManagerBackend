@@ -82,6 +82,54 @@ public class CattleService : ICattleService
         return cattleResponse;
     }
 
+    public async Task<IEnumerable<DropdownData>> GetMaleCattleByName(string name, Guid userId)
+    {
+        if (name?.Length == 0)
+            throw new BadRequestException("Nome do animal deve ser especificado.");
+
+        string nameWithoutAccent = StringExtensions.RemoveDiacritics(name!);
+
+        return await _cattleRepository.GetMaleCattleByName(nameWithoutAccent, userId);
+    }
+
+    public async Task<IEnumerable<DropdownData>> GetFemaleCattleByName(string name, Guid userId)
+    {
+        if (name?.Length == 0)
+            throw new BadRequestException("Nome do animal deve ser especificado.");
+
+        string nameWithoutAccent = StringExtensions.RemoveDiacritics(name!);
+
+        return await _cattleRepository.GetFemaleCattleByName(nameWithoutAccent, userId);
+    }
+
+    public async Task<IEnumerable<DropdownData>> GetAllCattleByNameForDropdownAsync(Guid userId, string name)
+    {
+        if (name?.Length == 0)
+            throw new BadRequestException("Nome do animal deve ser especificado.");
+
+        string nameWithoutAccent = StringExtensions.RemoveDiacritics(name!);
+
+        return await _cattleRepository.GetAllCattleByNameForDropdownAsync(nameWithoutAccent, userId);
+    }
+
+    public async Task<IEnumerable<CattleResponse>> GetAllChildrenFromCattle(Guid cattleId, Guid userId)
+    {
+        Cattle? cattle = await _cattleRepository.GetCattleById(cattleId, userId, trackChanges: false);
+        if (cattle is null)
+            throw new NotFoundException("Animal com o id especificado não existe.");
+
+        IEnumerable<Cattle> cattleChildren =
+            await _cattleRepository.GetAllChildrenFromCattleFromSpecificGenderAsync(cattleId, userId, (Gender)cattle.SexId);
+
+        List<CattleResponse> cattleChildrenResponse = new();
+        foreach (Cattle animal in cattleChildren)
+        {
+            cattleChildrenResponse.Add(GenerateCattleResponseDto(animal));
+        }
+
+        return cattleChildrenResponse;
+    }
+
     public async Task<IEnumerable<CalvingInterval>> GetAllCalvingIntervalsFromCattleAsync(Guid cattleId, Guid userId)
     {
         Cattle? cattle = await _cattleRepository.GetCattleById(cattleId, userId, false);
@@ -162,44 +210,6 @@ public class CattleService : ICattleService
 
         _cattleRepository.Delete(cattle);
         await _cattleRepository.CommitAsync();
-    }
-
-    public async Task<IEnumerable<DropdownData>> GetMaleCattleByName(string name, Guid userId)
-    {
-        if (name?.Length == 0)
-            throw new BadRequestException("Nome do animal deve ser especificado.");
-
-        string nameWithoutAccent = StringExtensions.RemoveDiacritics(name!);
-
-        return await _cattleRepository.GetMaleCattleByName(nameWithoutAccent, userId);
-    }
-
-    public async Task<IEnumerable<DropdownData>> GetFemaleCattleByName(string name, Guid userId)
-    {
-        if (name?.Length == 0)
-            throw new BadRequestException("Nome do animal deve ser especificado.");
-
-        string nameWithoutAccent = StringExtensions.RemoveDiacritics(name!);
-
-        return await _cattleRepository.GetFemaleCattleByName(nameWithoutAccent, userId);
-    }
-
-    public async Task<IEnumerable<CattleResponse>> GetAllChildrenFromCattle(Guid cattleId, Guid userId)
-    {
-        Cattle? cattle = await _cattleRepository.GetCattleById(cattleId, userId, trackChanges: false);
-        if (cattle is null)
-            throw new NotFoundException("Animal com o id especificado não existe.");
-
-        IEnumerable<Cattle> cattleChildren =
-            await _cattleRepository.GetAllChildrenFromCattleFromSpecificGenderAsync(cattleId, userId, (Gender)cattle.SexId);
-
-        List<CattleResponse> cattleChildrenResponse = new();
-        foreach (Cattle animal in cattleChildren)
-        {
-            cattleChildrenResponse.Add(GenerateCattleResponseDto(animal));
-        }
-
-        return cattleChildrenResponse;
     }
 
     private Cattle GenerateCattleFromRequest(ICattleRequest cattleRequest)

@@ -348,6 +348,32 @@ public class CattleServiceTests
     }
 
     [Fact]
+    public async Task Get_All_Cattle_By_Name_For_Dropdown_With_Empty_Name_Throws_BadRequestException()
+    {
+        const string name = "";
+
+        async Task result() => await _sut.GetAllCattleByNameForDropdownAsync(_userId, name);
+
+        var exception = await Assert.ThrowsAsync<BadRequestException>(result);
+        Assert.Equal("Nome do animal deve ser especificado.", exception.Message);
+    }
+
+    [Fact]
+    public async Task Get_All_Cattle_By_Name_For_Dropdown_Returns_All_Cattle()
+    {
+        const string name = "cattleName";
+        List<DropdownData> expectedCattle = new()
+        {
+            new DropdownData() { Text = name, Value = _cattleId }
+        };
+        A.CallTo(() => _cattleRepositoryMock.GetAllCattleByNameForDropdownAsync(name, _userId)).Returns(expectedCattle);
+
+        IEnumerable<DropdownData> cattle = await _sut.GetAllCattleByNameForDropdownAsync(_userId, name);
+
+        Assert.Equivalent(expectedCattle, cattle);
+    }
+
+    [Fact]
     public async Task Register_Cattle_With_Already_Existing_Name_And_Is_Owned_By_User_Throws_ConflictException()
     {
         CattleRequest cattleRequest = GenerateCattleRequest(_userId, fatherId: Guid.NewGuid(), motherId: Guid.NewGuid());

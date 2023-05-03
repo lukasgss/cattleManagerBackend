@@ -10,6 +10,7 @@ public interface ICattleService
     Task<AmountOfEntity> GetAmountOfCattleInLactationPeriodAsync(Guid userId);
     Task<AmountOfEntity> GetAmountOfCattleInDryPeriodAsync(Guid userId);
     Task<IEnumerable<CattleResponse>> GetCattleByNameAsync(string cattleName, Guid userId);
+    Task<IEnumerable<DropdownData>> GetAllCattleByNameForDropdownAsync(Guid userId, string name);
     Task<IEnumerable<CalvingInterval>> GetAllCalvingIntervalsFromCattleAsync(Guid cattleId, Guid userId);
     Task<CattleResponse> CreateCattle(CattleRequest cattleRequest, Guid userId);
     Task<CattleResponse> EditCattle(EditCattleRequest cattleRequest, Guid userId, Guid routeId);

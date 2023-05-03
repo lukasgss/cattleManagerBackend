@@ -15,6 +15,7 @@ public interface ICattleRepository : IGenericRepository<Cattle>
     Task<Cattle?> GetCattleDataOnlyById(Guid cattleId, Guid userId);
     Task<IEnumerable<DropdownData>> GetMaleCattleByName(string name, Guid userId);
     Task<IEnumerable<DropdownData>> GetFemaleCattleByName(string name, Guid userId);
+    Task<IEnumerable<DropdownData>> GetAllCattleByNameForDropdownAsync(string name, Guid userId);
     Task<IEnumerable<Cattle>> GetAllChildrenFromCattleFromSpecificGenderAsync(Guid cattleId, Guid userId, Gender gender);
     Task<IEnumerable<Cattle>> GetAllChildrenFromCattleAsync(Guid cattleId, Guid userId);
     Task<Cattle?> GetCattleIdAndSexByCattleIdAsync(Guid cattleId, Guid userId);
