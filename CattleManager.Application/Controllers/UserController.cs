@@ -33,7 +33,7 @@ public class UserController : ControllerBase
     [HttpGet("dropdown")]
     public async Task<ActionResult<DropdownData>> GetUserForDropdownByNameOrLastName(string name)
     {
-        var users = await _userService.GetUserByNameOrLastName(name);
+        IEnumerable<DropdownData> users = await _userService.GetUserByNameOrLastName(name);
         return Ok(users);
     }
 

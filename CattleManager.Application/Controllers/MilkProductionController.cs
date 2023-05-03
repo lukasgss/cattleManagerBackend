@@ -38,7 +38,8 @@ public class MilkProductionController : ControllerBase
     {
         Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var milkProductions = await _milkProductionService.GetAllMilkProductionsFromCattleAsync(cattleId, userId, page);
+        PaginatedMilkProductionResponse milkProductions =
+            await _milkProductionService.GetAllMilkProductionsFromCattleAsync(cattleId, userId, page);
         return Ok(milkProductions);
     }
 
@@ -77,7 +78,8 @@ public class MilkProductionController : ControllerBase
 
         Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var milkProduction = await _milkProductionService.CreateMilkProductionAsync(milkProductionRequest, userId);
+        MilkProductionResponse milkProduction =
+            await _milkProductionService.CreateMilkProductionAsync(milkProductionRequest, userId);
         return new CreatedAtRouteResult(nameof(GetMilkProductionById), new { milkProduction.Id }, milkProduction);
     }
 
@@ -86,7 +88,8 @@ public class MilkProductionController : ControllerBase
     {
         Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var editedMilkProduction = await _milkProductionService.EditMilkProductionByIdAsync(milkProduction, userId, id);
+        MilkProductionResponse editedMilkProduction =
+            await _milkProductionService.EditMilkProductionByIdAsync(milkProduction, userId, id);
         return Ok(editedMilkProduction);
     }
 

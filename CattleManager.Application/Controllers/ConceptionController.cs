@@ -31,7 +31,8 @@ public class ConceptionController : ControllerBase
     {
         Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var conceptionsFromCattle = await _conceptionService.GetAllConceptionsFromCattleAsync(id, userId, page);
+        PaginatedConceptionResponse conceptionsFromCattle =
+            await _conceptionService.GetAllConceptionsFromCattleAsync(id, userId, page);
         return Ok(conceptionsFromCattle);
     }
 
@@ -40,7 +41,8 @@ public class ConceptionController : ControllerBase
     {
         Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var createdConception = await _conceptionService.CreateConceptionAsync(conceptionRequest, userId);
+        ConceptionResponse createdConception =
+            await _conceptionService.CreateConceptionAsync(conceptionRequest, userId);
         return new CreatedAtRouteResult(nameof(GetConceptionById), new { id = createdConception.Id }, createdConception);
     }
 

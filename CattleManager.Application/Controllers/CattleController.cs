@@ -28,7 +28,7 @@ public class CattleController : ControllerBase
     {
         Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var cattle = await _cattleService.GetAllCattleFromOwner(userId, page);
+        PaginatedCattleResponse cattle = await _cattleService.GetAllCattleFromOwner(userId, page);
         return Ok(cattle);
     }
 
@@ -45,7 +45,7 @@ public class CattleController : ControllerBase
     {
         Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var cattle = await _cattleService.GetCattleByNameAsync(name, userId);
+        IEnumerable<CattleResponse> cattle = await _cattleService.GetCattleByNameAsync(name, userId);
         return Ok(cattle);
     }
 
@@ -72,7 +72,7 @@ public class CattleController : ControllerBase
     {
         Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var maleCattleByName = await _cattleService.GetMaleCattleByName(name, userId);
+        IEnumerable<DropdownData> maleCattleByName = await _cattleService.GetMaleCattleByName(name, userId);
         return Ok(maleCattleByName);
     }
 
@@ -81,7 +81,7 @@ public class CattleController : ControllerBase
     {
         Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var femaleCattleByName = await _cattleService.GetFemaleCattleByName(name, userId);
+        IEnumerable<DropdownData> femaleCattleByName = await _cattleService.GetFemaleCattleByName(name, userId);
         return Ok(femaleCattleByName);
     }
 
@@ -127,7 +127,7 @@ public class CattleController : ControllerBase
 
         Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var cattle = await _cattleService.CreateCattle(cattleRequest, userId);
+        CattleResponse cattle = await _cattleService.CreateCattle(cattleRequest, userId);
         return new CreatedAtRouteResult(nameof(GetCattleById), new { id = cattle.Id }, cattle);
     }
 
@@ -144,7 +144,7 @@ public class CattleController : ControllerBase
 
         Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var cattle = await _cattleService.EditCattle(cattleRequest, userId, cattleId);
+        CattleResponse cattle = await _cattleService.EditCattle(cattleRequest, userId, cattleId);
         return Ok(cattle);
     }
 

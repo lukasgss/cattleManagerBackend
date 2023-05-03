@@ -24,7 +24,8 @@ public class VaccinationController : ControllerBase
     {
         Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var vaccinationsFromCattle = await _vaccinationService.GetAllVaccinationsFromCattleAsync(cattleId, userId, page);
+        PaginatedVaccinationResponse vaccinationsFromCattle =
+            await _vaccinationService.GetAllVaccinationsFromCattleAsync(cattleId, userId, page);
         return Ok(vaccinationsFromCattle);
     }
 
@@ -33,7 +34,7 @@ public class VaccinationController : ControllerBase
     {
         Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var vaccination = await _vaccinationService.CreateVaccinationAsync(vaccinationRequest, userId);
+        VaccinationResponse vaccination = await _vaccinationService.CreateVaccinationAsync(vaccinationRequest, userId);
         return Ok(vaccination);
     }
 
@@ -42,7 +43,7 @@ public class VaccinationController : ControllerBase
     {
         Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        var editedVaccination = await _vaccinationService.EditVaccinationAsync(vaccinationRequest, vaccinationId, userId);
+        VaccinationResponse editedVaccination = await _vaccinationService.EditVaccinationAsync(vaccinationRequest, vaccinationId, userId);
         return Ok(editedVaccination);
     }
 
