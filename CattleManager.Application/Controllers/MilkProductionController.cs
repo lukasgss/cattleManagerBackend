@@ -43,6 +43,15 @@ public class MilkProductionController : ControllerBase
         return Ok(milkProductions);
     }
 
+    [HttpGet]
+    public async Task<ActionResult<PaginatedMilkProductionResponse>> GetAllMilkProductions(int page = 1)
+    {
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        PaginatedMilkProductionResponse milkProductions = await _milkProductionService.GetAllMilkProductionsAsync(userId, page);
+        return Ok(milkProductions);
+    }
+
     [HttpGet("average")]
     public async Task<ActionResult<AverageOfEntity>> GetAverageMilkProductionFromAllCattle(int month, int year)
     {

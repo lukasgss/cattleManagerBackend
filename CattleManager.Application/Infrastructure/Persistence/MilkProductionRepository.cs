@@ -14,11 +14,25 @@ public class MilkProductionRepository : GenericRepository<MilkProduction>, IMilk
     {
         _dbContext = dbContext;
     }
-
     public double GetAmountOfPages(Guid cattleId, Guid userId)
     {
         return Math.Ceiling(_dbContext.MilkProductions.Where(x => x.CattleId == cattleId
             && x.Cattle.Users.Any(x => x.Id == userId)).Count() / (double)GlobalConstants.ResultsPerPage);
+    }
+
+    public double GetAmountOfPages(Guid userId)
+    {
+        return Math.Ceiling(_dbContext.MilkProductions.Where(x =>
+            x.Cattle.Users.Any(x => x.Id == userId)).Count() / (double)GlobalConstants.ResultsPerPage);
+    }
+
+    public async Task<IEnumerable<MilkProduction>> GetAllMilkProductionsAsync(Guid userId, int page)
+    {
+        return await _dbContext.MilkProductions
+            .Where(milkProduction => milkProduction.Cattle.Users.Any(user => user.Id == userId))
+            .Skip((page - 1) * GlobalConstants.ResultsPerPage)
+            .Take(GlobalConstants.ResultsPerPage)
+            .ToListAsync();
     }
 
     public async Task<AverageOfEntity> GetAverageMilkProductionFromAllCattleAsync(Guid userId, int month, int year)

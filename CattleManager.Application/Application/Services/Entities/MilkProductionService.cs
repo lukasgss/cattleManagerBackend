@@ -28,6 +28,18 @@ public class MilkProductionService : IMilkProductionService
         _serviceValidations = serviceValidations;
     }
 
+    public async Task<PaginatedMilkProductionResponse> GetAllMilkProductionsAsync(Guid userId, int page)
+    {
+        double amountOfPages = _milkProductionRepository.GetAmountOfPages(userId);
+        if ((page > amountOfPages && amountOfPages > 1) || page < 1)
+            throw new BadRequestException($"Resultado possui {amountOfPages} página(s), insira um valor entre 1 e o número de páginas.");
+
+        IEnumerable<MilkProduction> milkProductions = await _milkProductionRepository.GetAllMilkProductionsAsync(userId, page);
+        List<MilkProductionResponse> milkProductionsResponse = _mapper.Map<List<MilkProductionResponse>>(milkProductions);
+
+        return new PaginatedMilkProductionResponse(milkProductionsResponse, page, amountOfPages);
+    }
+
     public async Task<MilkProductionResponse> GetMilkProductionByIdAsync(Guid milkProductionId, Guid userId)
     {
         var milkProduction = await _milkProductionRepository.GetMilkProductionByIdAsync(milkProductionId, userId);

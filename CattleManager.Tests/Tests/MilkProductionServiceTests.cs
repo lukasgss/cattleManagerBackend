@@ -43,6 +43,36 @@ public class MilkProductionServiceTests
     }
 
     [Fact]
+    public async Task Get_All_Milk_Productions_With_Page_Number_Bigger_Than_Existent_Throws_BadRequestException()
+    {
+        const int page = 15;
+        const int amountOfPages = 3;
+        A.CallTo(() => _milkProductionRepositoryMock.GetAmountOfPages(_userId)).Returns(amountOfPages);
+
+        async Task result() => await _sut.GetAllMilkProductionsAsync(_userId, page);
+
+        var exception = await Assert.ThrowsAsync<BadRequestException>(result);
+        Assert.Equal($"Resultado possui {amountOfPages} página(s), insira um valor entre 1 e o número de páginas.", exception.Message);
+    }
+
+    [Fact]
+    public async Task Get_All_Milk_Productions_Returns_All_Milk_Productions()
+    {
+        const int amountOfPages = 8;
+        const int currentPage = 1;
+        A.CallTo(() => _milkProductionRepositoryMock.GetAmountOfPages(_userId)).Returns(amountOfPages);
+        List<MilkProduction> expectedMilkProductions = GenerateListOfMilkProductions(_cattleId);
+        A.CallTo(() => _milkProductionRepositoryMock.GetAllMilkProductionsAsync(_userId, currentPage)).Returns(expectedMilkProductions);
+        List<MilkProductionResponse> milkProductionResponses = GenerateListOfMilkProductionResponseFromListOfMilkProductions(expectedMilkProductions);
+        A.CallTo(() => _mapperMock.Map<List<MilkProductionResponse>>(expectedMilkProductions)).Returns(milkProductionResponses);
+        PaginatedMilkProductionResponse expectedPaginatedResponse = new(milkProductionResponses, currentPage, amountOfPages);
+
+        PaginatedMilkProductionResponse paginatedMilkProductionResponse = await _sut.GetAllMilkProductionsAsync(_userId, currentPage);
+
+        Assert.Equivalent(expectedPaginatedResponse, paginatedMilkProductionResponse);
+    }
+
+    [Fact]
     public async Task Get_Milk_Production_By_Non_Existent_Id_Throws_NotFoundException()
     {
         Guid milkProductionId = Guid.NewGuid();
