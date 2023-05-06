@@ -1,5 +1,3 @@
-using CattleManager.Application.Domain.Entities;
-
 namespace CattleManager.Application.Application.Common.Interfaces.Entities.Messages;
 
 public interface IMessageService
