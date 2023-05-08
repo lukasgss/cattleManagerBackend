@@ -35,18 +35,17 @@ public class MilkProductionService : IMilkProductionService
             throw new BadRequestException($"Resultado possui {amountOfPages} página(s), insira um valor entre 1 e o número de páginas.");
 
         IEnumerable<MilkProduction> milkProductions = await _milkProductionRepository.GetAllMilkProductionsAsync(userId, page);
-        List<MilkProductionResponse> milkProductionsResponse = _mapper.Map<List<MilkProductionResponse>>(milkProductions);
+        List<MilkProductionResponse> milkProductionsResponse = PopulateMilkProductionResponseList(milkProductions);
 
         return new PaginatedMilkProductionResponse(milkProductionsResponse, page, amountOfPages);
     }
-
     public async Task<MilkProductionResponse> GetMilkProductionByIdAsync(Guid milkProductionId, Guid userId)
     {
         var milkProduction = await _milkProductionRepository.GetMilkProductionByIdAsync(milkProductionId, userId);
         if (milkProduction is null)
             throw new NotFoundException("Não foi possível encontrar produção de leite com o id especificado.");
 
-        return _mapper.Map<MilkProductionResponse>(milkProduction);
+        return ConvertToMilkProductionResponse(milkProduction);
     }
 
     public async Task<PaginatedMilkProductionResponse> GetAllMilkProductionsFromCattleAsync(Guid cattleId, Guid userId, int page)
@@ -61,7 +60,7 @@ public class MilkProductionService : IMilkProductionService
 
         var milkProductions = await _milkProductionRepository.GetMilkProductionsFromCattleAsync(cattleId, userId, page);
 
-        List<MilkProductionResponse> milkProductionsResponse = _mapper.Map<List<MilkProductionResponse>>(milkProductions);
+        List<MilkProductionResponse> milkProductionsResponse = PopulateMilkProductionResponseList(milkProductions);
         return new PaginatedMilkProductionResponse(milkProductionsResponse, page, amountOfPages);
     }
 
@@ -85,7 +84,7 @@ public class MilkProductionService : IMilkProductionService
         return await _milkProductionRepository.GetAverageMilkProductionFromCattleAsync(cattleId, userId, month, year);
     }
 
-    public async Task<MilkProductionResponse> CreateMilkProductionAsync(MilkProductionRequest milkProductionRequest, Guid userId)
+    public async Task<CreateMilkProductionResponse> CreateMilkProductionAsync(MilkProductionRequest milkProductionRequest, Guid userId)
     {
         var cattleOfMilkProduction = await _cattleRepository.GetCattleById(milkProductionRequest.CattleId, userId, false);
         if (cattleOfMilkProduction is null)
@@ -95,7 +94,13 @@ public class MilkProductionService : IMilkProductionService
         _milkProductionRepository.Add(milkProduction);
         await _milkProductionRepository.CommitAsync();
 
-        return _mapper.Map<MilkProductionResponse>(milkProduction);
+        return new CreateMilkProductionResponse(
+            Id: milkProduction.Id,
+            MilkInLiters: milkProduction.MilkInLiters,
+            PeriodOfDay: TranslatePeriodOfDay(milkProduction.PeriodOfDay),
+            Date: milkProduction.Date.ToString("dd/MM/yyyy"),
+            CattleId: milkProduction.CattleId
+        );
     }
 
     public async Task<MilkProductionResponse> EditMilkProductionByIdAsync(EditMilkProductionRequest milkProductionRequest, Guid userId, Guid routeId)
@@ -125,5 +130,38 @@ public class MilkProductionService : IMilkProductionService
 
         _milkProductionRepository.Delete(milkProduction);
         await _milkProductionRepository.CommitAsync();
+    }
+
+    private static MilkProductionResponse ConvertToMilkProductionResponse(MilkProduction milkProduction)
+    {
+        return new MilkProductionResponse(
+            Id: milkProduction.Id,
+            CattleName: milkProduction.Cattle.Name,
+            MilkInLiters: milkProduction.MilkInLiters,
+            PeriodOfDay: TranslatePeriodOfDay(milkProduction.PeriodOfDay),
+            Date: milkProduction.Date.ToString("dd/MM/yyyy"),
+            CattleId: milkProduction.CattleId);
+    }
+
+    private static List<MilkProductionResponse> PopulateMilkProductionResponseList(IEnumerable<MilkProduction> milkProductions)
+    {
+        List<MilkProductionResponse> milkProductionsResponse = new();
+        foreach (MilkProduction milkProduction in milkProductions)
+        {
+            milkProductionsResponse.Add(ConvertToMilkProductionResponse(milkProduction));
+        }
+        return milkProductionsResponse;
+    }
+
+    private static string TranslatePeriodOfDay(char periodOfDay)
+    {
+        return periodOfDay switch
+        {
+            'a' => "Tarde",
+            'd' => "Dia inteiro",
+            'm' => "Manhã",
+            'n' => "Noite",
+            _ => throw new Exception("Invalid period of day.")
+        };
     }
 }

@@ -29,7 +29,9 @@ public class MilkProductionRepository : GenericRepository<MilkProduction>, IMilk
     public async Task<IEnumerable<MilkProduction>> GetAllMilkProductionsAsync(Guid userId, int page)
     {
         return await _dbContext.MilkProductions
+            .Include(milkProduction => milkProduction.Cattle)
             .Where(milkProduction => milkProduction.Cattle.Users.Any(user => user.Id == userId))
+            .OrderByDescending(milkProduction => milkProduction.Date)
             .Skip((page - 1) * GlobalConstants.ResultsPerPage)
             .Take(GlobalConstants.ResultsPerPage)
             .ToListAsync();
@@ -95,9 +97,11 @@ public class MilkProductionRepository : GenericRepository<MilkProduction>, IMilk
     {
         return trackChanges ? (await _dbContext.MilkProductions
         .AsNoTracking()
+        .Include(milkProduction => milkProduction.Cattle)
         .SingleOrDefaultAsync(x => x.Id == milkProductionId && x.Cattle.Users.Any(x => x.Id == userId)))
         :
         (await _dbContext.MilkProductions
+        .Include(milkProduction => milkProduction.Cattle)
         .SingleOrDefaultAsync(x => x.Id == milkProductionId && x.Cattle.Users.Any(x => x.Id == userId)));
     }
 
@@ -105,6 +109,7 @@ public class MilkProductionRepository : GenericRepository<MilkProduction>, IMilk
     {
         return await _dbContext.MilkProductions
         .Where(x => x.CattleId == cattleId && x.Cattle.Users.Any(x => x.Id == userId))
+        .Include(milkProduction => milkProduction.Cattle)
         .OrderByDescending(x => x.Date)
         .Skip((page - 1) * GlobalConstants.ResultsPerPage)
         .Take(GlobalConstants.ResultsPerPage)

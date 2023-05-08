@@ -27,6 +27,7 @@ public class MilkProductionServiceTests
     private readonly IServiceValidations _serviceValidationsMock;
     private static readonly Guid _userId = Guid.NewGuid();
     private static readonly Guid _cattleId = Guid.NewGuid();
+    private const string _periodOfDay = "Tarde";
 
     public MilkProductionServiceTests()
     {
@@ -61,15 +62,14 @@ public class MilkProductionServiceTests
         const int amountOfPages = 8;
         const int currentPage = 1;
         A.CallTo(() => _milkProductionRepositoryMock.GetAmountOfPages(_userId)).Returns(amountOfPages);
-        List<MilkProduction> expectedMilkProductions = GenerateListOfMilkProductions(_cattleId);
-        A.CallTo(() => _milkProductionRepositoryMock.GetAllMilkProductionsAsync(_userId, currentPage)).Returns(expectedMilkProductions);
-        List<MilkProductionResponse> milkProductionResponses = GenerateListOfMilkProductionResponseFromListOfMilkProductions(expectedMilkProductions);
-        A.CallTo(() => _mapperMock.Map<List<MilkProductionResponse>>(expectedMilkProductions)).Returns(milkProductionResponses);
-        PaginatedMilkProductionResponse expectedPaginatedResponse = new(milkProductionResponses, currentPage, amountOfPages);
+        List<MilkProduction> milkProductions = GenerateListOfMilkProductions(_cattleId);
+        IEnumerable<MilkProductionResponse> milkProductionsResponse = GenerateListOfMilkProductionResponseFromListOfMilkProductions(milkProductions);
+        PaginatedMilkProductionResponse expectedPaginatedMilkProductionResponse = new(milkProductionsResponse, currentPage, amountOfPages);
+        A.CallTo(() => _milkProductionRepositoryMock.GetAllMilkProductionsAsync(_userId, currentPage)).Returns(milkProductions);
 
         PaginatedMilkProductionResponse paginatedMilkProductionResponse = await _sut.GetAllMilkProductionsAsync(_userId, currentPage);
 
-        Assert.Equivalent(expectedPaginatedResponse, paginatedMilkProductionResponse);
+        Assert.Equivalent(expectedPaginatedMilkProductionResponse, paginatedMilkProductionResponse);
     }
 
     [Fact]
@@ -192,9 +192,8 @@ public class MilkProductionServiceTests
         A.CallTo(() => _cattleRepositoryMock.GetCattleById(cattleId, userId, false)).Returns(new Cattle());
         MilkProductionRequest milkProductionRequest = GenerateMilkProductionRequest(cattleId);
         MilkProduction milkProduction = GenerateMilkProduction(cattleId);
-        MilkProductionResponse expectedMilkProductionResponse = GenerateMilkProductionResponseFromMilkProduction(milkProduction);
+        CreateMilkProductionResponse expectedMilkProductionResponse = GenerateCreateMilkProductionResponseFromMilkProduction(milkProduction);
         A.CallTo(() => _mapperMock.Map<MilkProduction>(milkProductionRequest)).Returns(milkProduction);
-        A.CallTo(() => _mapperMock.Map<MilkProductionResponse>(milkProduction)).Returns(expectedMilkProductionResponse);
 
         var milkProductionResponse = await _sut.CreateMilkProductionAsync(milkProductionRequest, userId);
 
@@ -288,6 +287,8 @@ public class MilkProductionServiceTests
         {
             Id = milkProductionId ?? _guidProvider.NewGuid(),
             CattleId = cattleId,
+            Cattle = new Cattle() { Name = "cattleName" },
+            PeriodOfDay = 'a',
             Date = DateOnly.FromDateTime(DateTime.Now),
             MilkInLiters = 15
         };
@@ -307,9 +308,10 @@ public class MilkProductionServiceTests
     {
         return new MilkProductionResponse(
             Id: milkProductionId ?? _guidProvider.NewGuid(),
+            CattleName: "cattleName",
             MilkInLiters: milkProduction.MilkInLiters,
-            PeriodOfDay: "afternoon",
-            Date: milkProduction.Date,
+            PeriodOfDay: _periodOfDay,
+            Date: milkProduction.Date.ToString("dd/MM/yyyy"),
             CattleId: milkProduction.CattleId);
     }
 
@@ -327,7 +329,7 @@ public class MilkProductionServiceTests
     {
         return new MilkProductionRequest(
             MilkInLiters: 15,
-            PeriodOfDay: "afternoon",
+            PeriodOfDay: "a",
             Date: DateOnly.FromDateTime(DateTime.Now),
             CattleId: cattleId
         );
@@ -338,9 +340,20 @@ public class MilkProductionServiceTests
         return new EditMilkProductionRequest(
             Id: milkProductionId,
             MilkInLiters: 15,
-            PeriodOfDay: "afternoon",
+            PeriodOfDay: "a",
             Date: DateOnly.FromDateTime(DateTime.Now),
             CattleId: cattleId ?? Guid.NewGuid()
+        );
+    }
+
+    private static CreateMilkProductionResponse GenerateCreateMilkProductionResponseFromMilkProduction(MilkProduction milkProduction)
+    {
+        return new CreateMilkProductionResponse(
+            Id: milkProduction.Id,
+            MilkInLiters: milkProduction.MilkInLiters,
+            PeriodOfDay: "Tarde",
+            Date: milkProduction.Date.ToString("dd/MM/yyyy"),
+            CattleId: milkProduction.CattleId
         );
     }
 }
