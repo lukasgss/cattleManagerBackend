@@ -75,7 +75,7 @@ public class MilkProductionController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<MilkProductionResponse>> CreateMilkProduction(MilkProductionRequest milkProductionRequest)
+    public async Task<ActionResult<CreateMilkProductionResponse>> CreateMilkProduction(MilkProductionRequest milkProductionRequest)
     {
         CreateMilkProductionValidator validator = new();
         var validationResult = validator.Validate(milkProductionRequest);
@@ -87,7 +87,7 @@ public class MilkProductionController : ControllerBase
 
         Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
-        MilkProductionResponse milkProduction =
+        CreateMilkProductionResponse milkProduction =
             await _milkProductionService.CreateMilkProductionAsync(milkProductionRequest, userId);
         return new CreatedAtRouteResult(nameof(GetMilkProductionById), new { milkProduction.Id }, milkProduction);
     }
