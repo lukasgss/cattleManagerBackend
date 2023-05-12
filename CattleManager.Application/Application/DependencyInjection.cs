@@ -1,5 +1,7 @@
+using CattleManager.Application.Application.Common.Helpers;
 using CattleManager.Application.Application.Common.Interfaces.Authentication;
 using CattleManager.Application.Application.Common.Interfaces.Authorization;
+using CattleManager.Application.Application.Common.Interfaces.DashboardHelper;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Breeds;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Conceptions;
@@ -35,6 +37,7 @@ public static class DependencyInjection
         services.AddScoped<IMessageService, MessageService>();
         services.AddScoped<IMedicalRecordService, MedicalRecordService>();
         services.AddScoped<IServiceValidations, ServiceValidations>();
+        services.AddScoped<IDashboardHelper, DashboardHelper>();
         services.AddValidatorsFromAssemblyContaining<IAssemblyMarker>();
 
         return services;

@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using CattleManager.Application.Application.Common.Exceptions;
-using CattleManager.Application.Application.Common.Interfaces.DateTimeProvider;
+using CattleManager.Application.Application.Common.Interfaces.DashboardHelper;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkProductions;
 using CattleManager.Application.Application.Common.Interfaces.GuidProvider;
@@ -25,6 +27,7 @@ public class MilkProductionServiceTests
     private readonly IMapper _mapperMock;
     private readonly IGuidProvider _guidProvider;
     private readonly IServiceValidations _serviceValidationsMock;
+    private readonly IDashboardHelper _dashboardHelperMock;
     private static readonly Guid _userId = Guid.NewGuid();
     private static readonly Guid _cattleId = Guid.NewGuid();
     private const string _periodOfDay = "Tarde";
@@ -36,11 +39,13 @@ public class MilkProductionServiceTests
         _mapperMock = A.Fake<IMapper>();
         _serviceValidationsMock = A.Fake<IServiceValidations>();
         _guidProvider = new GuidProvider();
+        _dashboardHelperMock = A.Fake<IDashboardHelper>();
         _sut = new MilkProductionService(
             _milkProductionRepositoryMock,
             _cattleRepositoryMock,
             _mapperMock,
-            _serviceValidationsMock);
+            _serviceValidationsMock,
+            _dashboardHelperMock);
     }
 
     [Fact]
@@ -167,6 +172,76 @@ public class MilkProductionServiceTests
         AverageMilkProduction averageMilkProduction = await _sut.GetAverageMilkProductionFromCattleAsync(_cattleId, _userId, month, year);
 
         Assert.Equivalent(expectedAverageMilkProduction, averageMilkProduction);
+    }
+
+    [Fact]
+    public async Task Get_Amount_Of_Milk_Production_Last_Months_With_Negative_Month_Throws_BadRequestException()
+    {
+        const int previousMonths = -1;
+
+        async Task result() => await _sut.GetAmountOfMilkProductionLastMonthsAsync(previousMonths, _userId);
+
+        var exception = await Assert.ThrowsAsync<BadRequestException>(result);
+        Assert.Equal("Valor dos meses anteriores deve ser maior ou igual a 1.", exception.Message);
+    }
+
+    [Fact]
+    public async Task Get_Amount_Of_Milk_Production_Last_Months_Returns_Total_Amount_By_Month()
+    {
+        const int previousMonths = 2;
+        List<List<MilkProductionByMonth>> milkProductions = GenerateMilkProductionLastMonths();
+        A.CallTo(() => _milkProductionRepositoryMock.GetTotalMilkProductionLastMonthsAsync(previousMonths, _userId)).Returns(milkProductions);
+        List<DataInMonth<decimal>> expectedMilkProductions = GenerateTotalAmountByMonth(milkProductions);
+
+        var milkProductionResponse = await _sut.GetAmountOfMilkProductionLastMonthsAsync(previousMonths, _userId);
+
+        Assert.Equivalent(expectedMilkProductions, milkProductionResponse);
+    }
+
+    [Fact]
+    public async Task Get_Amount_Of_Milk_Production_Last_Months_With_Empty_Month_Returns_Total_Amount_By_Month()
+    {
+        const int previousMonths = 2;
+        List<List<MilkProductionByMonth>> milkProductions = GenerateMilkProductionLastMonths();
+        A.CallTo(() => _milkProductionRepositoryMock.GetTotalMilkProductionLastMonthsAsync(previousMonths, _userId)).Returns(milkProductions);
+        List<DataInMonth<decimal>> expectedMilkProductions = GenerateTotalAmountByMonth(milkProductions);
+
+        var milkProductionResponse = await _sut.GetAmountOfMilkProductionLastMonthsAsync(previousMonths, _userId);
+
+        Assert.Equivalent(expectedMilkProductions, milkProductionResponse);
+    }
+    private static List<DataInMonth<decimal>> GenerateTotalAmountByMonth(List<List<MilkProductionByMonth>> milkProductions)
+    {
+        List<DataInMonth<decimal>> dataInMonths = new();
+        foreach (var milkProduction in milkProductions)
+        {
+            DataInMonth<decimal> dataInMonth = new()
+            {
+                Month = milkProduction[0].Date.ToString("MMM", new CultureInfo("pt-BR")),
+                Value = milkProduction.Sum(x => x.MilkInLiters)
+            };
+            dataInMonths.Add(dataInMonth);
+        }
+        return dataInMonths;
+    }
+
+    private static List<List<MilkProductionByMonth>> GenerateMilkProductionLastMonths()
+    {
+        return new List<List<MilkProductionByMonth>>()
+        {
+            new List<MilkProductionByMonth>()
+            {
+                new MilkProductionByMonth() { MilkInLiters = 33, Date = DateOnly.FromDateTime(new DateTime(2022, 1, 1)) }
+            },
+            new List<MilkProductionByMonth>()
+            {
+                new MilkProductionByMonth() { MilkInLiters = 40, Date = DateOnly.FromDateTime(new DateTime(2022, 2, 1)) }
+            },
+            new List<MilkProductionByMonth>()
+            {
+                new MilkProductionByMonth() { MilkInLiters = 10, Date = DateOnly.FromDateTime(new DateTime(2022, 3, 1)) }
+            }
+        };
     }
 
     [Fact]

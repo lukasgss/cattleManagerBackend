@@ -115,4 +115,23 @@ public class MilkProductionRepository : GenericRepository<MilkProduction>, IMilk
         .Take(GlobalConstants.ResultsPerPage)
         .ToListAsync();
     }
+
+    public async Task<IEnumerable<IEnumerable<MilkProductionByMonth>>> GetTotalMilkProductionLastMonthsAsync(int previousMonths, Guid userId)
+    {
+        DateOnly endDate = DateOnly.FromDateTime(DateTime.Now);
+        DateOnly startDate = endDate.AddMonths(-previousMonths);
+
+        var query = await _dbContext.MilkProductions
+            .Where(milkProduction => milkProduction.Cattle.Users.Any(user => user.Id == userId)
+                && milkProduction.Date >= startDate && milkProduction.Date <= endDate)
+            .Select(milkProduction => new MilkProductionByMonth()
+            {
+                Date = milkProduction.Date,
+                MilkInLiters = milkProduction.MilkInLiters
+            })
+            .GroupBy(milkProduction => milkProduction.Date.Month)
+            .ToListAsync();
+
+        return query.ConvertAll(x => x.ToList());
+    }
 }

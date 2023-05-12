@@ -1,5 +1,7 @@
+using System.Globalization;
 using AutoMapper;
 using CattleManager.Application.Application.Common.Exceptions;
+using CattleManager.Application.Application.Common.Interfaces.DashboardHelper;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkProductions;
 using CattleManager.Application.Application.Common.Interfaces.InCommon;
@@ -15,17 +17,20 @@ public class MilkProductionService : IMilkProductionService
     private readonly ICattleRepository _cattleRepository;
     private readonly IMapper _mapper;
     private readonly IServiceValidations _serviceValidations;
+    private readonly IDashboardHelper _dashboardHelper;
 
     public MilkProductionService(
         IMilkProductionRepository milkProductionRepository,
         ICattleRepository cattleRepository,
         IMapper mapper,
-        IServiceValidations serviceValidations)
+        IServiceValidations serviceValidations,
+        IDashboardHelper dashboardHelper)
     {
         _milkProductionRepository = milkProductionRepository;
         _cattleRepository = cattleRepository;
         _mapper = mapper;
         _serviceValidations = serviceValidations;
+        _dashboardHelper = dashboardHelper;
     }
 
     public async Task<PaginatedMilkProductionResponse> GetAllMilkProductionsAsync(Guid userId, int page)
@@ -82,6 +87,16 @@ public class MilkProductionService : IMilkProductionService
             throw new NotFoundException("Animal com o id especificado não existe.");
 
         return await _milkProductionRepository.GetAverageMilkProductionFromCattleAsync(cattleId, userId, month, year);
+    }
+
+    public async Task<IEnumerable<DataInMonth<decimal>>> GetAmountOfMilkProductionLastMonthsAsync(int previousMonths, Guid userId)
+    {
+        if (previousMonths <= 0)
+            throw new BadRequestException("Valor dos meses anteriores deve ser maior ou igual a 1.");
+
+        var milkProductionLastMonths = await _milkProductionRepository.GetTotalMilkProductionLastMonthsAsync(previousMonths, userId);
+
+        return FillDataInMonths(milkProductionLastMonths, previousMonths);
     }
 
     public async Task<CreateMilkProductionResponse> CreateMilkProductionAsync(MilkProductionRequest milkProductionRequest, Guid userId)
@@ -163,5 +178,30 @@ public class MilkProductionService : IMilkProductionService
             'n' => "Noite",
             _ => throw new Exception("Invalid period of day.")
         };
+    }
+
+    private IEnumerable<DataInMonth<decimal>> FillDataInMonths(IEnumerable<IEnumerable<MilkProductionByMonth>> milkProductions, int previousMonths)
+    {
+        List<DataInMonth<decimal>> dataInMonths = new();
+        foreach (var milkProduction in milkProductions)
+        {
+            MilkProductionByMonth? data = milkProduction.FirstOrDefault();
+            if (data is null)
+                break;
+
+            DataInMonth<decimal> dataInMonth = new()
+            {
+                Month = data.Date.ToString("MMM", new CultureInfo("pt-BR")),
+                Value = milkProduction.Sum(x => x.MilkInLiters)
+            };
+            dataInMonths.Add(dataInMonth);
+        }
+
+        // Adds 1 because the current month is exclusive
+        // ex.: previousMonths value is 4, it returns the current month and data from the 4 previouses 
+        if (dataInMonths.Count != previousMonths + 1)
+            return _dashboardHelper.FillEmptyMonthsWithZeroValue(dataInMonths, previousMonths);
+
+        return dataInMonths;
     }
 }
