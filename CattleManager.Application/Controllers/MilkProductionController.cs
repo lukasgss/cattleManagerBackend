@@ -74,6 +74,15 @@ public class MilkProductionController : ControllerBase
         return Ok(averageMilkProduction);
     }
 
+    [HttpGet("previous-months")]
+    public async Task<ActionResult<IEnumerable<DataInMonth<decimal>>>> GetTotalMilkProductionLastMonths(int months)
+    {
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        IEnumerable<DataInMonth<decimal>> totalMilkProductionsByMonth = await _milkProductionService.GetAmountOfMilkProductionLastMonthsAsync(months, userId);
+        return Ok(totalMilkProductionsByMonth);
+    }
+
     [HttpPost]
     public async Task<ActionResult<CreateMilkProductionResponse>> CreateMilkProduction(MilkProductionRequest milkProductionRequest)
     {

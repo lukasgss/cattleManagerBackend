@@ -13,4 +13,5 @@ public interface IMilkProductionRepository : IGenericRepository<MilkProduction>
     Task<IEnumerable<MilkProduction>> GetMilkProductionsFromCattleAsync(Guid cattleId, Guid userid, int page);
     Task<AverageOfEntity> GetAverageMilkProductionFromAllCattleAsync(Guid userId, int month, int year);
     Task<AverageMilkProduction> GetAverageMilkProductionFromCattleAsync(Guid cattleId, Guid userId, int month, int year);
+    Task<IEnumerable<IEnumerable<MilkProductionByMonth>>> GetTotalMilkProductionLastMonthsAsync(int previousMonths, Guid userId);
 }
