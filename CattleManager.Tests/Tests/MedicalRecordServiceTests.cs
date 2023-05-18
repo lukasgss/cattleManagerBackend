@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using CattleManager.Application.Application.Common.Exceptions;
+using CattleManager.Application.Application.Common.Interfaces.DashboardHelper;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MedicalRecords;
 using CattleManager.Application.Application.Common.Interfaces.ServiceValidations;
@@ -20,6 +21,7 @@ public class MedicalRecordServiceTests
     private readonly IServiceValidations _serviceValidationsMock;
     private readonly IMapper _mapperMock;
     private readonly ICattleRepository _cattleRepositoryMock;
+    private readonly IDashboardHelper _dashboardHelperMock;
     private static readonly Guid _medicalRecordId = Guid.NewGuid();
     private static readonly Guid _userId = Guid.NewGuid();
     private static readonly Guid _cattleId = Guid.NewGuid();
@@ -30,11 +32,13 @@ public class MedicalRecordServiceTests
         _medicalRecordRepositoryMock = A.Fake<IMedicalRecordRepository>();
         _cattleRepositoryMock = A.Fake<ICattleRepository>();
         _serviceValidationsMock = A.Fake<IServiceValidations>();
+        _dashboardHelperMock = A.Fake<IDashboardHelper>();
         _mapperMock = A.Fake<IMapper>();
         _sut = new MedicalRecordService(
             _medicalRecordRepositoryMock,
             _cattleRepositoryMock,
             _serviceValidationsMock,
+            _dashboardHelperMock,
             _mapperMock);
     }
 

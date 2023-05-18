@@ -127,7 +127,7 @@ public class MilkProductionRepository : GenericRepository<MilkProduction>, IMilk
             .Select(milkProduction => new MilkProductionByMonth()
             {
                 Date = milkProduction.Date,
-                MilkInLiters = milkProduction.MilkInLiters
+                Value = milkProduction.MilkInLiters
             })
             .GroupBy(milkProduction => milkProduction.Date.Month)
             .ToListAsync();

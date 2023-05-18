@@ -1,7 +1,9 @@
 using AutoMapper;
 using CattleManager.Application.Application.Common.Exceptions;
+using CattleManager.Application.Application.Common.Interfaces.DashboardHelper;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MedicalRecords;
+using CattleManager.Application.Application.Common.Interfaces.InCommon;
 using CattleManager.Application.Application.Common.Interfaces.ServiceValidations;
 using CattleManager.Application.Application.Services.CommonValidations;
 using CattleManager.Application.Domain.Entities;
@@ -13,17 +15,20 @@ public class MedicalRecordService : IMedicalRecordService
     private readonly IMedicalRecordRepository _medicalRecordRepository;
     private readonly ICattleRepository _cattleRepository;
     private readonly IServiceValidations _serviceValidations;
+    private readonly IDashboardHelper _dashboardHelper;
     private readonly IMapper _mapper;
 
     public MedicalRecordService(
         IMedicalRecordRepository medicalRecordRepository,
         ICattleRepository cattleRepository,
         IServiceValidations serviceValidations,
+        IDashboardHelper dashboardHelper,
         IMapper mapper)
     {
         _medicalRecordRepository = medicalRecordRepository;
         _cattleRepository = cattleRepository;
         _serviceValidations = serviceValidations;
+        _dashboardHelper = dashboardHelper;
         _mapper = mapper;
     }
 
@@ -60,6 +65,15 @@ public class MedicalRecordService : IMedicalRecordService
         _serviceValidations.ValidateDate(month, year);
 
         return await _medicalRecordRepository.GetAmountOfMedicalRecordsInSpecificMonthAndYearAsync(userId, month, year);
+    }
+
+    public async Task<IEnumerable<DataInMonth<decimal>>> GetAmountOfMedicalRecordsLastMonthsAsync(Guid userId, int previousMonths)
+    {
+        if (previousMonths <= 0)
+            throw new BadRequestException("Valor dos meses anteriores deve ser maior ou igual a 1.");
+
+        var medicalRecordLastMonths = await _medicalRecordRepository.GetAmountOfMedicalRecordsLastMonthsAsync(userId, previousMonths);
+        return _dashboardHelper.FillTotalCountOfEntityByMonths(medicalRecordLastMonths, previousMonths);
     }
 
     public async Task<MedicalRecordResponse> CreateMedicalRecordAsync(CreateMedicalRecord createMedicalRecord, Guid userId)

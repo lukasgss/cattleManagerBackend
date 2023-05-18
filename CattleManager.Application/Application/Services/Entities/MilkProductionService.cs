@@ -1,4 +1,3 @@
-using System.Globalization;
 using AutoMapper;
 using CattleManager.Application.Application.Common.Exceptions;
 using CattleManager.Application.Application.Common.Interfaces.DashboardHelper;
@@ -96,7 +95,7 @@ public class MilkProductionService : IMilkProductionService
 
         var milkProductionLastMonths = await _milkProductionRepository.GetTotalMilkProductionLastMonthsAsync(previousMonths, userId);
 
-        return FillDataInMonths(milkProductionLastMonths, previousMonths);
+        return _dashboardHelper.FillTotalSumOfValueByMonths(milkProductionLastMonths, previousMonths);
     }
 
     public async Task<CreateMilkProductionResponse> CreateMilkProductionAsync(MilkProductionRequest milkProductionRequest, Guid userId)
@@ -178,30 +177,5 @@ public class MilkProductionService : IMilkProductionService
             'n' => "Noite",
             _ => throw new Exception("Invalid period of day.")
         };
-    }
-
-    private IEnumerable<DataInMonth<decimal>> FillDataInMonths(IEnumerable<IEnumerable<MilkProductionByMonth>> milkProductions, int previousMonths)
-    {
-        List<DataInMonth<decimal>> dataInMonths = new();
-        foreach (var milkProduction in milkProductions)
-        {
-            MilkProductionByMonth? data = milkProduction.FirstOrDefault();
-            if (data is null)
-                break;
-
-            DataInMonth<decimal> dataInMonth = new()
-            {
-                Month = data.Date.ToString("MMM", new CultureInfo("pt-BR")),
-                Value = milkProduction.Sum(x => x.MilkInLiters)
-            };
-            dataInMonths.Add(dataInMonth);
-        }
-
-        // Adds 1 because the current month is exclusive
-        // ex.: previousMonths value is 4, it returns the current month and data from the 4 previouses 
-        if (dataInMonths.Count != previousMonths + 1)
-            return _dashboardHelper.FillEmptyMonthsWithZeroValue(dataInMonths, previousMonths);
-
-        return dataInMonths;
     }
 }

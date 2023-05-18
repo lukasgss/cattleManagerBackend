@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using CattleManager.Application.Application.Common.Helpers;
+using CattleManager.Application.Application.Common.Interfaces.Dashboard;
 using CattleManager.Application.Application.Common.Interfaces.DashboardHelper;
 using CattleManager.Application.Application.Common.Interfaces.DateTimeProvider;
 using CattleManager.Application.Application.Common.Interfaces.InCommon;
+using CattleManager.Tests.Tests.TestTypes;
 using FakeItEasy;
 using Xunit;
 
@@ -15,6 +15,9 @@ public class DashboardHelperTests
 {
     private readonly IDateTimeProvider _dateTimeProviderMock;
     private readonly IDashboardHelper _sut;
+    private readonly DateTime _currentDateTime = new(2023, 1, 1);
+    private const int _previousMonths = 1;
+    private const int _value = 2;
     public DashboardHelperTests()
     {
         _dateTimeProviderMock = A.Fake<IDateTimeProvider>();
@@ -22,60 +25,72 @@ public class DashboardHelperTests
     }
 
     [Fact]
-    public void Fills_Empty_Months_With_Zero_Value_Correctly()
+    public void Fills_Total_Count_Of_Entity_By_Months()
     {
-        const int previousMonths = 4;
-        DateTime currentDateTime = new(2020, 1, 1);
-        DateOnly currentDateOnly = DateOnly.FromDateTime(currentDateTime);
-        List<DataInMonth<decimal>> dataInMonths = GenerateDataInMonthData();
-        A.CallTo(() => _dateTimeProviderMock.Now()).Returns(currentDateTime);
-        DataInMonth<decimal>[] expectedDataInMonths = GenerateDataInMonthWithEmptyValuesAsZero(previousMonths, dataInMonths, currentDateOnly);
+        List<List<IDataByMonth>> dataByMonths = GenerateDataByMonthList();
+        A.CallTo(() => _dateTimeProviderMock.Now()).Returns(_currentDateTime);
+        DataInMonth<decimal>[] expectedData = GenerateExpectedDataInMonthResponse(dataByMonths);
 
-        DataInMonth<decimal>[] dataInMonthsResult = _sut.FillEmptyMonthsWithZeroValue(dataInMonths, previousMonths);
+        IEnumerable<DataInMonth<decimal>> data = _sut.FillTotalCountOfEntityByMonths(dataByMonths, _previousMonths);
 
-        Assert.Equivalent(expectedDataInMonths, dataInMonthsResult);
+        Assert.Equivalent(expectedData, data);
     }
 
-    private static DataInMonth<decimal>[] GenerateDataInMonthWithEmptyValuesAsZero(int previousMonths, List<DataInMonth<decimal>> dataInMonths, DateOnly dateToday)
+    [Fact]
+    public void Fills_Total_Sum_Of_Value_By_Months()
     {
-        DataInMonth<decimal>[] formattedDataInMonths = new DataInMonth<decimal>[previousMonths + 1];
-        DateOnly currentDate = dateToday.AddMonths(-previousMonths);
-        for (int i = 0; i <= previousMonths; i++)
-        {
-            string monthName = currentDate.ToString("MMM", new CultureInfo("pt-BR"));
-            int index = dataInMonths.FindIndex(x => x.Month == monthName);
-            if (index != -1)
-            {
-                formattedDataInMonths[i] = dataInMonths[index];
-                currentDate = currentDate.AddMonths(1);
-                continue;
-            }
+        List<List<IDataByMonth>> dataByMonths = GenerateDataByMonthList();
+        A.CallTo(() => _dateTimeProviderMock.Now()).Returns(_currentDateTime);
+        DataInMonth<decimal>[] expectedData = GenerateExpectedDataInMonthResponse(dataByMonths);
 
-            DataInMonth<decimal> dataInMonth = new()
-            {
-                Month = monthName,
-                Value = 0
-            };
+        IEnumerable<DataInMonth<decimal>> data = _sut.FillTotalCountOfEntityByMonths(dataByMonths, _previousMonths);
 
-            formattedDataInMonths[i] = dataInMonth;
-            currentDate = currentDate.AddMonths(1);
-        }
-        return formattedDataInMonths;
+        Assert.Equivalent(expectedData, data);
     }
 
-    private static List<DataInMonth<decimal>> GenerateDataInMonthData()
+    private static DataInMonth<decimal>[] GenerateExpectedDataInMonthResponse(List<List<IDataByMonth>> dataByMonths)
     {
-        return new List<DataInMonth<decimal>>()
+        return new DataInMonth<decimal>[]
         {
             new DataInMonth<decimal>()
             {
-                Month = "jan.",
-                Value = 10
+                Month = "nov.",
+                Value = dataByMonths[0].Count,
             },
             new DataInMonth<decimal>()
             {
-                Month = "fev.",
-                Value = 20
+                Month = "dez.",
+                Value = dataByMonths[1].Count,
+            },
+        };
+    }
+
+    private List<List<IDataByMonth>> GenerateDataByMonthList()
+    {
+        return new()
+        {
+            // november
+            new List<IDataByMonth>()
+            {
+                new DataByMonthTest()
+                {
+                    Date = DateOnly.FromDateTime(_currentDateTime).AddMonths(-2),
+                    Value = 0,
+                },
+                new DataByMonthTest()
+                {
+                    Date = DateOnly.FromDateTime(_currentDateTime),
+                    Value = _value
+                },
+            },
+            // december
+            new List<IDataByMonth>()
+            {
+                new DataByMonthTest()
+                {
+                    Date = DateOnly.FromDateTime(_currentDateTime).AddMonths(-1),
+                    Value = 0,
+                },
             }
         };
     }

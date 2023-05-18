@@ -1,8 +1,9 @@
+using System;
 using CattleManager.Application.Application.Common.Interfaces.Dashboard;
 
-namespace CattleManager.Application.Application.Common.Interfaces.Entities.MilkProductions;
+namespace CattleManager.Tests.Tests.TestTypes;
 
-public class MilkProductionByMonth : IDataByMonth
+public class DataByMonthTest : IDataByMonth
 {
     public DateOnly Date { get; set; }
     public decimal Value { get; set; }

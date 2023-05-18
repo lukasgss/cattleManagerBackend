@@ -38,6 +38,23 @@ public class MedicalRecordRepository : GenericRepository<MedicalRecord>, IMedica
         };
     }
 
+    public async Task<IEnumerable<IEnumerable<MedicalRecordByMonth>>> GetAmountOfMedicalRecordsLastMonthsAsync(Guid userId, int previousMonths)
+    {
+        DateOnly endDate = DateOnly.FromDateTime(DateTime.Now);
+        DateOnly startDate = endDate.AddMonths(-previousMonths);
+
+        var query = await _dbContext.MedicalRecords
+            .Where(medicalRecord => medicalRecord.Cattle.Users.Any(user => user.Id == userId) && medicalRecord.Date >= startDate && medicalRecord.Date <= endDate)
+            .Select(medicalRecord => new MedicalRecordByMonth()
+            {
+                Date = medicalRecord.Date,
+            })
+            .GroupBy(milkProduction => milkProduction.Date.Month)
+            .ToListAsync();
+
+        return query.ConvertAll(x => x.ToList());
+    }
+
     public async Task<MedicalRecord?> GetMedicalRecordByIdAsync(Guid medicalRecordId, Guid userId, bool trackChanges = true)
     {
         return trackChanges ? await _dbContext.MedicalRecords

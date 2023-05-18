@@ -192,6 +192,7 @@ public class MilkProductionServiceTests
         List<List<MilkProductionByMonth>> milkProductions = GenerateMilkProductionLastMonths();
         A.CallTo(() => _milkProductionRepositoryMock.GetTotalMilkProductionLastMonthsAsync(previousMonths, _userId)).Returns(milkProductions);
         List<DataInMonth<decimal>> expectedMilkProductions = GenerateTotalAmountByMonth(milkProductions);
+        A.CallTo(() => _dashboardHelperMock.FillTotalSumOfValueByMonths(milkProductions, previousMonths)).Returns(expectedMilkProductions);
 
         var milkProductionResponse = await _sut.GetAmountOfMilkProductionLastMonthsAsync(previousMonths, _userId);
 
@@ -199,12 +200,13 @@ public class MilkProductionServiceTests
     }
 
     [Fact]
-    public async Task Get_Amount_Of_Milk_Production_Last_Months_With_Empty_Month_Returns_Total_Amount_By_Month()
+    public async Task Get_Amount_Of_Milk_Production_Last_Months_With_Empty_Month_Returns_Total_Amount_By_Month_With_Zeroed_Values()
     {
         const int previousMonths = 2;
         List<List<MilkProductionByMonth>> milkProductions = GenerateMilkProductionLastMonths();
         A.CallTo(() => _milkProductionRepositoryMock.GetTotalMilkProductionLastMonthsAsync(previousMonths, _userId)).Returns(milkProductions);
         List<DataInMonth<decimal>> expectedMilkProductions = GenerateTotalAmountByMonth(milkProductions);
+        A.CallTo(() => _dashboardHelperMock.FillTotalSumOfValueByMonths(milkProductions, previousMonths)).Returns(expectedMilkProductions);
 
         var milkProductionResponse = await _sut.GetAmountOfMilkProductionLastMonthsAsync(previousMonths, _userId);
 
@@ -218,7 +220,7 @@ public class MilkProductionServiceTests
             DataInMonth<decimal> dataInMonth = new()
             {
                 Month = milkProduction[0].Date.ToString("MMM", new CultureInfo("pt-BR")),
-                Value = milkProduction.Sum(x => x.MilkInLiters)
+                Value = milkProduction.Sum(x => x.Value)
             };
             dataInMonths.Add(dataInMonth);
         }
@@ -231,15 +233,15 @@ public class MilkProductionServiceTests
         {
             new List<MilkProductionByMonth>()
             {
-                new MilkProductionByMonth() { MilkInLiters = 33, Date = DateOnly.FromDateTime(new DateTime(2022, 1, 1)) }
+                new MilkProductionByMonth() { Value = 33, Date = DateOnly.FromDateTime(new DateTime(2022, 1, 1)) }
             },
             new List<MilkProductionByMonth>()
             {
-                new MilkProductionByMonth() { MilkInLiters = 40, Date = DateOnly.FromDateTime(new DateTime(2022, 2, 1)) }
+                new MilkProductionByMonth() { Value = 40, Date = DateOnly.FromDateTime(new DateTime(2022, 2, 1)) }
             },
             new List<MilkProductionByMonth>()
             {
-                new MilkProductionByMonth() { MilkInLiters = 10, Date = DateOnly.FromDateTime(new DateTime(2022, 3, 1)) }
+                new MilkProductionByMonth() { Value = 10, Date = DateOnly.FromDateTime(new DateTime(2022, 3, 1)) }
             }
         };
     }

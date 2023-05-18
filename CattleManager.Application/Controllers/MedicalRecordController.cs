@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using CattleManager.Application.Application.Common.Interfaces.Authorization;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MedicalRecords;
+using CattleManager.Application.Application.Common.Interfaces.InCommon;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,6 +38,15 @@ public class MedicalRecordController : ControllerBase
         AmountOfMedicalRecords amountOfMedicalRecords =
             await _medicalRecordService.GetAmountOfMedicalRecordsInSpecificMonthAndYearAsync(userId, month, year);
         return Ok(amountOfMedicalRecords);
+    }
+
+    [HttpGet("previous-months")]
+    public async Task<ActionResult<IEnumerable<DataInMonth<decimal>>>> GetTotalMedicalRecordsLastMonths(int months)
+    {
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        var medicalRecords = await _medicalRecordService.GetAmountOfMedicalRecordsLastMonthsAsync(userId, months);
+        return Ok(medicalRecords);
     }
 
     [HttpPost]
