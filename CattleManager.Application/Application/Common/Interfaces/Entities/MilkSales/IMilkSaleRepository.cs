@@ -8,6 +8,6 @@ public interface IMilkSaleRepository : IGenericRepository<MilkSale>
 {
     Task<IEnumerable<MilkSale>> GetAllMilkSalesAsync(Guid userId);
     Task<MilkSale?> GetMilkSaleById(Guid milkSaleId, Guid userId, bool trackChanges = true);
-    Task<AverageOfEntity> GetMilkSalesAverageTotalIncomeInSpecificMonthAsync(Guid userId, int month, int year);
+    Task<AverageOfEntity> GetMilkSalesAverageRevenuePerSaleInSecificMonthAsync(Guid userId, int month, int year);
     Task<IEnumerable<MilkPriceHistory>> GetMilkPriceHistoryAsync(Guid userId);
 }

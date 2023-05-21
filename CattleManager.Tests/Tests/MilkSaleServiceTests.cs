@@ -88,10 +88,10 @@ public class MilkSaleServiceTests
             Quantity = 16
         };
 
-        A.CallTo(() => _milkSaleRepositoryMock.GetMilkSalesAverageTotalIncomeInSpecificMonthAsync(_userId, month, year))
+        A.CallTo(() => _milkSaleRepositoryMock.GetMilkSalesAverageRevenuePerSaleInSecificMonthAsync(_userId, month, year))
             .Returns(expectedAverageTotalIncome);
 
-        AverageOfEntity averageTotalIncome = await _sut.GetMilkSalesAverageTotalIncomeInSpecificMonthAsync(_userId, month, year);
+        AverageOfEntity averageTotalIncome = await _sut.GetMilkSalesAverageRevenuePerSaleInSecificMonthAsync(_userId, month, year);
 
         Assert.Equivalent(expectedAverageTotalIncome, averageTotalIncome);
     }

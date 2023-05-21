@@ -66,7 +66,7 @@ public class MilkSaleRepository : GenericRepository<MilkSale>, IMilkSaleReposito
         .SingleOrDefaultAsync(milkSale => milkSale.Id == milkSaleId && milkSale.Owner.Id == userId);
     }
 
-    public async Task<AverageOfEntity> GetMilkSalesAverageTotalIncomeInSpecificMonthAsync(Guid userId, int month, int year)
+    public async Task<AverageOfEntity> GetMilkSalesAverageRevenuePerSaleInSecificMonthAsync(Guid userId, int month, int year)
     {
         DateOnly startDate = new(year, month, 1);
         DateOnly endDate = startDate.AddDays(DateTime.DaysInMonth(year, month) - 1);

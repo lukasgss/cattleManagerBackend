@@ -39,12 +39,12 @@ public class MilkSaleController : ControllerBase
     }
 
     [HttpGet("average/income")]
-    public async Task<ActionResult<AverageOfEntity>> GetMilkSaleAverageTotalIncomeInSpecificMonth(int month, int year)
+    public async Task<ActionResult<AverageOfEntity>> GetMilkSalesAverageRevenuePerSaleInSecificMonthAsync(int month, int year)
     {
         Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
 
         AverageOfEntity averageTotalIncome =
-            await _milkSaleService.GetMilkSalesAverageTotalIncomeInSpecificMonthAsync(userId, month, year);
+            await _milkSaleService.GetMilkSalesAverageRevenuePerSaleInSecificMonthAsync(userId, month, year);
         return Ok(averageTotalIncome);
     }
 
