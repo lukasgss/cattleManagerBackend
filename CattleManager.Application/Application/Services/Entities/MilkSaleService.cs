@@ -65,12 +65,12 @@ public class MilkSaleService : IMilkSaleService
         return await _milkSaleRepository.GetMilkPriceHistoryAsync(userId);
     }
 
-    public async Task<AverageOfEntity> GetMilkSalesAverageTotalIncomeInSpecificMonthAsync(Guid userId, int month, int year)
+    public async Task<AverageOfEntity> GetMilkSalesAverageRevenuePerSaleInSecificMonthAsync(Guid userId, int month, int year)
     {
         ServiceValidations.ValidateMonth(month);
         _serviceValidations.ValidateDate(month, year);
 
-        return await _milkSaleRepository.GetMilkSalesAverageTotalIncomeInSpecificMonthAsync(userId, month, year);
+        return await _milkSaleRepository.GetMilkSalesAverageRevenuePerSaleInSecificMonthAsync(userId, month, year);
     }
 
     public async Task<MilkSaleResponse> CreateMilkSaleAsync(CreateMilkSale createMilkSale, Guid userId)
