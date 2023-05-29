@@ -86,4 +86,24 @@ public class MilkSaleRepository : GenericRepository<MilkSale>, IMilkSaleReposito
             Quantity = amountOfSales
         };
     }
+
+    public async Task<IEnumerable<IEnumerable<MilkSaleByMonth>>> GetTotalRevenueInPreviousMonths(int previousMonths, Guid userId)
+    {
+        DateOnly endDate = DateOnly.FromDateTime(DateTime.Now);
+        DateOnly startDate = endDate.AddMonths(-previousMonths);
+
+        var query = await _dbContext.MilkSales
+            .AsNoTracking()
+            .Where(milkSale => milkSale.Date >= startDate && milkSale.Date <= endDate
+                && milkSale.Owner.Id == userId)
+            .Select(milkSale => new MilkSaleByMonth()
+            {
+                Date = milkSale.Date,
+                Value = milkSale.MilkInLiters * milkSale.PricePerLiter
+            })
+            .GroupBy(milkSale => milkSale.Date.Month)
+            .ToListAsync();
+
+        return query.ConvertAll(x => x.ToList());
+    }
 }

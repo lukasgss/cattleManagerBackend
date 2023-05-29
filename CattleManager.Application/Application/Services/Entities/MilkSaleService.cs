@@ -1,5 +1,6 @@
 using AutoMapper;
 using CattleManager.Application.Application.Common.Exceptions;
+using CattleManager.Application.Application.Common.Interfaces.DashboardHelper;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkSales;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
 using CattleManager.Application.Application.Common.Interfaces.GuidProvider;
@@ -16,6 +17,7 @@ public class MilkSaleService : IMilkSaleService
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
     private readonly IGuidProvider _guidProvider;
+    private readonly IDashboardHelper _dashboardHelper;
     private readonly IServiceValidations _serviceValidations;
 
     public MilkSaleService(
@@ -23,13 +25,15 @@ public class MilkSaleService : IMilkSaleService
         IMapper mapper,
         IUserRepository userRepository,
         IGuidProvider guidProvider,
-        IServiceValidations serviceValidations)
+        IServiceValidations serviceValidations,
+        IDashboardHelper dashboardHelper)
     {
         _milkSaleRepository = milkSaleRepository;
         _mapper = mapper;
         _userRepository = userRepository;
         _guidProvider = guidProvider;
         _serviceValidations = serviceValidations;
+        _dashboardHelper = dashboardHelper;
     }
 
     public async Task<IEnumerable<MilkSaleResponse>> GetAllMilkSalesAsync(Guid userId)
@@ -71,6 +75,16 @@ public class MilkSaleService : IMilkSaleService
         _serviceValidations.ValidateDate(month, year);
 
         return await _milkSaleRepository.GetMilkSalesAverageRevenuePerSaleInSecificMonthAsync(userId, month, year);
+    }
+
+    public async Task<IEnumerable<DataInMonth<decimal>>> GetMilkSalesTotalRevenueInPreviousMonths(int previousMonths, Guid userId)
+    {
+        if (previousMonths <= 0)
+            throw new BadRequestException("Valor dos meses anteriores deve ser maior ou igual a 1.");
+
+        var milkSales = await _milkSaleRepository.GetTotalRevenueInPreviousMonths(previousMonths, userId);
+
+        return _dashboardHelper.FillTotalSumOfValueByMonths(milkSales, previousMonths);
     }
 
     public async Task<MilkSaleResponse> CreateMilkSaleAsync(CreateMilkSale createMilkSale, Guid userId)
