@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using CattleManager.Application.Application.Common.Exceptions;
+using CattleManager.Application.Application.Common.Interfaces.DashboardHelper;
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkSales;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
 using CattleManager.Application.Application.Common.Interfaces.GuidProvider;
@@ -23,6 +24,7 @@ public class MilkSaleServiceTests
     private readonly IMapper _mapperMock;
     private readonly IGuidProvider _guidProvider;
     private readonly IServiceValidations _serviceValidationsMock;
+    private readonly IDashboardHelper _dashboardHelperMock;
     private static readonly Guid _milkSaleId = Guid.NewGuid();
     private static readonly Guid _userId = Guid.NewGuid();
 
@@ -33,12 +35,14 @@ public class MilkSaleServiceTests
         _mapperMock = A.Fake<IMapper>();
         _guidProvider = A.Fake<IGuidProvider>();
         _serviceValidationsMock = A.Fake<IServiceValidations>();
+        _dashboardHelperMock = A.Fake<IDashboardHelper>();
         _sut = new MilkSaleService(
             _milkSaleRepositoryMock,
             _mapperMock,
             _userRepositoryMock,
             _guidProvider,
-            _serviceValidationsMock);
+            _serviceValidationsMock,
+            _dashboardHelperMock);
     }
 
     [Fact]
@@ -105,6 +109,31 @@ public class MilkSaleServiceTests
         IEnumerable<MilkPriceHistory> milkPriceHistory = await _sut.GetHistoryOfMilkPrices(_userId);
 
         Assert.Equivalent(expectedMilkPriceHistory, milkPriceHistory);
+    }
+
+    [Fact]
+    public async Task Get_Milk_Sales_Total_Revenue_In_Previous_Months_With_Month_Less_Than_1_Throws_BadRequestException()
+    {
+        const int previousMonths = 0;
+
+        async Task result() => await _sut.GetMilkSalesTotalRevenueInPreviousMonths(previousMonths, _userId);
+
+        var exception = await Assert.ThrowsAsync<BadRequestException>(result);
+        Assert.Equal("Valor dos meses anteriores deve ser maior ou igual a 1.", exception.Message);
+    }
+
+    [Fact]
+    public async Task Get_Milk_Sales_Total_Revenue_Returns_Total_Revenue()
+    {
+        const int previousMonths = 2;
+        IEnumerable<IEnumerable<MilkSaleByMonth>> milkSalesData = GenerateMilkSalesData();
+        A.CallTo(() => _milkSaleRepositoryMock.GetTotalRevenueInPreviousMonths(previousMonths, _userId)).Returns(milkSalesData);
+        IEnumerable<DataInMonth<decimal>> expectedMilkSalesTotalRevenueByMonth = GenerateMilkSalesTotalRevenueByMonth();
+        A.CallTo(() => _dashboardHelperMock.FillTotalSumOfValueByMonths(milkSalesData, previousMonths)).Returns(expectedMilkSalesTotalRevenueByMonth);
+
+        var milkSalesTotalRevenueByMonth = await _sut.GetMilkSalesTotalRevenueInPreviousMonths(previousMonths, _userId);
+
+        Assert.Equivalent(expectedMilkSalesTotalRevenueByMonth, milkSalesTotalRevenueByMonth);
     }
 
     [Fact]
@@ -240,6 +269,46 @@ public class MilkSaleServiceTests
                 From = new DateOnly(2021, 06, 08),
                 To = null,
                 Price = 2.46m
+            },
+        };
+    }
+
+    private static IEnumerable<IEnumerable<MilkSaleByMonth>> GenerateMilkSalesData()
+    {
+        return new List<List<MilkSaleByMonth>>()
+        {
+            new List<MilkSaleByMonth>()
+            {
+                new MilkSaleByMonth()
+                {
+                    Date = DateOnly.FromDateTime(new DateTime(2020, 1, 1)),
+                    Value = 0
+                },
+            },
+            new List<MilkSaleByMonth>()
+            {
+                new MilkSaleByMonth()
+                {
+                    Date = DateOnly.FromDateTime(new DateTime(2020, 2, 1)),
+                    Value = 0
+                },
+            }
+        };
+    }
+
+    private static IEnumerable<DataInMonth<decimal>> GenerateMilkSalesTotalRevenueByMonth()
+    {
+        return new List<DataInMonth<decimal>>()
+        {
+            new DataInMonth<decimal>()
+            {
+                Month = "jan.",
+                Value = 0
+            },
+            new DataInMonth<decimal>()
+            {
+                Month = "fev.",
+                Value = 0
             },
         };
     }

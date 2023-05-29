@@ -57,6 +57,15 @@ public class MilkSaleController : ControllerBase
         return Ok(milkPriceHistory);
     }
 
+    [HttpGet("total-revenue")]
+    public async Task<ActionResult<IEnumerable<DataInMonth<decimal>>>> GetTotalRevenueInPreviousMonths(int previousMonths)
+    {
+        Guid userId = _userAuthorizationService.GetUserIdFromJwtToken(User);
+
+        var totalRevenueInPreviousMonths = await _milkSaleService.GetMilkSalesTotalRevenueInPreviousMonths(previousMonths, userId);
+        return Ok(totalRevenueInPreviousMonths);
+    }
+
     [HttpPost]
     public async Task<ActionResult<MilkSaleResponse>> CreateMilkSale(CreateMilkSale createMilkSale)
     {
