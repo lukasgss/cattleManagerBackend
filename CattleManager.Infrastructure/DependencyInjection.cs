@@ -12,6 +12,7 @@ using CattleManager.Application.Application.Common.Interfaces.Entities.Vaccines;
 using CattleManager.Application.Application.Common.Interfaces.GuidProvider;
 using CattleManager.Application.Infrastructure.Persistence;
 using CattleManager.Application.Infrastructure.Providers;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CattleManager.Application.Infrastructure;
 

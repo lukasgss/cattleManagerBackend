@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using CattleManager.Application.Application.Common.Exceptions;
+using Microsoft.AspNetCore.Http;
 
 namespace CattleManager.Application.Application.Middlewares;
 
@@ -24,7 +25,7 @@ public class ErrorHandlerMiddleware
         }
     }
 
-    public async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    public static async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         HttpStatusCode statusCode;
         string message;

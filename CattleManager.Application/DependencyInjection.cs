@@ -18,6 +18,7 @@ using CattleManager.Application.Application.Services.Authorization;
 using CattleManager.Application.Application.Services.CommonValidations;
 using CattleManager.Application.Application.Services.Entities;
 using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CattleManager.Application.Application;
 

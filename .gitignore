@@ -1,7 +1,7 @@
-appsettings.json
-appsettings.Development.json
-/CattleManager.Application/bin
-/CattleManager.Application/obj
+/CattleManager.Api/appsettings.json
+/CattleManager.Api/appsettings.Development.json
+/CattleManager.*/bin
+/CattleManager.*/obj
 /CattleManager.Tests/bin
 /CattleManager.Tests/obj
 .vscode
