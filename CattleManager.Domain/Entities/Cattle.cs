@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using CatetleManager.Application.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace CattleManager.Application.Domain.Entities;
 

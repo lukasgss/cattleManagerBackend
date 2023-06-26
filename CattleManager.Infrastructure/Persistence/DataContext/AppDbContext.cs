@@ -1,3 +1,4 @@
+global using Microsoft.EntityFrameworkCore;
 using CatetleManager.Application.Domain.Entities;
 using CattleManager.Application.Domain.Entities;
 

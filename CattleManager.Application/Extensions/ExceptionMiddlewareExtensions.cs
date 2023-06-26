@@ -1,4 +1,5 @@
 using CattleManager.Application.Application.Middlewares;
+using Microsoft.AspNetCore.Builder;
 
 namespace CattleManager.Application.Application.Extensions;
 
