@@ -63,7 +63,8 @@ public class MessageService : IMessageService
             Date: message.Date,
             HasBeenRead: message.HasBeenRead,
             SenderId: message.SenderId,
-            ReceiverId: message.ReceiverId);
+            ReceiverId: message.ReceiverId
+        );
     }
 
     public async Task MarkMessagesAsRead(Guid userId, Guid senderId)
@@ -102,6 +103,7 @@ public class MessageService : IMessageService
             Date: message.Date,
             HasBeenRead: message.HasBeenRead,
             SenderId: sender.Id,
-            ReceiverId: receiver.Id);
+            ReceiverId: receiver.Id
+        );
     }
 }

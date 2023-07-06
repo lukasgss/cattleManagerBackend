@@ -7,7 +7,9 @@ using CattleManager.Application.Application.Common.Interfaces.Entities.MilkProdu
 using CattleManager.Application.Application.Common.Interfaces.Entities.MilkSales;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Vaccinations;
+using CattleManager.Application.Common.Interfaces.Entities.Farms;
 using CattleManager.Application.Domain.Entities;
+using CattleManager.Domain.Entities;
 
 namespace CattleManager.Application.Infrastructure.Persistence.Mappings;
 
@@ -38,5 +40,8 @@ public class MappingProfile : Profile
         CreateMap<CreateMedicalRecord, MedicalRecord>().ReverseMap();
         CreateMap<EditMedicalRecord, MedicalRecord>().ReverseMap();
         CreateMap<MedicalRecord, MedicalRecordResponse>().ReverseMap();
+
+        CreateMap<CreateFarmRequest, Farm>().ReverseMap();
+        CreateMap<Farm, FarmResponse>().ReverseMap();
     }
 }

@@ -1,6 +1,7 @@
 global using Microsoft.EntityFrameworkCore;
 using CatetleManager.Application.Domain.Entities;
 using CattleManager.Application.Domain.Entities;
+using CattleManager.Domain.Entities;
 
 namespace CattleManager.Application.Infrastructure.Persistence.DataContext;
 
@@ -20,6 +21,9 @@ public class AppDbContext : DbContext
     public DbSet<MilkSale> MilkSales { get; set; } = null!;
     public DbSet<Message> Messages { get; set; } = null!;
     public DbSet<MedicalRecord> MedicalRecords { get; set; } = null!;
+    public DbSet<Farm> Farms { get; set; } = null!;
+    public DbSet<FarmMember> FarmMembers { get; set; } = null!;
+    public DbSet<FarmOwner> FarmOwners { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -61,6 +65,18 @@ public class AppDbContext : DbContext
         {
             entity.HasAlternateKey(x => x.Name)
             .HasName("uniqueVaccineName");
+        });
+
+        modelBuilder.Entity<FarmMember>(entity =>
+        {
+            entity.HasKey(x => new { x.FarmId, x.MemberId });
+            entity.HasOne(x => x.Farm).WithMany(x => x.Members);
+        });
+
+        modelBuilder.Entity<FarmOwner>(entity =>
+        {
+            entity.HasKey(x => new { x.FarmId, x.OwnerId });
+            entity.HasOne(x => x.Farm).WithMany(x => x.Owners);
         });
     }
 }
