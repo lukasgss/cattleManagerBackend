@@ -17,6 +17,8 @@ using CattleManager.Application.Application.Services.Authentication;
 using CattleManager.Application.Application.Services.Authorization;
 using CattleManager.Application.Application.Services.CommonValidations;
 using CattleManager.Application.Application.Services.Entities;
+using CattleManager.Application.Common.Interfaces.Entities.Farms;
+using CattleManager.Application.Services.Entities;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -39,6 +41,7 @@ public static class DependencyInjection
         services.AddScoped<IMedicalRecordService, MedicalRecordService>();
         services.AddScoped<IServiceValidations, ServiceValidations>();
         services.AddScoped<IDashboardHelper, DashboardHelper>();
+        services.AddScoped<IFarmService, FarmService>();
         services.AddValidatorsFromAssemblyContaining<IAssemblyMarker>();
 
         return services;

@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using CattleManager.Domain.Entities;
+
 namespace CattleManager.Application.Domain.Entities;
 
 public class User
@@ -23,4 +25,6 @@ public class User
     public string Password { get; set; } = null!;
 
     public virtual ICollection<Cattle> Cattle { get; set; } = null!;
+    public virtual ICollection<FarmOwner> OwnedFarm { get; set; } = null!;
+    public virtual ICollection<FarmMember> FarmMember { get; set; } = null!;
 }

@@ -10,8 +10,10 @@ using CattleManager.Application.Application.Common.Interfaces.Entities.Users;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Vaccinations;
 using CattleManager.Application.Application.Common.Interfaces.Entities.Vaccines;
 using CattleManager.Application.Application.Common.Interfaces.GuidProvider;
+using CattleManager.Application.Common.Interfaces.Entities.Farms;
 using CattleManager.Application.Infrastructure.Persistence;
 using CattleManager.Application.Infrastructure.Providers;
+using CattleManager.Infrastructure.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CattleManager.Application.Infrastructure;
@@ -30,6 +32,7 @@ public static class DependencyInjection
         services.AddScoped<IMilkSaleRepository, MilkSaleRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<IMedicalRecordRepository, MedicalRecordRepository>();
+        services.AddScoped<IFarmRepository, FarmRepository>();
         services.AddSingleton<IGuidProvider, GuidProvider>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
