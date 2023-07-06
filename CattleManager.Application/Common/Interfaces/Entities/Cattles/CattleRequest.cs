@@ -3,7 +3,7 @@ using CattleManager.Application.Application.Common.Interfaces.Entities.CattleBre
 namespace CattleManager.Application.Application.Common.Interfaces.Entities.Cattles;
 
 public record CattleRequest : ICattleRequest
-{
+
     public Guid? Id { get; init; }
     public string Name { get; init; } = null!;
     public Guid? FatherId { get; init; }

@@ -642,6 +642,7 @@ namespace CattleManager.Application.Migrations
 
                     b.Navigation("Owners");
                 });
+
 #pragma warning restore 612, 618
         }
     }

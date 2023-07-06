@@ -8,6 +8,7 @@ namespace CattleManager.Application.Infrastructure.Persistence;
 public class VaccinationRepository : GenericRepository<Vaccination>, IVaccinationRepository
 {
     private readonly AppDbContext _dbContext;
+    
     public VaccinationRepository(AppDbContext dbContext) : base(dbContext)
     {
         _dbContext = dbContext;
